@@ -28,9 +28,7 @@ public class PartidosController {
   }
 
   @PostMapping("/partido/cancelar/{id}")
-  public ModelAndView cancelarPartido(@PathVariable("id") Long idPartido, HttpServletRequest request) {
-    ModelMap modelo = new ModelMap();
-
+  public ModelAndView cancelarPartido(@PathVariable("id") Long idPartido, Model model, HttpServletRequest request) {
     Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute("usuario");
 
     if (usuarioLogueado == null) {
@@ -39,11 +37,11 @@ public class PartidosController {
 
     try {
       servicioPartido.cancelarPartido(idPartido, usuarioLogueado);
-      modelo.put("exito", "El partido se canceló correctamente.");
+      model.addAttribute("exito", "El partido se canceló correctamente.");
     } catch (Exception e) {
-      modelo.put("error", e.getMessage());
+      model.addAttribute("error", e.getMessage());
     }
 
-    return new ModelAndView("redirect:/partidos", modelo);
+    return new ModelAndView("redirect:/partidos");
   }
 }
