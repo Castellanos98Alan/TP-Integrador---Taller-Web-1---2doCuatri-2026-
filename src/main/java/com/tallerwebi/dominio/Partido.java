@@ -13,10 +13,10 @@ public class Partido {
     private Long id;
     private LocalDateTime fecha;
     private EstadoPartido estado;
-    private String modalidad;
-    private String nivel;
+    //private String modalidad;
+    //private String nivel;
     private Integer cantJugadores;
-    private String descripcion;
+    //private String descripcion;
     private Usuario organizador;
 
 
