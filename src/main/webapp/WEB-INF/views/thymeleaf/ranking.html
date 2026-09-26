@@ -1,15 +1,1033 @@
-<!doctype html>
-<html lang="es">
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ranking - ArmoLaCancha</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background-color: #f4f7f6;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #17332b;
+        }
+
+        /* NAVBAR */
+
+        .navbar-ranking {
+            background-color: #003c2e;
+            padding: 12px 35px;
+        }
+
+        .marca {
+            color: white;
+            font-size: 25px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .marca span {
+            color: #50e3a4;
+        }
+
+        .nav-link {
+            color: white !important;
+            margin: 0 10px;
+        }
+
+        .nav-link.active {
+            color: #ffe600 !important;
+            border-bottom: 3px solid #ffe600;
+        }
+
+        .boton-crear {
+            background-color: #ffe600;
+            color: #18352c;
+            font-weight: bold;
+            border-radius: 8px;
+            padding: 10px 20px;
+            text-decoration: none;
+        }
+
+
+        /* HERO */
+
+        .hero-ranking {
+            min-height: 230px;
+            padding: 45px;
+            color: white;
+
+            background:
+                    linear-gradient(
+                            90deg,
+                            rgba(0, 67, 50, 0.98),
+                            rgba(0, 67, 50, 0.78),
+                            rgba(0, 67, 50, 0.55)
+                    );
+        }
+
+        .hero-ranking small {
+            color: #67e6ad;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .hero-ranking h1 {
+            font-size: 45px;
+            font-weight: 800;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        .hero-ranking h1 span {
+            color: #61e7ae;
+        }
+
+        .hero-ranking p {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .datos-hero {
+            margin-top: 25px;
+            display: flex;
+            gap: 35px;
+            flex-wrap: wrap;
+        }
+
+        .dato-hero {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icono-hero {
+            font-size: 25px;
+        }
+
+
+        /* CONTENIDO */
+
+        .contenido-ranking {
+            margin-top: -20px;
+            background-color: white;
+            border-radius: 25px 25px 0 0;
+            padding: 20px;
+        }
+
+
+        /* TABS */
+
+        .tabs-ranking {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .tab-ranking {
+            border: 1px solid #e3ece8;
+            background: #f6f9f8;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+
+        .tab-ranking.activo {
+            background-color: #006747;
+            color: white;
+        }
+
+        .tab-titulo {
+            font-weight: bold;
+        }
+
+        .tab-subtitulo {
+            font-size: 11px;
+        }
+
+
+        /* FILTROS */
+
+        .filtros {
+            background-color: #f6f9f8;
+            border-radius: 12px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filtro label {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .filtro select {
+            width: 100%;
+            border: 1px solid #d8e2de;
+            border-radius: 6px;
+            padding: 8px;
+            background-color: white;
+        }
+
+
+        /* PODIO */
+
+        .podio {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .podio-card {
+            min-height: 175px;
+            border-radius: 12px;
+            background-color: #f7faf9;
+            border: 1px solid #e3ebe8;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .podio-card.primero {
+            background: linear-gradient(
+                    135deg,
+                    #fff8da,
+                    #fffdf2
+            );
+
+            border: 1px solid #f3d76e;
+        }
+
+        .medalla {
+            font-size: 32px;
+            margin-bottom: 7px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: auto;
+            background-color: #006747;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .nombre-podio {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .puntos-podio {
+            color: #00563e;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+
+        /* TABLA */
+
+        .tabla-ranking {
+            border: 1px solid #e0e9e5;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .tabla-ranking table {
+            margin-bottom: 0;
+        }
+
+        .tabla-ranking thead {
+            background-color: #f2f6f4;
+        }
+
+        .tabla-ranking th {
+            font-size: 13px;
+            padding: 13px;
+            border-bottom: 1px solid #dde6e2;
+        }
+
+        .tabla-ranking td {
+            padding: 13px;
+            vertical-align: middle;
+        }
+
+        .numero-posicion {
+            font-weight: bold;
+            color: #536762;
+        }
+
+        .jugador-tabla {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar-tabla {
+            width: 35px;
+            height: 35px;
+            background-color: #006747;
+            color: white;
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: bold;
+        }
+
+        .puntos-tabla {
+            font-weight: bold;
+            color: #004d38;
+        }
+
+
+        /* PANEL DERECHO */
+
+        .panel-lateral {
+            background-color: white;
+        }
+
+        .tarjeta-posicion {
+            background: linear-gradient(
+                    135deg,
+                    #004a37,
+                    #00694b
+            );
+
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .tarjeta-posicion h5 {
+            font-weight: bold;
+        }
+
+        .posicion-destacada {
+            font-size: 30px;
+            font-weight: bold;
+            color: #ffe600;
+        }
+
+
+        /* RANGOS */
+
+        .rangos {
+            border: 1px solid #e1e9e5;
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .rangos h5 {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .rango {
+            display: grid;
+            grid-template-columns: 45px 100px 1fr;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px solid #edf1ef;
+            font-size: 13px;
+        }
+
+        .letra-rango {
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .rango-d {
+            background-color: #8a9490;
+        }
+
+        .rango-c {
+            background-color: #22a765;
+        }
+
+        .rango-b {
+            background-color: #168bd2;
+        }
+
+        .rango-a {
+            background-color: #f6ce1c;
+            color: #333;
+        }
+
+        .rango-s {
+            background-color: #ff7b23;
+        }
+
+        .rango-ss {
+            background-color: #e83c43;
+        }
+
+
+        /* VACÍO */
+
+        .ranking-vacio {
+            padding: 50px;
+            text-align: center;
+        }
+
+
+        @media(max-width: 900px) {
+
+            .tabs-ranking,
+            .filtros {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .podio {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-ranking h1 {
+                font-size: 35px;
+            }
+
+        }
+
+    </style>
 </head>
+
+
 <body>
 
-<a href="http://localhost:8080/spring/home">HOME</a>
+
+<!-- NAVBAR -->
+
+<nav class="navbar navbar-expand-lg navbar-ranking">
+
+    <div class="container-fluid">
+
+        <a class="marca" th:href="@{/home}">
+            ⚽ Armo<span>LaCancha</span>
+        </a>
+
+        <div class="navbar-nav ms-auto me-auto">
+
+            <a class="nav-link"
+               th:href="@{/home}">
+                Inicio
+            </a>
+
+            <a class="nav-link"
+               th:href="@{/partidos}">
+                Partidos
+            </a>
+
+            <a class="nav-link active"
+               th:href="@{/ranking}">
+                Ranking
+            </a>
+
+            <a class="nav-link"
+               th:href="@{/perfil}">
+                Mi Perfil
+            </a>
+
+        </div>
+
+        <a class="boton-crear"
+           th:href="@{/crearPartido}">
+            ＋ Crear partido
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<!-- HERO -->
+
+<section class="hero-ranking">
+
+    <small>
+        MÁS FÚTBOL. MÁS AMIGOS. MENOS LÍO.
+    </small>
+
+    <h1>
+        RANKING <span>DE JUGADORES</span>
+    </h1>
+
+    <p>
+        Los jugadores se ordenan según los puntos obtenidos.
+    </p>
+
+    <p>
+        Jugá partidos, sumá puntos y subí posiciones.
+    </p>
+
+
+    <div class="datos-hero">
+
+        <div class="dato-hero">
+            <span class="icono-hero">👥</span>
+
+            <div>
+                <strong>Comunidad</strong>
+                <br>
+                <small>Jugadores de ArmoLaCancha</small>
+            </div>
+        </div>
+
+        <div class="dato-hero">
+            <span class="icono-hero">🏆</span>
+
+            <div>
+                <strong>Ranking general</strong>
+                <br>
+                <small>Ordenado por puntos</small>
+            </div>
+        </div>
+
+        <div class="dato-hero">
+            <span class="icono-hero">⚽</span>
+
+            <div>
+                <strong>Fútbol amateur</strong>
+                <br>
+                <small>Competí y mejorá</small>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<div class="container-fluid contenido-ranking">
+
+    <div class="row">
+
+        <!-- CONTENIDO PRINCIPAL -->
+
+        <div class="col-lg-8">
+
+
+            <!-- TABS -->
+
+            <div class="tabs-ranking">
+
+                <div class="tab-ranking activo">
+                    <div class="tab-titulo">
+                        🏆 General
+                    </div>
+
+                    <div class="tab-subtitulo">
+                        Todos los jugadores
+                    </div>
+                </div>
+
+
+                <div class="tab-ranking">
+                    <div class="tab-titulo">
+                        📅 Este mes
+                    </div>
+
+                    <div class="tab-subtitulo">
+                        Próximamente
+                    </div>
+                </div>
+
+
+                <div class="tab-ranking">
+                    <div class="tab-titulo">
+                        📍 Mi zona
+                    </div>
+
+                    <div class="tab-subtitulo">
+                        Próximamente
+                    </div>
+                </div>
+
+
+                <div class="tab-ranking">
+                    <div class="tab-titulo">
+                        👥 Amigos
+                    </div>
+
+                    <div class="tab-subtitulo">
+                        Próximamente
+                    </div>
+                </div>
+
+            </div>
+
+
+
+            <!-- FILTROS VISUALES -->
+
+            <div class="filtros">
+
+                <div class="filtro">
+
+                    <label>Nivel</label>
+
+                    <select disabled>
+                        <option>Todos los niveles</option>
+                    </select>
+
+                </div>
+
+
+                <div class="filtro">
+
+                    <label>Posición</label>
+
+                    <select disabled>
+                        <option>Todas las posiciones</option>
+                    </select>
+
+                </div>
+
+
+                <div class="filtro">
+
+                    <label>Rango</label>
+
+                    <select disabled>
+                        <option>Todos los rangos</option>
+                    </select>
+
+                </div>
+
+
+                <div class="filtro">
+
+                    <label>Vista</label>
+
+                    <select disabled>
+                        <option>General</option>
+                    </select>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- SI HAY JUGADORES -->
+
+            <div th:if="${ranking != null and !ranking.isEmpty()}">
+
+
+                <!-- PODIO -->
+
+                <div class="podio">
+
+
+                    <!-- SEGUNDO -->
+
+                    <div class="podio-card"
+                         th:if="${ranking.size() > 1}">
+
+                        <div class="medalla">
+                            🥈
+                        </div>
+
+                        <div class="avatar">
+                            ⚽
+                        </div>
+
+                        <div class="nombre-podio"
+                             th:text="${ranking[1].nombre}">
+                            Jugador
+                        </div>
+
+                        <div class="puntos-podio">
+
+                            <span th:text="${ranking[1].puntos}">
+                                0
+                            </span>
+
+                            pts
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PRIMERO -->
+
+                    <div class="podio-card primero"
+                         th:if="${ranking.size() > 0}">
+
+                        <div class="medalla">
+                            👑
+                        </div>
+
+                        <div class="avatar">
+                            ⚽
+                        </div>
+
+                        <div class="nombre-podio"
+                             th:text="${ranking[0].nombre}">
+                            Jugador
+                        </div>
+
+                        <div class="puntos-podio">
+
+                            <span th:text="${ranking[0].puntos}">
+                                0
+                            </span>
+
+                            pts
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- TERCERO -->
+
+                    <div class="podio-card"
+                         th:if="${ranking.size() > 2}">
+
+                        <div class="medalla">
+                            🥉
+                        </div>
+
+                        <div class="avatar">
+                            ⚽
+                        </div>
+
+                        <div class="nombre-podio"
+                             th:text="${ranking[2].nombre}">
+                            Jugador
+                        </div>
+
+                        <div class="puntos-podio">
+
+                            <span th:text="${ranking[2].puntos}">
+                                0
+                            </span>
+
+                            pts
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- TABLA -->
+
+                <div class="tabla-ranking">
+
+                    <table class="table table-hover">
+
+                        <thead>
+
+                        <tr>
+
+                            <th>#</th>
+
+                            <th>Jugador</th>
+
+                            <th>Puntos ↓</th>
+
+                            <th>Rango</th>
+
+                        </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                        <tr th:each="jugador, estado : ${ranking}">
+
+                            <td class="numero-posicion"
+                                th:text="${estado.index + 1}">
+                                1
+                            </td>
+
+
+                            <td>
+
+                                <div class="jugador-tabla">
+
+                                    <div class="avatar-tabla">
+                                        ⚽
+                                    </div>
+
+                                    <strong th:text="${jugador.nombre}">
+                                        Jugador
+                                    </strong>
+
+                                </div>
+
+                            </td>
+
+
+                            <td class="puntos-tabla"
+                                th:text="${jugador.puntos}">
+                                0
+                            </td>
+
+
+                            <td>
+
+                                <span class="letra-rango rango-ss"
+                                      th:if="${jugador.puntos >= 110}">
+                                    SS
+                                </span>
+
+                                <span class="letra-rango rango-s"
+                                      th:if="${jugador.puntos >= 80 and jugador.puntos < 110}">
+                                    S
+                                </span>
+
+                                <span class="letra-rango rango-a"
+                                      th:if="${jugador.puntos >= 50 and jugador.puntos < 80}">
+                                    A
+                                </span>
+
+                                <span class="letra-rango rango-b"
+                                      th:if="${jugador.puntos >= 30 and jugador.puntos < 50}">
+                                    B
+                                </span>
+
+                                <span class="letra-rango rango-c"
+                                      th:if="${jugador.puntos >= 10 and jugador.puntos < 30}">
+                                    C
+                                </span>
+
+                                <span class="letra-rango rango-d"
+                                      th:if="${jugador.puntos < 10}">
+                                    D
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- SIN JUGADORES -->
+
+            <div class="ranking-vacio"
+                 th:if="${ranking == null or ranking.isEmpty()}">
+
+                <h3>⚽ Todavía no hay jugadores en el ranking</h3>
+
+                <p>
+                    Cuando haya jugadores registrados aparecerán acá.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- PANEL DERECHO -->
+
+        <div class="col-lg-4 panel-lateral">
+
+
+            <div class="tarjeta-posicion">
+
+                <h5>
+                    🏆 Ranking general
+                </h5>
+
+                <p>
+                    El jugador con mayor cantidad de puntos ocupa
+                    el primer puesto.
+                </p>
+
+                <div th:if="${ranking != null and !ranking.isEmpty()}">
+
+                    <span class="posicion-destacada">
+                        #1
+                    </span>
+
+                    <strong th:text="${ranking[0].nombre}">
+                        Jugador
+                    </strong>
+
+                    <br>
+
+                    <span th:text="${ranking[0].puntos}">
+                        0
+                    </span>
+
+                    puntos
+
+                </div>
+
+            </div>
+
+
+
+            <!-- RANGOS -->
+
+            <div class="rangos">
+
+                <h5>
+                    🏆 Rangos de puntos
+                </h5>
+
+
+                <div class="rango">
+
+                    <span class="letra-rango rango-d">
+                        D
+                    </span>
+
+                    <span>
+                        0 - 9
+                    </span>
+
+                    <span>
+                        Jugador inicial
+                    </span>
+
+                </div>
+
+
+                <div class="rango">
+
+                    <span class="letra-rango rango-c">
+                        C
+                    </span>
+
+                    <span>
+                        10 - 29
+                    </span>
+
+                    <span>
+                        En crecimiento
+                    </span>
+
+                </div>
+
+
+                <div class="rango">
+
+                    <span class="letra-rango rango-b">
+                        B
+                    </span>
+
+                    <span>
+                        30 - 49
+                    </span>
+
+                    <span>
+                        Jugador regular
+                    </span>
+
+                </div>
+
+
+                <div class="rango">
+
+                    <span class="letra-rango rango-a">
+                        A
+                    </span>
+
+                    <span>
+                        50 - 79
+                    </span>
+
+                    <span>
+                        Jugador destacado
+                    </span>
+
+                </div>
+
+
+                <div class="rango">
+
+                    <span class="letra-rango rango-s">
+                        S
+                    </span>
+
+                    <span>
+                        80 - 109
+                    </span>
+
+                    <span>
+                        Gran jugador
+                    </span>
+
+                </div>
+
+
+                <div class="rango">
+
+                    <span class="letra-rango rango-ss">
+                        SS
+                    </span>
+
+                    <span>
+                        110+
+                    </span>
+
+                    <span>
+                        Élite
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js">
+</script>
 
 </body>
+
 </html>

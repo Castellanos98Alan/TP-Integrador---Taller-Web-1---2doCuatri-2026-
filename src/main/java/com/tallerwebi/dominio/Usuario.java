@@ -1,9 +1,6 @@
 package com.tallerwebi.dominio;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Usuario {
@@ -16,6 +13,11 @@ public class Usuario {
   private String password;
   private String rol;
   private Boolean activo = false;
+
+  private String nombre;
+
+  @Column(nullable = false)
+  private Integer puntos = 0;
 
   public Long getId() {
     return id;
@@ -55,6 +57,22 @@ public class Usuario {
 
   public void setActivo(Boolean activo) {
     this.activo = activo;
+  }
+
+  public String getNombre() {
+    return nombre;
+  }
+
+  public Integer getPuntos() {
+    return puntos;
+  }
+
+  public void setNombre(String nombre) {
+    this.nombre = nombre;
+  }
+
+  public void setPuntos(Integer puntos) {
+    this.puntos = puntos;
   }
 
   public void activar() {
