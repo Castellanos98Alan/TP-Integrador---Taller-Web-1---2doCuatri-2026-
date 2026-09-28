@@ -1,19 +1,152 @@
-<!doctype html>
-<html lang="es">
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi perfil | ArmoLaCancha</title>
+    <link rel="stylesheet" th:href="@{/css/perfil.css}">
 </head>
 <body>
-<a href="http://localhost:8080/spring/home">HOME</a>
 
-<h1 th:text="${nombre}"></h1>
-<p th:text="${posicion}"></p>
-<p th:text="${zona}"></p>
-<p th:text="${biografia}"></p>
+<nav class="navbar">
+    <a class="navbar-logo" th:href="@{/home}">
+        <span class="logo-icon">⚽</span>
+        <span>Armo<span class="logo-highlight">LaCancha</span></span>
+    </a>
+
+    <div class="navbar-links">
+        <a th:href="@{/home}">Inicio</a>
+        <a th:href="@{/perfil}" class="nav-active">Mi perfil</a>
+    </div>
+</nav>
+
+<main class="perfil-container">
+
+    <div class="perfil-portada">
+        <div class="portada-textura"></div>
+        <div class="portada-etiqueta">
+            <span class="estado-punto"></span>
+            PERFIL DE JUGADOR
+        </div>
+    </div>
+
+    <section class="perfil-principal">
+
+        <div class="perfil-identidad">
+            <div class="foto-perfil">
+                ⚽
+            </div>
+
+            <div class="perfil-titulo">
+                <span class="etiqueta">MI PERFIL</span>
+                <h1 th:text="${nombre != null and !nombre.isEmpty() ? nombre : 'Jugador'}">
+                    Jugador
+                </h1>
+
+                <div class="perfil-resumen">
+                        <span th:if="${posicion != null and !posicion.isEmpty()}"
+                              class="dato-etiqueta"
+                              th:text="${posicion}">
+                            Posición
+                        </span>
+
+                    <span th:if="${zona != null and !zona.isEmpty()}"
+                          class="dato-etiqueta"
+                          th:text="${zona}">
+                            Zona
+                        </span>
+                </div>
+            </div>
+        </div>
+
+        <a th:href="@{/editar-perfil}" class="btn-editar">
+            <span>✎</span> Editar perfil
+        </a>
+
+    </section>
+
+    <div class="perfil-contenido">
+
+        <section class="perfil-card">
+            <div class="card-titulo">
+                <div class="card-icono">☰</div>
+                <div>
+                    <h2>Sobre mí</h2>
+                    <p>Conocé un poco más sobre este jugador.</p>
+                </div>
+            </div>
+
+            <p class="biografia"
+               th:if="${biografia != null and !biografia.isEmpty()}"
+               th:text="${biografia}">
+            </p>
+
+            <div class="vacio"
+                 th:if="${biografia == null or biografia.isEmpty()}">
+                <p> Todavía no agregaste una biografía.</p>
+                <a th:href="@{/editar-perfil}">Completá tu perfil →</a>
+            </div>
+        </section>
+
+        <section class="perfil-card">
+            <div class="card-titulo">
+                <div class="card-icono">⚙</div>
+                <div>
+                    <h2>Información de la cuenta</h2>
+                    <p>Datos asociados a tu usuario.</p>
+                </div>
+            </div>
+
+            <div class="datos-cuenta">
+
+                <div class="dato-cuenta">
+                    <span class="dato-label">Correo electrónico</span>
+                    <p th:text="${email}">correo@ejemplo.com</p>
+                </div>
+
+                <div class="dato-cuenta">
+                    <span class="dato-label">Tipo de usuario</span>
+                    <p th:text="${rol}">Jugador</p>
+                </div>
+
+                <div class="dato-cuenta">
+                    <span class="dato-label">Estado de la cuenta</span>
+                    <p>
+                            <span class="estado-cuenta"
+                                  th:classappend="${activo == true ? ' estado-activo' : ' estado-inactivo'}"
+                                  th:text="${activo == true ? 'Activo' : 'Inactivo'}">
+                                Activo
+                            </span>
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="perfil-card actividad-card">
+            <div class="card-titulo">
+                <div class="card-icono">⚽</div>
+                <div>
+                    <h2>Mi actividad</h2>
+                    <p>Tu participación en ArmoLaCancha.</p>
+                </div>
+            </div>
+
+            <div class="actividad-vacia">
+                <div class="actividad-icono">⚽</div>
+                <h3>¡Tu próximo partido te espera!</h3>
+                <p>Próximamente vas a poder visualizar tu actividad deportiva desde acá.</p>
+            </div>
+        </section>
+
+    </div>
+
+</main>
+
+<footer class="footer">
+    <p>ArmoLaCancha <span>•</span> Conectando jugadores, creando equipos.</p>
+</footer>
 
 </body>
 </html>
