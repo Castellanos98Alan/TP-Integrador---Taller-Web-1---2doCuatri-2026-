@@ -23,7 +23,7 @@ public class CrearPartidoController {
   @GetMapping("/crearPartido")
   public ModelAndView irACrearPartido() {
     ModelAndView model = new ModelAndView("crearPartido");
-    model.addObject("datosPartido", new DatosCrearPartido());
+    model.getModelMap().put("datosPartido", new DatosCrearPartido());
     return model;
   }
 
@@ -39,7 +39,7 @@ public class CrearPartidoController {
 
     if (datosPartido.getCancha() == null || datosPartido.getCancha().isEmpty()) {
       ModelAndView model = new ModelAndView("crearPartido");
-      model.addObject("error", "Debe ingresar una cancha");
+      model.getModelMap().put("error", "Debe ingresar una cancha");
       return model;
     }
 
