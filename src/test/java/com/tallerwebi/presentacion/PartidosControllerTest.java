@@ -53,6 +53,69 @@ public class PartidosControllerTest {
   private static final String ATRIBUTO_LISTA = "listaPartidos";
 
   @Test
+  public void deberiaRetornarLaVistaPartidosYElModeloConLaListaDePartidos() {
+    // Preparación
+    List<Partido> listaMock = new ArrayList<>();
+    when(
+      servicioPartidoMock.listarPartidosSegunFiltro(
+        "TODOS",
+        "TODOS",
+        null,
+        "TODOS",
+        "TODOS",
+        "TODOS"
+      )
+    )
+      .thenReturn(listaMock);
+
+    // Ejecución
+    ModelAndView mav = partidosController.consultarPartidos(
+      "TODOS",
+      "TODOS",
+      null,
+      "TODOS",
+      "TODOS",
+      "TODOS"
+    );
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("partidos"));
+    thenLaVistaEs("partidos", mav);
+    thenModeloKeyEs(listaMock, mav);
+  }
+
+  /* 
+  @Test
+  public void deberiaRetornarLaVistaPartidosYElModeloConLaListaDePartidos() {
+    // Preparación
+    List<Partido> listaMock = new ArrayList<>();
+    when(
+      servicioPartidoMock.listarPartidosSegunFiltro(
+        "TODOS",
+        "TODOS",
+        null,
+        "TODOS",
+        "TODOS",
+        "TODOS"
+      )
+    )
+      .thenReturn(listaMock);
+
+    // Ejecución
+    ModelAndView mav = partidosController.consultarPartidos(
+      "TODOS",
+      "TODOS",
+      null,
+      "TODOS",
+      "TODOS",
+      "TODOS"
+    );
+    //validación
+    assertThat(mav.getViewName(), equalTo("partidos"));
+    assertThat(mav.getModel().get("listaPartidos"), equalTo(listaMock));
+  }
+*/
+  @Test
   public void deberiaMostrarPartidosPublicosCuandoElFiltroEsPublico() {
     // Preparación
     ArrayList<Partido> partidosPublicos = new ArrayList<>();
@@ -201,7 +264,6 @@ public class PartidosControllerTest {
     p.setcupoMaximo(10);
     partidos10Jugadores.add(p);
     String cupoMaximoString = "10";
-    // Asumimos que el servicio ahora recibe (nivel, tipo, cupos, fecha, distancia)
     when(
       servicioPartidoMock.listarPartidosSegunFiltro(
         FILTRO_TODOS,
@@ -447,6 +509,10 @@ public class PartidosControllerTest {
 
   private void thenLaVistaEs(String vistaEsperada, ModelAndView mav) {
     assertThat(vistaEsperada, equalTo(mav.getViewName()));
+  }
+
+  private void thenModeloKeyEs(List<Partido> listaMock, ModelAndView mav) {
+    assertThat(mav.getModel().get("listaPartidos"), equalTo(listaMock));
   }
 
   private void thenElNivelEs(String nivelEsperado, ModelAndView mav) {
