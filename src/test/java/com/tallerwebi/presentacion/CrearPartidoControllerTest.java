@@ -61,9 +61,6 @@ public class CrearPartidoControllerTest {
     thenLaVistaEs(mav, "redirect:/partidos");
   }
 
-
-
-
   // Métodos auxiliares: Preparación
 
   private void givenExisteUnUsuarioEnSesion() {
@@ -86,7 +83,6 @@ public class CrearPartidoControllerTest {
   private ModelAndView whenSeIntentaCrearPartido(DatosCrearPartido datos) {
     return controlador.crearPartido(datos, session);
   }
-
 
   // Métodos auxiliares: Validación
 

@@ -1,4 +1,3 @@
-
 package com.tallerwebi.presentacion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -98,11 +97,11 @@ public class PerfilControllerTest {
     when(session.getAttribute(USUARIO)).thenReturn(usuario);
 
     ModelAndView modelAndView = controlador.guardarPerfil(
-            "Santiago",
-            "delantero",
-            "Lafe",
-            "Naci para este deporte...",
-            request
+      "Santiago",
+      "delantero",
+      "Lafe",
+      "Naci para este deporte...",
+      request
     );
 
     verify(session).setAttribute(NOMBRE, "Santiago");
@@ -123,11 +122,11 @@ public class PerfilControllerTest {
     when(request.getSession()).thenReturn(session);
 
     ModelAndView modelAndView = controlador.guardarPerfil(
-            "Santiago",
-            "delantero",
-            "Lafe",
-            "Naci para este deporte...",
-            request
+      "Santiago",
+      "delantero",
+      "Lafe",
+      "Naci para este deporte...",
+      request
     );
 
     assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_LOGIN));
