@@ -27,44 +27,44 @@ public class CrearPartidoControllerTest {
 
   @Test
   public void queAlPedirCrearPartidoDevuelvaLaVistaCrearPartido() {
-    // When
+    // Ejecución
     ModelAndView mav = whenSePideIrACrearPartido();
 
-    // Then
+    // Validación
     thenLaVistaEs(mav, "crearPartido");
   }
 
   @Test
   public void queAlCrearPartidoSinCanchaVuelvaALaVistaConError() {
-    // Given
+    // Preparación
     givenExisteUnUsuarioEnSesion();
     DatosCrearPartido datosSinCancha = givenDatosCrearPartidoConCancha("");
 
-    // When
+    // Ejecución
     ModelAndView mav = whenSeIntentaCrearPartido(datosSinCancha);
 
-    // Then
+    // Validación
     thenLaVistaEsIgnorandoMayusculas(mav, "crearPartido");
     thenElMensajeDeErrorEs(mav, "Debe ingresar una cancha");
   }
 
   @Test
   public void queAlCrearPartidoExitosamenteRedirijaAPartidos() {
-    // Given
+    // Preparación
     givenExisteUnUsuarioEnSesion();
     DatosCrearPartido datosValidos = givenDatosCrearPartidoConCancha("Cancha 5");
 
-    // When
+    // Ejecución
     ModelAndView mav = whenSeIntentaCrearPartido(datosValidos);
 
-    // Then
+    // Validación
     thenLaVistaEs(mav, "redirect:/partidos");
   }
 
 
-  
 
-  // Métodos auxiliares: Given
+
+  // Métodos auxiliares: Preparación
 
   private void givenExisteUnUsuarioEnSesion() {
     Usuario usuario = new Usuario();
@@ -77,7 +77,7 @@ public class CrearPartidoControllerTest {
     return datos;
   }
 
-  // Métodos auxiliares: When
+  // Métodos auxiliares: Ejecución
 
   private ModelAndView whenSePideIrACrearPartido() {
     return controlador.irACrearPartido();
@@ -88,7 +88,7 @@ public class CrearPartidoControllerTest {
   }
 
 
-  // Métodos auxiliares: Then
+  // Métodos auxiliares: Validación
 
   private void thenLaVistaEs(ModelAndView mav, String vistaEsperada) {
     assertThat(mav.getViewName(), equalTo(vistaEsperada));
