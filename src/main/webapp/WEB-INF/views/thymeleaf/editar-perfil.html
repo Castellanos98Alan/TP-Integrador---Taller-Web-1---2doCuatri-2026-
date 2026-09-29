@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar perfil | ArmoLaCancha</title>
+    <link rel="stylesheet" th:href="@{/css/perfil.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-logo" th:href="@{/home}">
+        <span class="logo-icon">⚽</span>
+        <span>Armo<span class="logo-highlight">LaCancha</span></span>
+    </a>
+
+    <div class="navbar-links">
+        <a th:href="@{/home}">Inicio</a>
+        <a th:href="@{/perfil}" class="nav-active">Mi perfil</a>
+    </div>
+</nav>
+
+<main class="editar-container">
+
+    <div class="pagina-intro">
+        <span class="etiqueta">MI CUENTA</span>
+        <h1>Editar perfil</h1>
+        <p>Personalizá tu perfil y contales a los demás un poco sobre vos.</p>
+    </div>
+
+    <form class="editar-card"
+          th:action="@{/guardar-perfil}"
+          method="post">
+
+        <div class="seccion-titulo">
+            <div class="seccion-icono">👤</div>
+            <div>
+                <h2>Información personal</h2>
+                <p>Actualizá los datos de tu perfil deportivo.</p>
+            </div>
+        </div>
+
+        <div class="foto-section">
+            <div class="foto-preview">
+                ⚽
+            </div>
+
+            <div class="foto-controles">
+                <label for="fotoArchivo">Foto de perfil</label>
+                <p>Elegí una imagen para personalizar tu perfil.</p>
+                <label for="fotoArchivo" class="btn-foto">
+                    <span>＋</span> Seleccionar imagen
+                </label>
+                <input
+                        type="file"
+                        id="fotoArchivo"
+                        accept="image/*"
+                        class="input-archivo">
+                <small>JPG o PNG. Funcionalidad próximamente.</small>
+            </div>
+        </div>
+
+        <div class="form-grid">
+
+            <div class="campo campo-completo">
+                <label for="nombre">Nombre completo <span>*</span></label>
+                <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        placeholder="Ej: Santiago Navarro"
+                        required>
+            </div>
+
+            <div class="campo">
+                <label for="posicion">Posición</label>
+                <select id="posicion" name="posicion">
+                    <option value="" selected disabled>Seleccioná tu posición</option>
+                    <option value="Arquero">Arquero</option>
+                    <option value="Defensor">Defensor</option>
+                    <option value="Mediocampista">Mediocampista</option>
+                    <option value="Delantero">Delantero</option>
+                    <option value="Polifuncional">Polifuncional</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label for="zona">Zona</label>
+                <input
+                        type="text"
+                        id="zona"
+                        name="zona"
+                        placeholder="Ej: Laferrere">
+            </div>
+
+            <div class="campo campo-completo">
+                <label for="biografia">Sobre mí</label>
+                <textarea
+                        id="biografia"
+                        name="biografia"
+                        rows="5"
+                        placeholder="Contanos sobre vos, tu experiencia o qué tipo de equipo buscás..."></textarea>
+                <small class="ayuda">Compartí algo que te gustaría que sepan los demás jugadores.</small>
+            </div>
+
+        </div>
+
+        <div class="form-footer">
+            <p><span>*</span> Campos obligatorios</p>
+
+            <div class="acciones">
+                <a th:href="@{/perfil}" class="btn-cancelar">
+                    Cancelar
+                </a>
+
+                <button type="submit" class="btn-guardar">
+                    Guardar cambios <span>→</span>
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+</body>
+</html>
