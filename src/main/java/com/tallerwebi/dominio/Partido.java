@@ -31,7 +31,7 @@ public class Partido {
   private String nivel;
   private Boolean esPrivado = false;
   private LocalDateTime fecha;
-
+  
   // @ManyToOne
   private Cancha cancha;
   private Integer cupoMaximo;
