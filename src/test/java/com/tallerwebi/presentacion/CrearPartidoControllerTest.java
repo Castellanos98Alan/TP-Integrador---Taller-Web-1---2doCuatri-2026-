@@ -27,34 +27,78 @@ public class CrearPartidoControllerTest {
 
   @Test
   public void queAlPedirCrearPartidoDevuelvaLaVistaCrearPartido() {
-    ModelAndView mav = controlador.irACrearPartido();
-    assertThat(mav.getViewName(), equalTo("crearPartido"));
+    // When
+    ModelAndView mav = whenSePideIrACrearPartido();
+
+    // Then
+    thenLaVistaEs(mav, "crearPartido");
   }
 
   @Test
   public void queAlCrearPartidoSinCanchaVuelvaALaVistaConError() {
-    Usuario usuario = new Usuario();
-    session.setAttribute("USUARIO", usuario);
+    // Given
+    givenExisteUnUsuarioEnSesion();
+    DatosCrearPartido datosSinCancha = givenDatosCrearPartidoConCancha("");
 
-    DatosCrearPartido datos = new DatosCrearPartido();
-    datos.setCancha("");
+    // When
+    ModelAndView mav = whenSeIntentaCrearPartido(datosSinCancha);
 
-    ModelAndView mav = controlador.crearPartido(datos, session);
-
-    assertThat(mav.getViewName(), equalToIgnoringCase("crearPartido"));
-    assertThat(mav.getModel().get("error").toString(), equalTo("Debe ingresar una cancha"));
+    // Then
+    thenLaVistaEsIgnorandoMayusculas(mav, "crearPartido");
+    thenElMensajeDeErrorEs(mav, "Debe ingresar una cancha");
   }
 
   @Test
   public void queAlCrearPartidoExitosamenteRedirijaAPartidos() {
+    // Given
+    givenExisteUnUsuarioEnSesion();
+    DatosCrearPartido datosValidos = givenDatosCrearPartidoConCancha("Cancha 5");
+
+    // When
+    ModelAndView mav = whenSeIntentaCrearPartido(datosValidos);
+
+    // Then
+    thenLaVistaEs(mav, "redirect:/partidos");
+  }
+
+
+  
+
+  // Métodos auxiliares: Given
+
+  private void givenExisteUnUsuarioEnSesion() {
     Usuario usuario = new Usuario();
     session.setAttribute("USUARIO", usuario);
+  }
 
+  private DatosCrearPartido givenDatosCrearPartidoConCancha(String nombreCancha) {
     DatosCrearPartido datos = new DatosCrearPartido();
-    datos.setCancha("Cancha 5");
+    datos.setCancha(nombreCancha);
+    return datos;
+  }
 
-    ModelAndView mav = controlador.crearPartido(datos, session);
+  // Métodos auxiliares: When
 
-    assertThat(mav.getViewName(), equalTo("redirect:/partidos"));
+  private ModelAndView whenSePideIrACrearPartido() {
+    return controlador.irACrearPartido();
+  }
+
+  private ModelAndView whenSeIntentaCrearPartido(DatosCrearPartido datos) {
+    return controlador.crearPartido(datos, session);
+  }
+
+
+  // Métodos auxiliares: Then
+
+  private void thenLaVistaEs(ModelAndView mav, String vistaEsperada) {
+    assertThat(mav.getViewName(), equalTo(vistaEsperada));
+  }
+
+  private void thenLaVistaEsIgnorandoMayusculas(ModelAndView mav, String vistaEsperada) {
+    assertThat(mav.getViewName(), equalToIgnoringCase(vistaEsperada));
+  }
+
+  private void thenElMensajeDeErrorEs(ModelAndView mav, String mensajeEsperado) {
+    assertThat(mav.getModel().get("error").toString(), equalTo(mensajeEsperado));
   }
 }
