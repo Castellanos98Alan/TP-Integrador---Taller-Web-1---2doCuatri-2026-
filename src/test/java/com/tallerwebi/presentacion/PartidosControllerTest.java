@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 //import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,10 +18,38 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
 
+
+import com.tallerwebi.dominio.ServicioPartido;
+import com.tallerwebi.dominio.Usuario;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.ui.Model; // <-- Importante importar est
+import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.mockito.Mockito.*;
+
 public class PartidosControllerTest {
 
-  ServicioPartidos servicioPartidos = mock(ServicioPartidos.class);
-  PartidosController partidosController = new PartidosController(servicioPartidos);
+  // ServicioPartidos servicioPartidos = mock(ServicioPartidos.class);
+  //PartidosController partidosController = new PartidosController(servicioPartidos);
+  
+  private PartidosController partidosController;
+  private ServicioPartido servicioPartidoMock;
+  private HttpServletRequest requestMock;
+  private HttpSession sessionMock;
+  private Model modelMock;
+  
+  @BeforeEach
+  public void init() {
+        servicioPartidoMock = mock(ServicioPartido.class);
+        partidosController = new PartidosController(servicioPartidoMock);
+
+        requestMock = mock(HttpServletRequest.class);
+        sessionMock = mock(HttpSession.class);
+        modelMock = mock(Model.class); // <-- Lo inicializamos
+  }
+  
+  
   public static final String FILTRO_TODOS = "TODOS";
   private static final String FILTRO_PUBLICO = "PUBLICO";
   private static final String NIVEL_PRINCIPIANTE = "PRINCIPIANTE";
@@ -344,6 +373,36 @@ public class PartidosControllerTest {
     // Validación
     thenLaHoraCoincideCon(horaBuscada, mav);
   }
+  
+   @Test
+    public void queAlCancelarUnPartidoExitosamenteRedirijaALaVistaDePartidos() {
+        Long idPartido = 5L;
+        Usuario usuarioLogueado = new Usuario();
+        usuarioLogueado.setId(1L);
+
+        when(requestMock.getSession()).thenReturn(sessionMock);
+        when(sessionMock.getAttribute("usuario")).thenReturn(usuarioLogueado);
+
+        // Pasamos modelMock como segundo argumento
+        ModelAndView modelAndView = partidosController.cancelarPartido(idPartido, modelMock, requestMock);
+
+        verify(servicioPartidoMock, times(1)).cancelarPartido(idPartido, usuarioLogueado);
+        assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/partidos"));
+    }
+
+    @Test
+    public void queSiNoHayUsuarioLogueadoAlIntentarCancelarRedirijaAlLogin() {
+        Long idPartido = 5L;
+
+        when(requestMock.getSession()).thenReturn(sessionMock);
+        when(sessionMock.getAttribute("usuario")).thenReturn(null); // Sin sesión activa
+
+        // Pasamos modelMock como segundo argumento
+        ModelAndView modelAndView = partidosController.cancelarPartido(idPartido, modelMock, requestMock);
+
+        verify(servicioPartidoMock, never()).cancelarPartido(anyLong(), any());
+        assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
+    }
 
   private void thenLaHoraCoincideCon(String horaBuscada, ModelAndView mav) {
     List<Partido> lista = (List<Partido>) mav.getModel().get(ATRIBUTO_LISTA);

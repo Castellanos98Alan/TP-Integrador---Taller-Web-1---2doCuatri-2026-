@@ -16,6 +16,11 @@ import java.util.List;
  */
 //@Entity
 public class Partido {
+  public enum EstadoPartido {
+        ACTIVO,
+        FINALIZADO,
+        CANCELADO
+    }
 
   // @Id
   //  @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +38,34 @@ public class Partido {
   // hay que crear una entidad entre usuario y partido. ej Convocatoria.java
   // por ahora lo voy a dejar en ManyToMany
   // @ManyToMany
-  private List<Usuario> confirmados = new ArrayList<>();
+  
+  private EstadoPartido estado;
+    //private String modalidad;
+    //private String nivel;
+    private Integer cantJugadores;
+    //private String descripcion;
+    private Usuario organizador;
 
+  
+  private List<Usuario> confirmados = new ArrayList<>();
+  
+   public Partido() {
+        this.estado = EstadoPartido.ACTIVO;
+    }
+
+    public void iniciarPartido() {
+        this.estado = EstadoPartido.ACTIVO;
+    }
+
+    public void finalizarPartido() {
+        this.estado = EstadoPartido.FINALIZADO;
+    }
+
+    public void cancelarPartido() {
+        this.estado = EstadoPartido.CANCELADO;
+    }
+  
+  
   public Long getId() {
     return id;
   }
@@ -106,4 +137,30 @@ public class Partido {
   public void setDistanciaKm(Integer distanciaNueva) {
     this.distancia = distanciaNueva;
   }
+  
+      public EstadoPartido getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoPartido estado) {
+        this.estado = estado;
+    }
+
+    public Usuario getOrganizador() {
+        return organizador;
+    }
+
+    public void setOrganizador(Usuario organizador) {
+        this.organizador = organizador;
+    }
+
+    public Integer getCantJugadores() {
+        return cantJugadores;
+    }
+
+    public void setCantJugadores(Integer cantJugadores) {
+        this.cantJugadores = cantJugadores;
+    }
+  
 }
+
