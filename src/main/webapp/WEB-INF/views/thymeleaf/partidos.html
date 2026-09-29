@@ -1,245 +1,139 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encontrar Partidos - ArmoLaCancha</title>
-
-    <!-- Bootstrap y FontAwesome -->
+    <meta charset="utf-8">
+    <title>Buscar Partidos - ArmoLaCancha</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <style>
-        * { box-sizing: border-box; }
-        
-        body {
-            margin: 0;
-            background-color: #f4f7f6;
-            font-family: Arial, Helvetica, sans-serif;
-            color: #17332b;
-        }
-
-        /* NAVBAR */
-        .navbar-principal {
-            background-color: #003c2e;
-            padding: 12px 35px;
-        }
-        .marca {
-            color: white;
-            font-size: 25px;
-            font-weight: bold;
-            text-decoration: none;
-        }
-        .marca span { color: #50e3a4; }
-        .nav-link {
-            color: white !important;
-            margin: 0 10px;
-        }
-        .nav-link.active {
-            color: #ffe600 !important;
-            border-bottom: 3px solid #ffe600;
-        }
-        .boton-crear {
-            background-color: #ffe600;
-            color: #18352c;
-            font-weight: bold;
-            border-radius: 8px;
-            padding: 10px 20px;
-            text-decoration: none;
-        }
-
-        /* HERO */
-        .hero-seccion {
-            min-height: 230px;
-            padding: 45px;
-            color: white;
-            background: linear-gradient(90deg, rgba(0, 67, 50, 0.98), rgba(0, 67, 50, 0.78), rgba(0, 67, 50, 0.55));
-        }
-        .hero-seccion small {
-            color: #67e6ad;
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
-        .hero-seccion h1 {
-            font-size: 45px;
-            font-weight: 800;
-            margin-top: 10px;
-            margin-bottom: 5px;
-        }
-        .hero-seccion h1 span { color: #61e7ae; }
-        .hero-seccion p {
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-
-        /* CONTENIDO PRINCIPAL */
-        .contenido-principal {
-            margin-top: -20px;
-            background-color: white;
-            border-radius: 25px 25px 0 0;
-            padding: 30px;
-            min-height: 500px;
-        }
-
-        /* FILTROS (Adaptados al diseño del equipo) */
-        .filtros-busqueda {
-            background-color: #f6f9f8;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
-            border: 1px solid #e3ece8;
-        }
-    </style>
 </head>
-
 <body>
+    <div class="container mt-5">
+        <h2>Encontrar Partidos</h2>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-principal">
-    <div class="container-fluid">
-        <a class="marca" th:href="@{/home}">
-            <i class="fa-solid fa-futbol"></i> ArmoLaCancha
-        </a>
-        <div class="navbar-nav ms-auto me-auto">
-            <a class="nav-link" th:href="@{/home}">Inicio</a>
-            <!-- Pestaña activa -->
-            <a class="nav-link active" th:href="@{/partidos}">Partidos</a>
-            <a class="nav-link" th:href="@{/ranking}">Ranking</a>
-            <a class="nav-link" th:href="@{/perfil}">Mi Perfil</a>
+        <!-- Mostrar errores si existen -->
+        <div th:if="${error != null}" class="alert alert-danger" th:text="${error}"></div>
+
+        <!-- Filtros -->
+    <form th:action="@{/partidos}" method="GET" class="mb-4 bg-light p-3 rounded shadow-sm">
+        <div class="row g-2 align-items-end">
+            
+            <!-- Filtro 1: Nivel (Rango) -->
+            <div class="col-md-4 col-lg-2">
+                <label for="filtroNivel" class="form-label small fw-bold mb-1">Rango mínimo</label>
+                <select name="filtroNivel" id="filtroNivel" class="form-select form-select-sm">
+                    <option value="TODOS">Cualquier rango</option>
+                    <option value="PRINCIPIANTE">Principiante</option>
+                    <option value="INTERMEDIO">Intermedio</option>
+                    <option value="AVANZADO">Avanzado</option>
+                </select>
+            </div>
+
+            <!-- Filtro 2: Distancia -->
+            <div class="col-md-4 col-lg-2">
+                <label for="filtroDistancia" class="form-label small fw-bold mb-1">Distancia máx.</label>
+                <select name="filtroDistancia" id="filtroDistancia" class="form-select form-select-sm">
+                    <option value="TODOS">Cualquiera</option>
+                    <option value="3">Hasta 3 km</option>
+                    <option value="5">Hasta 5 km</option>
+                    <option value="10">Hasta 10 km</option>
+                </select>
+            </div>
+
+            <!-- Filtro 3: Tipo de partido -->
+            <div class="col-md-4 col-lg-2">
+                <label for="filtroTipo" class="form-label small fw-bold mb-1">Tipo de partido</label>
+                <select name="filtroTipo" id="filtroTipo" class="form-select form-select-sm">
+                    <option value="TODOS">Todos</option>
+                    <option value="PUBLICO">Público</option>
+                    <option value="PRIVADO">Privado</option>
+                </select>
+            </div>
+
+            <!-- Filtro 4: Jugadores -->
+            <div class="col-md-4 col-lg-2">
+                <label for="filtroJugadores" class="form-label small fw-bold mb-1">Jugadores</label>
+                <select name="filtroJugadores" id="filtroJugadores" class="form-select form-select-sm">
+                    <option value="">Cualquiera</option>
+                    <option value="10">Fútbol 5 (10)</option>
+                    <option value="14">Fútbol 7 (14)</option>
+                    <option value="22">Fútbol 11 (22)</option>
+                </select>
+            </div>
+
+            <!-- Filtro 5: Fecha -->
+            <div class="col-md-4 col-lg-2">
+                <label for="filtroFecha" class="form-label small fw-bold mb-1">Fecha</label>
+                <select name="filtroFecha" id="filtroFecha" class="form-select form-select-sm">
+                    <option value="TODOS">Cualquier día</option>
+                    <option value="2026-10-02">2 Octubre</option>
+                    <option value="2026-10-03">3 Octubre</option>
+                    <option value="2026-10-04">4 Octubre</option>
+                </select>
+            </div>
+
+            <!-- Filtro 6: Horario (NUEVO) -->
+            <div class="col-md-4 col-lg-2">
+                <label for="filtroHora" class="form-label small fw-bold mb-1">Horario</label>
+                <select name="filtroHora" id="filtroHora" class="form-select form-select-sm">
+                    <option value="TODOS">Cualquier horario</option>
+                    <option value="14:30">14:30 hs</option>
+                    <option value="18:00">18:00 hs</option>
+                    <option value="20:00">20:00 hs</option>
+                </select>
+            </div>
+
+            <!-- Botón de Filtrar (Nueva fila) -->
+            <div class="col-12 mt-3 text-end">
+                <button type="submit" class="btn btn-success btn-sm px-4">Aplicar Filtros</button>
+            </div>
+
         </div>
-        <a class="boton-crear" th:href="@{/crearPartido}">＋ Crear partido</a>
-    </div>
-</nav>
+    </form>
 
-<!-- HERO -->
-<section class="hero-seccion">
-    <small>MÁS FÚTBOL. MÁS AMIGOS. MENOS LÍO.</small>
-    <h1>PARTIDOS <span>CERCA TUYO</span></h1>
-    <p>Encontrá partidos, unite y viví el fútbol amateur como debe ser.</p>
-</section>
-
-<!-- CONTENIDO PRINCIPAL SUPERPUESTO -->
-<div class="container-fluid contenido-principal">
-    <div class="row justify-content-center">
-        <div class="col-lg-11">
-
-            <!-- FORMULARIO DE FILTROS -->
-            <div class="filtros-busqueda shadow-sm">
-                <form th:action="@{/partidos}" method="GET">
-                    <div class="row g-3 align-items-end">
+       <!-- Grilla de Partidos -->
+    <div class="row">
+        <div th:each="partido : ${listaPartidos}" class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    
+                    <!-- Título de la Cancha -->
+                    <h5 class="card-title text-success fw-bold mb-3" th:text="${partido.cancha.nombre}">Cancha Defecto</h5>
+                    
+                    <!-- Datos del Partido -->
+                    <div class="card-text mb-3 text-secondary">
+                        <!-- Separamos el LocalDateTime en Fecha y Hora -->
+                        <strong>Fecha:</strong> <span th:text="${#temporals.format(partido.fecha, 'dd/MM/yyyy')}"></span><br>
+                        <strong>Hora:</strong> <span th:text="${#temporals.format(partido.fecha, 'HH:mm')} + ' hs'"></span><br>
                         
-                        <div class="col-md-4 col-lg-2">
-                            <label for="filtroNivel" class="form-label small fw-bold mb-1">Rango mínimo</label>
-                            <select name="filtroNivel" id="filtroNivel" class="form-select form-select-sm">
-                                <option value="TODOS">Cualquier rango</option>
-                                <option value="PRINCIPIANTE">Principiante</option>
-                                <option value="INTERMEDIO">Intermedio</option>
-                                <option value="AVANZADO">Avanzado</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 col-lg-2">
-                            <label for="filtroDistancia" class="form-label small fw-bold mb-1">Distancia máx.</label>
-                            <select name="filtroDistancia" id="filtroDistancia" class="form-select form-select-sm">
-                                <option value="TODOS">Cualquiera</option>
-                                <option value="3">Hasta 3 km</option>
-                                <option value="5">Hasta 5 km</option>
-                                <option value="10">Hasta 10 km</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 col-lg-2">
-                            <label for="filtroTipo" class="form-label small fw-bold mb-1">Tipo de partido</label>
-                            <select name="filtroTipo" id="filtroTipo" class="form-select form-select-sm">
-                                <option value="TODOS">Todos</option>
-                                <option value="PUBLICO">Público</option>
-                                <option value="PRIVADO">Privado</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 col-lg-2">
-                            <label for="filtroJugadores" class="form-label small fw-bold mb-1">Jugadores</label>
-                            <select name="filtroJugadores" id="filtroJugadores" class="form-select form-select-sm">
-                                <option value="">Cualquiera</option>
-                                <option value="10">Fútbol 5 (10)</option>
-                                <option value="14">Fútbol 7 (14)</option>
-                                <option value="22">Fútbol 11 (22)</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 col-lg-2">
-                            <label for="filtroFecha" class="form-label small fw-bold mb-1">Fecha</label>
-                            <select name="filtroFecha" id="filtroFecha" class="form-select form-select-sm">
-                                <option value="TODOS">Cualquier día</option>
-                                <option value="2026-10-02">2 Octubre</option>
-                                <option value="2026-10-03">3 Octubre</option>
-                                <option value="2026-10-04">4 Octubre</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 col-lg-2">
-                            <label for="filtroHora" class="form-label small fw-bold mb-1">Horario</label>
-                            <select name="filtroHora" id="filtroHora" class="form-select form-select-sm">
-                                <option value="TODOS">Cualquier horario</option>
-                                <option value="14:30">14:30 hs</option>
-                                <option value="18:00">18:00 hs</option>
-                                <option value="20:00">20:00 hs</option>
-                            </select>
-                        </div>
-
-                        <div class="col-12 mt-3 text-end">
-                            <button type="submit" class="btn btn-success btn-sm px-4 fw-bold">Aplicar Filtros</button>
-                        </div>
+                        <!-- Nueva variable de Distancia -->
+                        <strong>Distancia:</strong> a <span th:text="${partido.distanciaKm}"></span> km<br>
+                        
+                        <strong>Nivel:</strong> <span th:text="${partido.nivel}"></span><br>
+                        
+                        <strong>Cupo:</strong> <span th:text="${partido.confirmados.size()} + '/' + ${partido.cupoMaximo}"></span>
                     </div>
-                </form>
-            </div>
-
-            <!-- GRILLA DE PARTIDOS -->
-            <div class="row">
-                <!-- Mensaje si no hay partidos -->
-                <div th:if="${listaPartidos == null or listaPartidos.isEmpty()}" class="col-12 text-center py-5">
-                    <h4 class="text-muted"><i class="fa-solid fa-futbol"></i> No se encontraron partidos con esos filtros</h4>
-                </div>
-
-                <!-- Tarjetas -->
-                <div th:each="partido : ${listaPartidos}" class="col-md-6 col-lg-4 mb-4">
-                    <div class="card shadow-sm h-100 border-0" style="border: 1px solid #e3ece8 !important;">
-                        <div class="card-body d-flex flex-column">
-                            
-                            <h5 class="card-title text-success fw-bold mb-3" th:text="${partido.cancha.nombre}">Cancha</h5>
-                            
-                            <div class="card-text mb-3 text-secondary" style="font-size: 14px;">
-                                <strong><i class="fa-regular fa-calendar"></i> Fecha:</strong> <span th:text="${#temporals.format(partido.fecha, 'dd/MM/yyyy')}"></span><br>
-                                <strong><i class="fa-regular fa-clock"></i> Hora:</strong> <span th:text="${#temporals.format(partido.fecha, 'HH:mm')} + ' hs'"></span><br>
-                                <strong><i class="fa-solid fa-location-dot"></i> Distancia:</strong> a <span th:text="${partido.distanciaKm}"></span> km<br>
-                                <strong><i class="fa-solid fa-ranking-star"></i> Nivel:</strong> <span th:text="${partido.nivel}"></span><br>
-                                <strong><i class="fa-solid fa-users"></i> Cupo:</strong> <span th:text="${partido.confirmados.size()} + '/' + ${partido.cupoMaximo}"></span>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <span th:if="${partido.esPrivado}" class="badge bg-warning text-dark"><i class="fa-solid fa-lock"></i> Privado</span>
-                                <span th:unless="${partido.esPrivado}" class="badge bg-success"><i class="fa-solid fa-lock-open"></i> Público</span>
-                            </div>
-
-                            <form th:action="@{/partidos/unirse}" method="POST" class="mt-auto">
-                                <input type="hidden" name="partidoId" th:value="${partido.id}">
-                                
-                                <div th:if="${partido.esPrivado}" class="mb-2">
-                                    <input type="text" name="codigoAcceso" class="form-control form-control-sm" placeholder="Código de acceso" required>
-                                </div>
-                                
-                                <button type="submit" class="btn btn-outline-success w-100 fw-bold">Unirme <i class="fa-solid fa-arrow-right"></i></button>
-                            </form>
-                        </div>
+                    
+                    <!-- Etiqueta Privado/Público -->
+                    <div class="mb-3">
+                        <span th:if="${partido.esPrivado}" class="badge bg-warning text-dark">Privado</span>
+                        <span th:unless="${partido.esPrivado}" class="badge bg-success">Público</span>
                     </div>
+
+                    <!-- Formulario para Unirse (mt-auto empuja el botón siempre al fondo de la tarjeta) -->
+                    <form th:action="@{/partidos/unirse}" method="POST" class="mt-auto">
+                        <input type="hidden" name="partidoId" th:value="${partido.id}">
+                        
+                        <!-- Solo se muestra el input de código si el partido es privado -->
+                        <div th:if="${partido.esPrivado}" class="mb-2">
+                            <input type="text" name="codigoAcceso" class="form-control form-control-sm" placeholder="Código de acceso" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Confirmar Asistencia</button>
+                    </form>
+                    
                 </div>
             </div>
-
         </div>
     </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
 </body>
 </html>
