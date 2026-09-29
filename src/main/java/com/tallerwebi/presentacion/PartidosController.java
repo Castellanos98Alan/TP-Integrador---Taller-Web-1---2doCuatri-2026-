@@ -1,29 +1,29 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ServicioPartidos;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import com.tallerwebi.dominio.ServicioPartido;
 import com.tallerwebi.dominio.Usuario;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.web.bind.annotation.GetMapping;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+//import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class PartidosController {
 
-  private ServicioPartidos servicioPartidos;
+  private ServicioPartido servicioPartido;
 
   @Autowired
-  public PartidosController(ServicioPartidos servicioPartidos) {
-    this.servicioPartidos = servicioPartidos;
+  public PartidosController(ServicioPartido servicioPartido) {
+    this.servicioPartido = servicioPartido;
   }
 
   private static final String FILTRO_TODOS = "TODOS";
@@ -64,7 +64,7 @@ public class PartidosController {
     Map<String, Object> model = new ModelMap();
     model.put(
       "listaPartidos",
-      servicioPartidos.listarPartidosSegunFiltro(
+      servicioPartido.listarPartidosSegunFiltro(
         filtroNivel,
         filtroTipo,
         filtroCupo,
@@ -77,7 +77,11 @@ public class PartidosController {
   }
 
   @PostMapping("/partido/cancelar/{id}")
-  public ModelAndView cancelarPartido(@PathVariable("id") Long idPartido, Model model, HttpServletRequest request) {
+  public ModelAndView cancelarPartido(
+    @PathVariable("id") Long idPartido,
+    Model model,
+    HttpServletRequest request
+  ) {
     Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute("usuario");
 
     if (usuarioLogueado == null) {
