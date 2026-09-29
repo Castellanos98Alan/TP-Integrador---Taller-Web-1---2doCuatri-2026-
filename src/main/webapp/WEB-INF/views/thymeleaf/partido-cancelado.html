@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArmoLaCancha - Partido Cancelado</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f4f7f6;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #17332b;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .card-cancelado {
+            background-color: white;
+            border: 1px solid #e3ebe8;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .icono-alerta {
+            font-size: 60px;
+            color: #e83c43;
+            margin-bottom: 20px;
+        }
+
+        .card-cancelado h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #004d38;
+            margin-bottom: 15px;
+        }
+
+        .card-cancelado p {
+            color: #536762;
+            font-size: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn-volver {
+            background-color: #006747;
+            color: white;
+            font-weight: bold;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+
+        .btn-volver:hover {
+            background-color: #004d38;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card-cancelado">
+    <div class="icono-alerta">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <h1>Operación Cancelada</h1>
+    <p>Has cancelado la creación del partido.</p>
+
+    <a th:href="@{/partidos}" class="btn-volver">
+        <i class="fa-solid fa-arrow-left me-1"></i> Volver a Partidos
+    </a>
+</div>
+
+</body>
+</html>

@@ -4,7 +4,6 @@ import com.tallerwebi.dominio.ServicioLogin;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -25,7 +24,7 @@ public class ControladorLogin {
 
   @RequestMapping("/login")
   public ModelAndView irALogin() {
-    Map<String, Object> modelo = new ModelMap();
+    ModelMap modelo = new ModelMap();
     modelo.put("datosLogin", new DatosLogin());
     return new ModelAndView("login", modelo);
   }
@@ -46,7 +45,7 @@ public class ControladorLogin {
 
       return new ModelAndView("redirect:/home");
     } else {
-      Map<String, Object> model = new ModelMap();
+      ModelMap model = new ModelMap();
       model.put("error", "Usuario o clave incorrecta");
       return new ModelAndView("login", model);
     }
@@ -54,7 +53,7 @@ public class ControladorLogin {
 
   @RequestMapping(path = "/registrarme", method = RequestMethod.POST)
   public ModelAndView registrarme(@ModelAttribute("usuario") Usuario usuario) {
-    Map<String, Object> model = new ModelMap();
+    ModelMap model = new ModelMap();
     try {
       servicioLogin.registrar(usuario);
     } catch (UsuarioExistente e) {
@@ -69,7 +68,7 @@ public class ControladorLogin {
 
   @RequestMapping(path = "/nuevo-usuario", method = RequestMethod.GET)
   public ModelAndView nuevoUsuario() {
-    Map<String, Object> model = new ModelMap();
+    ModelMap model = new ModelMap();
     model.put("usuario", new Usuario());
     return new ModelAndView("nuevo-usuario", model);
   }
