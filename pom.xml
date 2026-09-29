@@ -226,6 +226,90 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.28.0</version>
+                <configuration>
+                    <!-- Mostrar los errores de reglas directamente en la consola de Maven -->
+                    <printFailingErrors>true</printFailingErrors>
+                    <!-- No generar enlaces a reportes XRef (referencias cruzadas del código) -->
+                    <linkXRef>false</linkXRef>
+                    <rulesets>
+                        <!-- Conjuntos de reglas a aplicar (estándar y personalizados) -->
+                        <ruleset>/category/java/bestpractices.xml</ruleset>
+                        <ruleset>/category/java/errorprone.xml</ruleset>
+                        <ruleset>${project.basedir}/pmd-reglas-de-codigo.xml</ruleset>
+                    </rulesets>
+                </configuration>
+                <executions>
+                    <!-- Ejecución unificada de PMD (Análisis de reglas) -->
+                    <execution>
+                        <!-- Identificador único de la ejecución -->
+                        <id>pmd-all</id>
+                        <!-- Fase del ciclo de vida de Maven en la que se ejecuta (validación inicial) -->
+                        <phase>validate</phase>
+                        <goals>
+                            <!-- Genera el reporte PMD (necesario para el check) -->
+                            <goal>pmd</goal>
+                            <!-- Valida los resultados contra las reglas definidas y falla si hay errores -->
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Directorio donde se guarda el archivo XML de resultados para la validación -->
+                            <targetDirectory>${project.basedir}/.calidad-de-codigo/pmd</targetDirectory>
+                            <!-- Directorio donde se generan los reportes visuales (HTML) y sus recursos (CSS/imágenes) -->
+                            <outputDirectory>${project.basedir}/.calidad-de-codigo/pmd</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <!-- Ejecución unificada de CPD (Detección de duplicados) -->
+                    <execution>
+                        <!-- Identificador único de la ejecución -->
+                        <id>cpd-all</id>
+                        <!-- Fase del ciclo de vida de Maven en la que se ejecuta (validación inicial) -->
+                        <phase>validate</phase>
+                        <goals>
+                            <!-- Genera el reporte CPD de duplicados -->
+                            <goal>cpd</goal>
+                            <!-- Valida los duplicados encontrados y falla si superan el umbral -->
+                            <goal>cpd-check</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Directorio donde se guarda el archivo XML de duplicados para la validación -->
+                            <targetDirectory>${project.basedir}/.calidad-de-codigo/cpd</targetDirectory>
+                            <!-- Directorio donde se generan los reportes visuales de duplicados (HTML) -->
+                            <outputDirectory>${project.basedir}/.calidad-de-codigo/cpd</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pmd-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>pmd</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Directorio de resultados XML para la fase de pruebas -->
+                            <targetDirectory>${project.basedir}/.calidad-de-codigo/pmd</targetDirectory>
+                            <!-- Directorio de reportes HTML para la fase de pruebas -->
+                            <outputDirectory>${project.basedir}/.calidad-de-codigo/pmd</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>cpd-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>cpd</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Directorio de resultados XML de duplicados para la fase de pruebas -->
+                            <targetDirectory>${project.basedir}/.calidad-de-codigo/cpd</targetDirectory>
+                            <!-- Directorio de reportes HTML de duplicados para la fase de pruebas -->
+                            <outputDirectory>${project.basedir}/.calidad-de-codigo/cpd</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.jacoco</groupId>

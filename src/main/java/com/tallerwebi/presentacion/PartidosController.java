@@ -97,9 +97,4 @@ public class PartidosController {
 
     return new ModelAndView("redirect:/partidos");
   }
-
-  @RequestMapping(path = "/cancelar-partido", method = RequestMethod.GET)
-  public ModelAndView cancelarCreacionFormulario() {
-    return new ModelAndView("partido-cancelado");
-  }
 }
