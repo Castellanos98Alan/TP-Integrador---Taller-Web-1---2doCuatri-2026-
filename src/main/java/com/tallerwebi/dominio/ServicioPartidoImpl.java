@@ -109,9 +109,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
 
       Boolean coincideFecha =
         FILTRO_TODOS.equals(filtroFecha) ||
-        (p.getFecha() != null &&
-          filtroFecha != null &&
-          p.getFecha().toLocalDate().toString().equals(filtroFecha));
+        (p.getFecha() != null && p.getFecha().toLocalDate().toString().equals(filtroFecha));
 
       Boolean coincideHora =
         FILTRO_TODOS.equals(filtroHora) ||
