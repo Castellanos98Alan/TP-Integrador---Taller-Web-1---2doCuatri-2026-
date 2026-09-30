@@ -440,7 +440,6 @@ public class PartidosControllerTest {
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("usuario")).thenReturn(usuarioLogueado);
 
-    // Pasamos modelMock como segundo argumento
     ModelAndView modelAndView = partidosController.cancelarPartido(
       idPartido,
       modelMock,
@@ -458,7 +457,6 @@ public class PartidosControllerTest {
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("usuario")).thenReturn(null); // Sin sesión activa
 
-    // Pasamos modelMock como segundo argumento
     ModelAndView modelAndView = partidosController.cancelarPartido(
       idPartido,
       modelMock,

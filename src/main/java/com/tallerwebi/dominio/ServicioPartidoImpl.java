@@ -31,11 +31,11 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
 
     if (partido.getOrganizador() == null || !partido.getOrganizador().equals(usuarioLogueado)) {
-      throw new RuntimeException("No estás autorizado para cancelar este partido.");
+      throw new RuntimeException("No estas autorizado para cancelar este partido.");
     }
 
     if (partido.getEstado() == Partido.EstadoPartido.FINALIZADO) {
-      throw new RuntimeException("No se puede cancelar un partido que ya finalizó.");
+      throw new RuntimeException("No se puede cancelar un partido que ya finalizo.");
     }
 
     partido.cancelarPartido();
