@@ -45,8 +45,8 @@ public class ServicioPartidoTest {
     Usuario organizador = new Usuario();
     organizador.setId(1L);
 
-    Usuario intruso = new Usuario();
-    intruso.setId(2L);
+    Usuario noOrganizador = new Usuario();
+    noOrganizador.setId(2L);
 
     Partido partido = new Partido();
     partido.setId(10L);
@@ -58,11 +58,11 @@ public class ServicioPartidoTest {
     Exception exception = assertThrows(
       RuntimeException.class,
       () -> {
-        servicioPartido.cancelarPartido(10L, intruso);
+        servicioPartido.cancelarPartido(10L, noOrganizador);
       }
     );
 
-    assertEquals("No estás autorizado para cancelar este partido.", exception.getMessage());
+    assertEquals("No estas autorizado para cancelar este partido.", exception.getMessage());
     verify(repositorioPartidoMock, never()).modificar(any());
   }
 
@@ -85,7 +85,7 @@ public class ServicioPartidoTest {
       }
     );
 
-    assertEquals("No se puede cancelar un partido que ya finalizó.", exception.getMessage());
+    assertEquals("No se puede cancelar un partido que ya finalizo.", exception.getMessage());
     verify(repositorioPartidoMock, never()).modificar(any());
   }
 
