@@ -3,8 +3,6 @@ package com.tallerwebi.dominio;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "usuario")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Usuario {
 
   @Id
@@ -23,7 +21,6 @@ public class Usuario {
 
   public Usuario() {}
 
-  // Getters y Setters...
   public Long getId() {
     return id;
   }
@@ -68,12 +65,12 @@ public class Usuario {
     return nombre;
   }
 
-  public void setNombre(String nombre) {
-    this.nombre = nombre;
-  }
-
   public Integer getPuntos() {
     return puntos;
+  }
+
+  public void setNombre(String nombre) {
+    this.nombre = nombre;
   }
 
   public void setPuntos(Integer puntos) {
