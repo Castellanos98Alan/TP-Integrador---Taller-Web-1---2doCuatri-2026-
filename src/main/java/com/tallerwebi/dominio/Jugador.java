@@ -1,53 +1,42 @@
 package com.tallerwebi.dominio;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-public class Jugador {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+public class Jugador extends Usuario {
 
   private String posicion1;
-
   private String posicion2;
-
   private String nivel;
 
-  @Column(nullable = false)
-  private Integer puntos;
+  @ManyToMany(fetch = FetchType.LAZY)
+  private List<Equipo> equipos = new ArrayList<>();
 
-  public Jugador(Integer id, String posicion1, String posicion2, String nivel) {
-    this.id = id;
+  public Jugador() {}
+
+  public Jugador(String posicion1, String posicion2, String nivel) {
     this.posicion1 = posicion1;
     this.posicion2 = posicion2;
     this.nivel = nivel;
-    this.puntos = 0;
   }
 
-  public Integer getId() {
-    return id;
-  }
-
-  public void setId(Integer id) {
-    this.id = id;
-  }
-
+  // Getters y Setters...
   public String getPosicion1() {
     return posicion1;
   }
 
-  public void setPosicion1(String posicion) {
-    this.posicion1 = posicion;
+  public void setPosicion1(String posicion1) {
+    this.posicion1 = posicion1;
   }
 
   public String getPosicion2() {
     return posicion2;
   }
 
-  public void setPosicion2(String posicion) {
-    this.posicion2 = posicion;
+  public void setPosicion2(String posicion2) {
+    this.posicion2 = posicion2;
   }
 
   public String getNivel() {
@@ -58,11 +47,11 @@ public class Jugador {
     this.nivel = nivel;
   }
 
-  public Integer getPuntos() {
-    return puntos;
+  public List<Equipo> getEquipos() {
+    return equipos;
   }
 
-  public void setPuntos(Integer puntos) {
-    this.puntos = puntos;
+  public void setEquipos(List<Equipo> equipos) {
+    this.equipos = equipos;
   }
 }

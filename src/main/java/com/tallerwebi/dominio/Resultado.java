@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "resultado")
 public class Resultado {
 
   @Id
@@ -12,19 +13,27 @@ public class Resultado {
 
   private Integer golesPrimerEquipo;
   private Integer golesSegundoEquipo;
+
+  // Hibernate crea por defecto las columnas ganador_id y perdedor_id
+  @ManyToOne(fetch = FetchType.EAGER)
   private Equipo ganador;
+
+  @ManyToOne(fetch = FetchType.EAGER)
   private Equipo perdedor;
+
   private LocalDateTime fechaRegistro;
 
+  // 1. Constructor vacío OBLIGATORIO para Hibernate
+  public Resultado() {}
+
+  // 2. Constructor con parámetros para tu lógica
   public Resultado(
-    Integer id,
     Integer golesPrimerEquipo,
     Integer golesSegundoEquipo,
     Equipo ganador,
     Equipo perdedor,
     LocalDateTime fechaRegistro
   ) {
-    this.id = id;
     this.golesPrimerEquipo = golesPrimerEquipo;
     this.golesSegundoEquipo = golesSegundoEquipo;
     this.ganador = ganador;
@@ -32,6 +41,7 @@ public class Resultado {
     this.fechaRegistro = fechaRegistro;
   }
 
+  // Getters y Setters...
   public Integer getId() {
     return id;
   }

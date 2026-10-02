@@ -1,19 +1,9 @@
 package com.tallerwebi.dominio;
 
-//import jakarta.persistence.Entity;
-//import jakarta.persistence.GeneratedValue;
-//import jakarta.persistence.GenerationType;
-//import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
-/**
- * Entidad Cancha.
- */
 @Entity
+@Table(name = "cancha")
 public class Cancha {
 
   @Id
@@ -22,11 +12,14 @@ public class Cancha {
 
   private String nombre;
 
+  public Cancha() {}
+
   public Cancha(Long id, String nombre) {
     this.id = id;
     this.nombre = nombre;
   }
 
+  // Getters y Setters...
   public Long getId() {
     return id;
   }
@@ -36,10 +29,10 @@ public class Cancha {
   }
 
   public String getNombre() {
-    return this.nombre;
+    return nombre;
   }
 
-  public void setNombre(String nuevoNombre) {
-    this.nombre = nuevoNombre;
+  public void setNombre(String nombre) {
+    this.nombre = nombre;
   }
 }

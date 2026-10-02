@@ -34,6 +34,8 @@ public class Estadistica {
     this.puntaje = puntaje;
   }
 
+  public Estadistica() {}
+
   public Integer getId() {
     return id;
   }

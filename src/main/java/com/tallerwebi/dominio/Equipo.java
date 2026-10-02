@@ -1,31 +1,35 @@
 package com.tallerwebi.dominio;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "equipo")
 public class Equipo {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+  private Long id; // Cambiado a Long para consistencia con el resto
 
   private String nombre;
 
-  public Equipo(Integer id, String nombre, List<Jugador> jugadores) {
+  @ManyToMany(mappedBy = "equipos", fetch = FetchType.LAZY)
+  private List<Jugador> jugadores = new ArrayList<>();
+
+  public Equipo() {}
+
+  public Equipo(Long id, String nombre) {
     this.id = id;
     this.nombre = nombre;
   }
 
-  public Equipo(Integer id) {
-    this.id = id;
-  }
-
-  public Integer getId() {
+  // Getters y Setters...
+  public Long getId() {
     return id;
   }
 
-  public void setId(Integer id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -35,5 +39,13 @@ public class Equipo {
 
   public void setNombre(String nombre) {
     this.nombre = nombre;
+  }
+
+  public List<Jugador> getJugadores() {
+    return jugadores;
+  }
+
+  public void setJugadores(List<Jugador> jugadores) {
+    this.jugadores = jugadores;
   }
 }
