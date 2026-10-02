@@ -16,7 +16,7 @@ import java.util.List;
  */
 //@Entity
 @SuppressWarnings("PMD.TooManyFields")
-public class Partido {
+public class Partido {git
 
   public enum EstadoPartido {
     ACTIVO,
