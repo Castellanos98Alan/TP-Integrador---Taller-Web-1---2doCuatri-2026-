@@ -5,19 +5,27 @@ package com.tallerwebi.dominio;
 //import jakarta.persistence.GenerationType;
 //import jakarta.persistence.Id;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 /**
  * Entidad Cancha.
  */
-// @Entity
+@Entity
 public class Cancha {
 
-  //  @Id
-  //  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   private String nombre;
 
-  public Cancha() {}
+  public Cancha(Long id, String nombre) {
+    this.id = id;
+    this.nombre = nombre;
+  }
 
   public Long getId() {
     return id;
