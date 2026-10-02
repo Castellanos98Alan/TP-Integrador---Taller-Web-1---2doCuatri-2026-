@@ -12,25 +12,16 @@ public class Resultado {
 
   private Integer golesPrimerEquipo;
   private Integer golesSegundoEquipo;
+
+  @ManyToOne(fetch = FetchType.EAGER)
   private Equipo ganador;
+
+  @ManyToOne(fetch = FetchType.EAGER)
   private Equipo perdedor;
+
   private LocalDateTime fechaRegistro;
 
-  public Resultado(
-    Integer id,
-    Integer golesPrimerEquipo,
-    Integer golesSegundoEquipo,
-    Equipo ganador,
-    Equipo perdedor,
-    LocalDateTime fechaRegistro
-  ) {
-    this.id = id;
-    this.golesPrimerEquipo = golesPrimerEquipo;
-    this.golesSegundoEquipo = golesSegundoEquipo;
-    this.ganador = ganador;
-    this.perdedor = perdedor;
-    this.fechaRegistro = fechaRegistro;
-  }
+  public Resultado() {}
 
   public Integer getId() {
     return id;

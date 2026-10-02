@@ -19,6 +19,8 @@ public class Usuario {
   @Column(nullable = false)
   private Integer puntos = 0;
 
+  public Usuario() {}
+
   public Long getId() {
     return id;
   }

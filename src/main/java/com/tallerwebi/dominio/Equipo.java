@@ -12,13 +12,11 @@ public class Equipo {
 
   private String nombre;
 
+  public Equipo() {}
+
   public Equipo(Integer id, String nombre, List<Jugador> jugadores) {
     this.id = id;
     this.nombre = nombre;
-  }
-
-  public Equipo(Integer id) {
-    this.id = id;
   }
 
   public Integer getId() {

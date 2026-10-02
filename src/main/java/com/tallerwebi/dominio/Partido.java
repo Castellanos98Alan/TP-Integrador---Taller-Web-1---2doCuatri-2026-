@@ -31,64 +31,41 @@ public class Partido {
   private Boolean esPrivado = false;
   private LocalDateTime fecha;
 
+  @ManyToOne(fetch = FetchType.EAGER)
   private Cancha cancha;
 
   private Integer cupoMaximo;
   private String codigoDeAcceso;
   private Integer distancia; // valor harcodeao. en realidad se obtiene de un calculo con entre las
+
   // dos ubicaciones de usuario y Cancha.
   // hay que crear una entidad entre usuario y partido. ej Convocatoria.java
   // por ahora lo voy a dejar en ManyToMany
   // @ManyToMany
 
+  @Enumerated(EnumType.STRING)
   private EstadoPartido estado;
+
   //private String modalidad;
   //private String nivel;
   private Integer cantJugadores;
+
   //private String descripcion;
+
+  @ManyToOne(fetch = FetchType.EAGER)
   private Usuario organizador;
 
+  @OneToMany(fetch = FetchType.LAZY)
   private List<Usuario> confirmados = new ArrayList<>();
 
+  @ManyToOne(fetch = FetchType.EAGER)
   private Equipo equipo1;
 
+  @ManyToOne(fetch = FetchType.EAGER)
   private Equipo equipo2;
 
+  @ManyToOne(fetch = FetchType.EAGER)
   private Resultado resultado;
-
-  public Partido(
-    Long id,
-    String nivel,
-    Boolean esPrivado,
-    LocalDateTime fecha,
-    Cancha cancha,
-    Integer cupoMaximo,
-    String codigoDeAcceso,
-    Integer distancia,
-    EstadoPartido estado,
-    Integer cantJugadores,
-    Usuario organizador,
-    List<Usuario> confirmados,
-    Equipo equipo1,
-    Equipo equipo2,
-    Resultado resultado
-  ) {
-    this.id = id;
-    this.nivel = nivel;
-    this.esPrivado = true;
-    this.fecha = fecha;
-    this.cancha = cancha;
-    this.cupoMaximo = cupoMaximo;
-    this.codigoDeAcceso = codigoDeAcceso;
-    this.distancia = distancia;
-    this.estado = EstadoPartido.PENDIENTE;
-    this.cantJugadores = cantJugadores;
-    this.organizador = organizador;
-    this.confirmados = confirmados;
-    this.equipo1 = equipo1;
-    this.equipo2 = equipo2;
-    this.resultado = resultado;
-  }
 
   public Partido() {
     this.estado = EstadoPartido.ACTIVO;

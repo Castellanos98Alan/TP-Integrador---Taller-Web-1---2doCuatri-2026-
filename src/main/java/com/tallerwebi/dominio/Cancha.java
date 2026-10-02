@@ -22,6 +22,8 @@ public class Cancha {
 
   private String nombre;
 
+  public Cancha() {}
+
   public Cancha(Long id, String nombre) {
     this.id = id;
     this.nombre = nombre;

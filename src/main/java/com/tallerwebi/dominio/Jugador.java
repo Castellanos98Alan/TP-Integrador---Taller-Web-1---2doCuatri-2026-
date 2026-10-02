@@ -18,6 +18,8 @@ public class Jugador {
   @Column(nullable = false)
   private Integer puntos;
 
+  public Jugador() {}
+
   public Jugador(Integer id, String posicion1, String posicion2, String nivel) {
     this.id = id;
     this.posicion1 = posicion1;
