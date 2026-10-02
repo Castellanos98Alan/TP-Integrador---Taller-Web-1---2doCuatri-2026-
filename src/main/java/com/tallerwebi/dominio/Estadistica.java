@@ -18,8 +18,6 @@ public class Estadistica {
   private Integer rojas;
   private Integer puntaje;
 
-  public Estadistica() {}
-
   public Estadistica(
     Integer id,
     Integer goles,
