@@ -1,20 +1,18 @@
 package com.tallerwebi.dominio;
 
-//import jakarta.persistence.Entity;
-//import jakarta.persistence.GeneratedValue;
-//import jakarta.persistence.GenerationType;
-//import jakarta.persistence.Id;
 //import jakarta.persistence.ManyToMany;
 //import jakarta.persistence.ManyToOne;
 //import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Partido
- */
-//@Entity
+@Entity
 @SuppressWarnings("PMD.TooManyFields")
 public class Partido {
 
@@ -22,21 +20,23 @@ public class Partido {
     ACTIVO,
     FINALIZADO,
     CANCELADO,
+    PENDIENTE,
   }
 
-  // @Id
-  //  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   private String nivel;
   private Boolean esPrivado = false;
   private LocalDateTime fecha;
 
-  // @ManyToOne
   private Cancha cancha;
+
   private Integer cupoMaximo;
   private String codigoDeAcceso;
-  private Integer distancia; // valor harcodeao. en realidad se obtiene de un calculo con entre las dos ubicaciones de usuario y Cancha.
+  private Integer distancia; // valor harcodeao. en realidad se obtiene de un calculo con entre las
+  // dos ubicaciones de usuario y Cancha.
   // hay que crear una entidad entre usuario y partido. ej Convocatoria.java
   // por ahora lo voy a dejar en ManyToMany
   // @ManyToMany
@@ -49,6 +49,46 @@ public class Partido {
   private Usuario organizador;
 
   private List<Usuario> confirmados = new ArrayList<>();
+
+  private Equipo equipo1;
+
+  private Equipo equipo2;
+
+  private Resultado resultado;
+
+  public Partido(
+    Long id,
+    String nivel,
+    Boolean esPrivado,
+    LocalDateTime fecha,
+    Cancha cancha,
+    Integer cupoMaximo,
+    String codigoDeAcceso,
+    Integer distancia,
+    EstadoPartido estado,
+    Integer cantJugadores,
+    Usuario organizador,
+    List<Usuario> confirmados,
+    Equipo equipo1,
+    Equipo equipo2,
+    Resultado resultado
+  ) {
+    this.id = id;
+    this.nivel = nivel;
+    this.esPrivado = true;
+    this.fecha = fecha;
+    this.cancha = cancha;
+    this.cupoMaximo = cupoMaximo;
+    this.codigoDeAcceso = codigoDeAcceso;
+    this.distancia = distancia;
+    this.estado = EstadoPartido.PENDIENTE;
+    this.cantJugadores = cantJugadores;
+    this.organizador = organizador;
+    this.confirmados = confirmados;
+    this.equipo1 = equipo1;
+    this.equipo2 = equipo2;
+    this.resultado = resultado;
+  }
 
   public Partido() {
     this.estado = EstadoPartido.ACTIVO;
@@ -160,5 +200,41 @@ public class Partido {
 
   public void setCantJugadores(Integer cantJugadores) {
     this.cantJugadores = cantJugadores;
+  }
+
+  public void setCupoMaximo(Integer cupoMaximo) {
+    this.cupoMaximo = cupoMaximo;
+  }
+
+  public Integer getDistancia() {
+    return distancia;
+  }
+
+  public void setDistancia(Integer distancia) {
+    this.distancia = distancia;
+  }
+
+  public Equipo getEquipo1() {
+    return equipo1;
+  }
+
+  public void setEquipo1(Equipo equipo1) {
+    this.equipo1 = equipo1;
+  }
+
+  public Equipo getEquipo2() {
+    return equipo2;
+  }
+
+  public void setEquipo2(Equipo equipo2) {
+    this.equipo2 = equipo2;
+  }
+
+  public Resultado getResultado() {
+    return resultado;
+  }
+
+  public void setResultado(Resultado resultado) {
+    this.resultado = resultado;
   }
 }

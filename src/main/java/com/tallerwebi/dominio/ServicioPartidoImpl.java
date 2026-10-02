@@ -66,7 +66,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
   ) {
     //Partidos harcodeados
     List<Partido> partidosFalsos = new ArrayList<>();
-    Cancha cancha = new Cancha();
+    Cancha cancha = new Cancha(1L, "Pedro");
     cancha.setId(1L);
     cancha.setNombre("Cancha de fútbol los leones");
 
