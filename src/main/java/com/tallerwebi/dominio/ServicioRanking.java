@@ -4,5 +4,5 @@ import java.util.List;
 
 @FunctionalInterface
 public interface ServicioRanking {
-  List<Usuario> obtenerRanking();
+  List<Jugador> obtenerRanking();
 }

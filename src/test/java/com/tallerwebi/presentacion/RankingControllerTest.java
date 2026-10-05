@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.ServicioRanking;
 import com.tallerwebi.dominio.Usuario;
 import java.util.ArrayList;
@@ -26,15 +27,15 @@ public class RankingControllerTest {
   @Test
   public void mostrarRankingDeberiaMostrarLaVistaRankingConLosJugadores() {
     // preparacion
-    Usuario pedro = new Usuario();
+    Jugador pedro = new Jugador();
     pedro.setNombre("Pedro");
     pedro.setPuntos(1500);
 
-    Usuario juan = new Usuario();
+    Jugador juan = new Jugador();
     juan.setNombre("Juan");
     juan.setPuntos(1000);
 
-    List<Usuario> rankingEsperado = new ArrayList<>();
+    List<Jugador> rankingEsperado = new ArrayList<>();
     rankingEsperado.add(pedro);
     rankingEsperado.add(juan);
 

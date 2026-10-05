@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.ServicioRanking;
 import com.tallerwebi.dominio.Usuario;
 import java.util.List;
@@ -22,7 +23,7 @@ public class RankingController {
 
   @GetMapping("/ranking")
   public ModelAndView mostrarRanking() {
-    List<Usuario> ranking = this.servicioRanking.obtenerRanking();
+    List<Jugador> ranking = this.servicioRanking.obtenerRanking();
 
     Map<String, Object> modelo = new ModelMap();
     modelo.put("ranking", ranking);

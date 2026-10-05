@@ -14,11 +14,6 @@ public class Usuario {
   private String rol;
   private Boolean activo = false;
 
-  private String nombre;
-
-  @Column(nullable = false)
-  private Integer puntos = 0;
-
   public Usuario() {}
 
   public Long getId() {
@@ -59,22 +54,6 @@ public class Usuario {
 
   public void setActivo(Boolean activo) {
     this.activo = activo;
-  }
-
-  public String getNombre() {
-    return nombre;
-  }
-
-  public Integer getPuntos() {
-    return puntos;
-  }
-
-  public void setNombre(String nombre) {
-    this.nombre = nombre;
-  }
-
-  public void setPuntos(Integer puntos) {
-    this.puntos = puntos;
   }
 
   public void activar() {

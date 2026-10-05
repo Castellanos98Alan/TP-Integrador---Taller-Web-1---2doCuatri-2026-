@@ -9,6 +9,8 @@ public class Jugador {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
+  private String nombre;
+
   private String posicion1;
 
   private String posicion2;
@@ -20,8 +22,9 @@ public class Jugador {
 
   public Jugador() {}
 
-  public Jugador(Integer id, String posicion1, String posicion2, String nivel) {
+  public Jugador(Integer id, String nombre, String posicion1, String posicion2, String nivel) {
     this.id = id;
+    this.nombre = nombre;
     this.posicion1 = posicion1;
     this.posicion2 = posicion2;
     this.nivel = nivel;
@@ -66,5 +69,13 @@ public class Jugador {
 
   public void setPuntos(Integer puntos) {
     this.puntos = puntos;
+  }
+
+  public String getNombre() {
+    return nombre;
+  }
+
+  public void setNombre(String nombre) {
+    this.nombre = nombre;
   }
 }

@@ -15,38 +15,38 @@ import org.junit.jupiter.api.Test;
 public class ServicioRankingTest {
 
   private ServicioRanking servicioRanking;
-  private RepositorioUsuario repositorioUsuarioMock;
+  private RepositorioJugador repositorioJugadorMock;
 
   @BeforeEach
   public void init() {
-    this.repositorioUsuarioMock = mock(RepositorioUsuario.class);
-    this.servicioRanking = new ServicioRankingImp(this.repositorioUsuarioMock);
+    this.repositorioJugadorMock = mock(RepositorioJugador.class);
+    this.servicioRanking = new ServicioRankingImp(this.repositorioJugadorMock);
   }
 
   @Test
   public void obtenerRankingDeberiaOrdenarJugadoresPorPuntosDeMayorAMenor() {
     // preparacion
-    Usuario juan = new Usuario();
+    Jugador juan = new Jugador();
     juan.setNombre("Juan");
     juan.setPuntos(1000);
 
-    Usuario pedro = new Usuario();
+    Jugador pedro = new Jugador();
     pedro.setNombre("Pedro");
     pedro.setPuntos(1500);
 
-    Usuario lucas = new Usuario();
+    Jugador lucas = new Jugador();
     lucas.setNombre("Lucas");
     lucas.setPuntos(800);
 
-    List<Usuario> jugadores = new ArrayList<>();
+    List<Jugador> jugadores = new ArrayList<>();
     jugadores.add(juan);
     jugadores.add(pedro);
     jugadores.add(lucas);
 
-    when(this.repositorioUsuarioMock.buscarTodos()).thenReturn(jugadores);
+    when(this.repositorioJugadorMock.buscarTodos()).thenReturn(jugadores);
 
     // ejecucion
-    List<Usuario> ranking = this.servicioRanking.obtenerRanking();
+    List<Jugador> ranking = this.servicioRanking.obtenerRanking();
 
     // validacion
     assertThat(ranking.get(0).getNombre(), equalTo("Pedro"));
@@ -58,22 +58,22 @@ public class ServicioRankingTest {
     assertThat(ranking.get(2).getNombre(), equalTo("Lucas"));
     assertThat(ranking.get(2).getPuntos(), equalTo(800));
 
-    verify(this.repositorioUsuarioMock, times(1)).buscarTodos();
+    verify(this.repositorioJugadorMock, times(1)).buscarTodos();
   }
 
   @Test
   public void obtenerRankingSinJugadoresDeberiaDevolverUnaListaVacia() {
     // preparacion
-    List<Usuario> jugadores = new ArrayList<>();
+    List<Jugador> jugadores = new ArrayList<>();
 
-    when(this.repositorioUsuarioMock.buscarTodos()).thenReturn(jugadores);
+    when(this.repositorioJugadorMock.buscarTodos()).thenReturn(jugadores);
 
     // ejecucion
-    List<Usuario> ranking = this.servicioRanking.obtenerRanking();
+    List<Jugador> ranking = this.servicioRanking.obtenerRanking();
 
     // validacion
     assertThat(ranking.size(), equalTo(0));
 
-    verify(this.repositorioUsuarioMock, times(1)).buscarTodos();
+    verify(this.repositorioJugadorMock, times(1)).buscarTodos();
   }
 }

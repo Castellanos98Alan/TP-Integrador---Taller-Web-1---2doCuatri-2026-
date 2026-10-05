@@ -8,18 +8,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class ServicioRankingImp implements ServicioRanking {
 
-  private RepositorioUsuario repositorioUsuario;
+  private RepositorioJugador repositorioJugador;
 
-  public ServicioRankingImp(RepositorioUsuario repositorioUsuario) {
-    this.repositorioUsuario = repositorioUsuario;
+  public ServicioRankingImp(RepositorioJugador repositorioJugador) {
+    this.repositorioJugador = repositorioJugador;
   }
 
   @Transactional
   @Override
-  public List<Usuario> obtenerRanking() {
-    List<Usuario> jugadores = this.repositorioUsuario.buscarTodos();
+  public List<Jugador> obtenerRanking() {
+    List<Jugador> jugadores = this.repositorioJugador.buscarTodos();
 
-    List<Usuario> ranking = new ArrayList<>(jugadores);
+    List<Jugador> ranking = new ArrayList<>(jugadores);
 
     ranking.sort((jugador1, jugador2) -> jugador2.getPuntos().compareTo(jugador1.getPuntos()));
 
