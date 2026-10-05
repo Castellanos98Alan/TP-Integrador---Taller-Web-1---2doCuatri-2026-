@@ -17,6 +17,12 @@ public class Jugador {
 
   private String nivel;
 
+  @ManyToOne(fetch = FetchType.EAGER)
+  private Estadistica estadisticas;
+
+  @OneToOne(fetch = FetchType.EAGER)
+  private Usuario usuario;
+
   @Column(nullable = false)
   private Integer puntos;
 

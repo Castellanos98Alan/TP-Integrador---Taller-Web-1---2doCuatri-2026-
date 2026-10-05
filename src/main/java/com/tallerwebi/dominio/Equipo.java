@@ -12,11 +12,15 @@ public class Equipo {
 
   private String nombre;
 
+  @OneToMany(fetch = FetchType.LAZY)
+  private List<Jugador> jugadores;
+
   public Equipo() {}
 
   public Equipo(Integer id, String nombre, List<Jugador> jugadores) {
     this.id = id;
     this.nombre = nombre;
+    this.jugadores = jugadores;
   }
 
   public Integer getId() {
@@ -33,5 +37,13 @@ public class Equipo {
 
   public void setNombre(String nombre) {
     this.nombre = nombre;
+  }
+
+  public List<Jugador> getJugadores() {
+    return jugadores;
+  }
+
+  public void setJugadores(List<Jugador> jugadores) {
+    this.jugadores = jugadores;
   }
 }

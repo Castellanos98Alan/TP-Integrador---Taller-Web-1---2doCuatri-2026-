@@ -67,6 +67,9 @@ public class Partido {
   @ManyToOne(fetch = FetchType.EAGER)
   private Resultado resultado;
 
+  @OneToMany(fetch = FetchType.LAZY)
+  private List<Estadistica> estadisticas;
+
   public Partido() {
     this.estado = EstadoPartido.ACTIVO;
   }
@@ -214,4 +217,13 @@ public class Partido {
   public void setResultado(Resultado resultado) {
     this.resultado = resultado;
   }
+
+  public List<Estadistica> getEstadisticas() {
+    return estadisticas;
+  }
+
+  public void setEstadisticas(List<Estadistica> estadisticas) {
+    this.estadisticas = estadisticas;
+  }
+
 }
