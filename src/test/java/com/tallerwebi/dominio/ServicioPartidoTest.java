@@ -7,6 +7,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioPartido;
+import com.tallerwebi.presentacion.DatosCrearPartido;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,11 +17,13 @@ public class ServicioPartidoTest {
 
   private ServicioPartido servicioPartido;
   private RepositorioPartido repositorioPartidoMock;
+  private RepositorioCancha repositorioCanchaMock;
 
   @BeforeEach
   public void init() {
     repositorioPartidoMock = mock(RepositorioPartido.class);
-    servicioPartido = new ServicioPartidoImpl(repositorioPartidoMock);
+    repositorioCanchaMock = mock(RepositorioCancha.class);
+    servicioPartido = new ServicioPartidoImpl(repositorioPartidoMock, repositorioCanchaMock);
   }
 
   @Test
@@ -207,5 +211,78 @@ public class ServicioPartidoTest {
     assertThat("La lista no debería estar vacía", resultado.size(), greaterThan(0));
     Partido partido = resultado.get(0);
     assertThat(partido.getDistanciaKm().toString(), equalTo("5"));
+  }
+
+  //sprint2
+  @Test
+  public void deberiaGuardarElPartidoAlCrearPartido() {
+    // Given
+    when(repositorioCanchaMock.buscarPorNombre("Cancha Los Leones")).thenReturn(new Cancha());
+    DatosCrearPartido datos = new DatosCrearPartido("Cancha Los Leones", LocalDateTime.of(2026, 10, 20, 18, 30), 10, "INTERMEDIO"
+    );
+
+    // When
+    servicioPartido.crearPartido(datos, new Usuario());
+
+    // Then
+    verify(repositorioPartidoMock).guardar(any());
+  }
+
+  @Test
+  public void noDeberiaCrearElPartidoSiLaCanchaIngresadaNoExiste() {
+    // Given
+    DatosCrearPartido datos = new DatosCrearPartido(
+            "Inexistente",
+            LocalDateTime.of(2026, 10, 20, 18, 30),
+            10,
+            "INTERMEDIO"
+    );
+
+    // When
+    Exception exception = assertThrows(
+            RuntimeException.class,
+            () -> servicioPartido.crearPartido(datos, new Usuario())
+    );
+
+    // Then
+    assertEquals("La cancha ingresada no existe.", exception.getMessage());
+    verify(repositorioPartidoMock, never()).guardar(any());
+  }
+
+  @Test
+  public void noDeberiaCrearElPartidoSiElCupoEsCeroONegativo() {
+    // Given
+    DatosCrearPartido datos = new DatosCrearPartido(
+            "Cancha Los Leones",
+            LocalDateTime.of(2026, 10, 20, 18, 30),
+            0,
+            "INTERMEDIO"
+    );
+
+    // When
+    Exception exception = assertThrows(
+            RuntimeException.class,
+            () -> servicioPartido.crearPartido(datos, new Usuario())
+    );
+
+    // Then
+    assertEquals("El cupo debe ser mayor a cero.", exception.getMessage());
+    verify(repositorioPartidoMock, never()).guardar(any());
+  }
+
+  @Test
+  public void noDeberiaCrearElPartidoSiLaFechaEstaVacia() {
+    // Given
+    DatosCrearPartido datos = new DatosCrearPartido("Cancha Los Leones", null, 10, "INTERMEDIO");
+
+    // When
+    Exception exception = assertThrows(
+            RuntimeException.class,
+            () -> servicioPartido.crearPartido(datos, new Usuario())
+    );
+
+    // Then
+    assertEquals("Debe ingresar una fecha y hora.", exception.getMessage());
+    verify(repositorioPartidoMock, never()).guardar(any());
   }
 }

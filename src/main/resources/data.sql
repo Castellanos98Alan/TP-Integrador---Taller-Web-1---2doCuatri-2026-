@@ -9,3 +9,12 @@ VALUES(null, 'pedro@gmail.com', '1234', 'USUARIO', true, 'Pedro', 110);
 
 INSERT INTO Usuario(id, email, password, rol, activo, nombre, puntos)
 VALUES(null, 'lucas@gmail.com', '1234', 'USUARIO', true, 'Lucas', 25);
+
+INSERT INTO Cancha(id, nombre)
+VALUES(null, 'Cancha Los Leones');
+
+INSERT INTO Cancha(id, nombre)
+VALUES(null, 'Cancha 5');
+
+INSERT INTO Cancha(id, nombre)
+VALUES(null, 'Cancha El Potrero');

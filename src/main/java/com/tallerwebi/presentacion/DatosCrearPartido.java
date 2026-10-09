@@ -1,15 +1,21 @@
 package com.tallerwebi.presentacion;
 
+import java.time.LocalDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
+
 public class DatosCrearPartido {
 
   private String cancha;
-  private String fechaHora;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private LocalDateTime fechaHora;
+
   private Integer cupo;
   private String nivel;
 
   public DatosCrearPartido() {}
 
-  public DatosCrearPartido(String cancha, String fechaHora, Integer cupo, String nivel) {
+  public DatosCrearPartido(String cancha, LocalDateTime fechaHora, Integer cupo, String nivel) {
     this.cancha = cancha;
     this.fechaHora = fechaHora;
     this.cupo = cupo;
@@ -24,11 +30,11 @@ public class DatosCrearPartido {
     this.cancha = cancha;
   }
 
-  public String getFechaHora() {
+  public LocalDateTime getFechaHora() {
     return fechaHora;
   }
 
-  public void setFechaHora(String fechaHora) {
+  public void setFechaHora(LocalDateTime fechaHora) {
     this.fechaHora = fechaHora;
   }
 

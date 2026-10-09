@@ -12,8 +12,29 @@ public class Equipo {
 
   private String nombre;
 
+  /*@ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+          name = "equipo_jugador",
+          joinColumns = @JoinColumn(name = "equipo_id"),
+          inverseJoinColumns = @JoinColumn(name = "jugador_id")
+
+  private List<Jugador> jugadores = new ArrayList<>();
+ )*/
   public Equipo() {}
 
+  /*public Equipo(Integer id, String nombre, List<Jugador> jugadores) {
+    this.id = id;
+    this.nombre = nombre;
+    this.jugadores = jugadores;
+  }
+
+  public List<Jugador> getJugadores() {
+    return jugadores;
+  }
+
+  public void setJugadores(List<Jugador> jugadores) {
+    this.jugadores = jugadores;
+  }*/
   public Equipo(Integer id, String nombre, List<Jugador> jugadores) {
     this.id = id;
     this.nombre = nombre;

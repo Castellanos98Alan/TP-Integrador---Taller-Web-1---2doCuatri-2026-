@@ -13,14 +13,42 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServicioPartidoImpl implements ServicioPartido {
 
   private final RepositorioPartido repositorioPartido;
+  private final RepositorioCancha repositorioCancha;
 
   @Autowired
-  public ServicioPartidoImpl(RepositorioPartido repositorioPartido) {
+  public ServicioPartidoImpl(
+    RepositorioPartido repositorioPartido,
+    RepositorioCancha repositorioCancha
+  ) {
     this.repositorioPartido = repositorioPartido;
+    this.repositorioCancha = repositorioCancha;
   }
 
+  //spint 2
   @Override
-  public void crearPartido(DatosCrearPartido datos, Usuario creador) {}
+  public void crearPartido(DatosCrearPartido datos, Usuario creador) {
+    if (datos.getCupo() == null || datos.getCupo() <= 0) {
+      throw new RuntimeException("El cupo debe ser mayor a cero.");
+    }
+
+    if (datos.getFechaHora() == null) {
+      throw new RuntimeException("Debe ingresar una fecha y hora.");
+    }
+
+    Cancha cancha = repositorioCancha.buscarPorNombre(datos.getCancha());
+    if (cancha == null) {
+      throw new RuntimeException("La cancha ingresada no existe.");
+    }
+
+    Partido partido = new Partido();
+    partido.setCancha(cancha);
+    partido.setFecha(datos.getFechaHora());
+    partido.setCupoMaximo(datos.getCupo());
+    partido.setNivel(datos.getNivel());
+    partido.setOrganizador(creador);
+
+    repositorioPartido.guardar(partido);
+  }
 
   @Override
   public void cancelarPartido(Long partidoId, Usuario usuarioLogueado) {

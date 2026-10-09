@@ -19,6 +19,8 @@ public class Resultado {
   @ManyToOne(fetch = FetchType.EAGER)
   private Equipo perdedor;
 
+  //agregar caso de empate
+
   private LocalDateTime fechaRegistro;
 
   public Resultado() {}
