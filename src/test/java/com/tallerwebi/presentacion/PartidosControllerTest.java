@@ -429,6 +429,28 @@ public class PartidosControllerTest {
     );
   }
 
+  @Test
+  public void unirseAlPartidoConExcepcionDeberiaLanzarError() {
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
+
+    doThrow(new RuntimeException("Cupo maximo alcanzado")).when(servicioPartidoMock).unirseAPartido(1L, usuario);
+
+    ModelAndView modelAndView = partidosController.unirseAlPartido(1L, requestMock);
+
+    verify(servicioPartidoMock, times(1)).unirseAPartido(1L, usuario);
+
+
+    assertThat(
+            modelAndView.getViewName(),
+            equalToIgnoringCase("redirect:/partido/1/sala-de-espera")
+    );
+  }
+
   private void thenLaHoraCoincideCon(String horaBuscada, ModelAndView mav) {
     List<Partido> lista = (List<Partido>) mav.getModel().get(ATRIBUTO_LISTA);
     Partido partido = lista.get(0);
