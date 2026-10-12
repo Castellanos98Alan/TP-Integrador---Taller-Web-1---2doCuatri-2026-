@@ -84,7 +84,7 @@ public class PartidosController {
     Model model,
     HttpServletRequest request
   ) {
-    Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute("usuario");
+    Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute("USUARIO");
 
     if (usuarioLogueado == null) {
       return new ModelAndView("redirect:/login");
