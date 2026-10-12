@@ -47,9 +47,6 @@ public class Partido {
   private EstadoPartido estado;
 
   //private String modalidad;
-  //private String nivel;
-  private Integer cantJugadores;
-
   //private String descripcion;
 
   @ManyToOne(fetch = FetchType.EAGER)
@@ -72,6 +69,12 @@ public class Partido {
 
   public Partido() {
     this.estado = EstadoPartido.ACTIVO;
+  }
+
+  public Partido(String nivel, Boolean esPrivado, LocalDateTime fecha) {
+    this.nivel = nivel;
+    this.esPrivado = esPrivado;
+    this.fecha = fecha;
   }
 
   public void iniciarPartido() {
@@ -174,18 +177,6 @@ public class Partido {
     this.organizador = organizador;
   }
 
-  public Integer getCantJugadores() {
-    return cantJugadores;
-  }
-
-  public void setCantJugadores(Integer cantJugadores) {
-    this.cantJugadores = cantJugadores;
-  }
-
-  public void setCupoMaximo(Integer cupoMaximo) {
-    this.cupoMaximo = cupoMaximo;
-  }
-
   public Integer getDistancia() {
     return distancia;
   }
@@ -225,5 +216,4 @@ public class Partido {
   public void setEstadisticas(List<Estadistica> estadisticas) {
     this.estadisticas = estadisticas;
   }
-
 }
