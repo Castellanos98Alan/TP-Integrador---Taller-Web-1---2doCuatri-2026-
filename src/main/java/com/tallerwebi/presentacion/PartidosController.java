@@ -138,7 +138,6 @@ public class PartidosController {
     return new ModelAndView("sala-de-espera", model);
   }
 
-
   // Con este metodo procesamos la accion de unirse a un partido especifico mediante una peticion POST,
   //utilizando el ID de partido que mandamos por la URL.
   // Utilizamos el HttpServletRequest para poder almacenar la sesion de ese momento, esto para poder traer al usuario logueado
