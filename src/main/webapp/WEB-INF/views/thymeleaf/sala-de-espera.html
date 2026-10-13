@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sala de Espera - ArmoLaCancha</title>
+
+    <!-- Bootstrap CSS y FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background-color: #ebf0ee;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #17332b;
+        }
+
+        /* NAVBAR */
+        .navbar-principal {
+            background-color: #003c2e;
+            padding: 12px 35px;
+        }
+        .marca {
+            color: white;
+            font-size: 25px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .marca span { color: #50e3a4; }
+        .nav-link {
+            color: white !important;
+            margin: 0 10px;
+        }
+        .nav-link.active {
+            color: #ffe600 !important;
+            border-bottom: 3px solid #ffe600;
+        }
+        .boton-crear {
+            background-color: #ffe600;
+            color: #18352c;
+            font-weight: bold;
+            border-radius: 8px;
+            padding: 10px 20px;
+            text-decoration: none;
+        }
+
+        /* HERO DEL PARTIDO */
+        .hero-partido {
+            background-color: #003c2e;
+            color: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        .cancha-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+        .badge-proximo {
+            color: #50e3a4;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        .info-pill {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 10px 16px;
+        }
+
+        /* TARJETAS Y EQUIPOS */
+        .card-custom {
+            background: white;
+            border-radius: 18px;
+            padding: 22px;
+            border: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+        .equipo-header-verde {
+            background-color: #e8f7f0;
+            color: #003c2e;
+            border-radius: 12px;
+            padding: 10px 16px;
+        }
+        .equipo-header-amarillo {
+            background-color: #fffde6;
+            color: #5c4d00;
+            border-radius: 12px;
+            padding: 10px 16px;
+        }
+        .avatar-jugador {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #50e3a4;
+        }
+        .badge-posicion {
+            background-color: #f0f4f2;
+            color: #4a635a;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+        .badge-puntos {
+            background-color: #d1fae5;
+            color: #065f46;
+            font-weight: bold;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        /* FIELD VISUAL */
+        .cancha-tactica {
+            background: linear-gradient(180deg, #1f7a4d 0%, #155c39 100%);
+            border-radius: 14px;
+            height: 180px;
+            position: relative;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .linea-media {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+        .circulo-central {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-principal mb-4">
+    <div class="container-fluid">
+        <a class="marca" th:href="@{/home}">
+            <i class="fa-solid fa-futbol"></i> ArmoLaCancha
+        </a>
+        <div class="navbar-nav ms-auto me-auto">
+            <a class="nav-link" th:href="@{/home}">Inicio</a>
+            <a class="nav-link active" th:href="@{/partidos}">Partidos</a>
+            <a class="nav-link" th:href="@{/ranking}">Ranking</a>
+            <a class="nav-link" th:href="@{/perfil}">Mi Perfil</a>
+        </div>
+        <a class="boton-crear" th:href="@{/crearPartido}">＋ Crear partido</a>
+    </div>
+</nav>
+
+<div class="container-fluid px-lg-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a th:href="@{/partidos}" class="text-success text-decoration-none fw-bold">
+            <i class="fa-solid fa-arrow-left me-1"></i> Volver a partidos
+        </a>
+        <div class="d-flex gap-3 text-secondary small">
+            <span><i class="fa-solid fa-share-nodes me-1"></i> Compartir</span>
+            <span><i class="fa-regular fa-calendar-plus me-1"></i> Agregar al calendario</span>
+        </div>
+    </div>
+
+    <!-- Alertas de éxito o error -->
+    <div th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${exito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- HERO DEL PARTIDO CON DATOS REALES -->
+    <div class="hero-partido">
+        <div class="row align-items-center">
+            <div class="col-md-3 mb-3 mb-md-0">
+                <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80" class="cancha-img" alt="Cancha">
+            </div>
+            <div class="col-md-9">
+                <span class="badge-proximo">PRÓXIMO PARTIDO - NIVEL: <span th:text="${partido.nivel}"></span></span>
+
+                <!-- Nombre de la cancha desde la base de datos -->
+                <h2 class="fw-bold text-white mb-1" th:text="${partido.cancha != null ? partido.cancha.nombre : 'Cancha sin asignar'}">Nombre de Cancha</h2>
+
+                <p class="text-white-50 mb-3 small">
+                    <i class="fa-solid fa-location-dot text-warning me-1"></i>
+                    <span>Ubicación de la Cancha</span>
+                    (<span th:text="${partido.distanciaKm != null ? partido.distanciaKm : 0}">0</span> km)
+                </p>
+
+                <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                    <!-- Fecha formateada -->
+                    <div class="info-pill d-flex align-items-center gap-2">
+                        <i class="fa-regular fa-calendar text-warning fs-5"></i>
+                        <div>
+                            <small class="d-block text-white-50" style="font-size: 10px;">FECHA</small>
+                            <strong style="font-size: 13px;" th:text="${partido.fecha != null ? #temporals.format(partido.fecha, 'dd/MM/yyyy') : 'A confirmar'}">Fecha</strong>
+                        </div>
+                    </div>
+
+                    <!-- Hora formateada -->
+                    <div class="info-pill d-flex align-items-center gap-2">
+                        <i class="fa-regular fa-clock text-warning fs-5"></i>
+                        <div>
+                            <small class="d-block text-white-50" style="font-size: 10px;">HORARIO</small>
+                            <strong style="font-size: 13px;" th:text="${partido.fecha != null ? #temporals.format(partido.fecha, 'HH:mm') + ' hs' : '--:--'}">Hora</strong>
+                        </div>
+                    </div>
+
+                    <!-- Cupos reales -->
+                    <div class="info-pill d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-users text-warning fs-5"></i>
+                        <div>
+                            <small class="d-block text-white-50" style="font-size: 10px;">CUPOS</small>
+                            <strong style="font-size: 13px;">
+                                <span th:text="${partido.cantJugadores != null ? partido.cantJugadores : 0}">0</span> /
+                                <span th:text="${partido.cupoMaximo}">10</span>
+                            </strong>
+                        </div>
+                    </div>
+
+                    <!-- Botón Unirse (POST) -->
+                    <div class="ms-auto">
+                        <form th:action="@{/partido/{id}/unirse(id=${partido.id})}" method="post">
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold text-dark px-4 py-2" style="border-radius: 12px; background-color: #ffe600;">
+                                <i class="fa-solid fa-user-plus me-1"></i> ¡Unirme al Partido!
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- EQUIPO VERDE / JUGADORES CONFIRMADOS -->
+        <div class="col-lg-4 mb-4">
+            <div class="card card-custom">
+                <div class="equipo-header-verde d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-users-gear fs-4 text-success"></i>
+                        <div>
+                            <h6 class="fw-bold mb-0">Jugadores Confirmados</h6>
+                            <small class="text-muted" style="font-size: 11px;">Lista oficial</small>
+                        </div>
+                    </div>
+                    <span class="badge bg-success px-3 py-2" th:text="${partido.cantJugadores + ' / ' + partido.cupoMaximo}"></span>
+                </div>
+
+                <!-- Mensaje si no hay confirmados -->
+                <div th:if="${partido.confirmados == null || partido.confirmados.isEmpty()}" class="text-center py-4 text-muted small">
+                    <i class="fa-solid fa-futbol display-6 d-block mb-2 text-black-50"></i>
+                    Aún no hay jugadores confirmados. ¡Sumate!
+                </div>
+
+                <!-- Iterar lista real de confirmados -->
+                <div th:each="jugador : ${partido.confirmados}" class="d-flex align-items-center justify-content-between p-2 mb-2 rounded" style="background-color: #f9fbfb;">
+                    <div class="d-flex align-items-center gap-2">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador" alt="Avatar">
+                        <div>
+                            <strong class="d-block text-dark" style="font-size: 14px;" th:text="${jugador.email}">Jugador</strong>
+                            <span class="badge-posicion">Confirmado</span>
+                        </div>
+                    </div>
+                    <span class="badge-puntos">OK</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- EQUIPO AMARILLO (Opcional / Simulado hasta armar equipos) -->
+        <div class="col-lg-4 mb-4">
+            <div class="card card-custom">
+                <div class="equipo-header-amarillo d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-users-gear fs-4 text-warning"></i>
+                        <div>
+                            <h6 class="fw-bold mb-0">Distribución</h6>
+                            <small class="text-muted" style="font-size: 11px;">Equipos</small>
+                        </div>
+                    </div>
+                    <span class="badge bg-warning text-dark px-3 py-2">Modo Sala</span>
+                </div>
+
+                <div class="text-center py-4 text-muted small">
+                    <i class="fa-solid fa-user-clock display-6 d-block mb-2 text-warning"></i>
+                    Los equipos se armarán automáticamente al completarse el cupo de la sala.
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL LATERAL: PROGRESO Y OCUPACIÓN -->
+        <div class="col-lg-4 mb-4">
+            <div class="card card-custom mb-3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="fa-solid fa-scale-balanced fs-4 text-success"></i>
+                    <h6 class="fw-bold mb-0">Balance de equipos</h6>
+                </div>
+                <p class="text-muted small mb-3">Los equipos se balancean en base al nivel y estadísticas de cada jugador.</p>
+
+                <div class="cancha-tactica mb-3">
+                    <div class="linea-media"></div>
+                    <div class="circulo-central"></div>
+                </div>
+
+                <div class="d-flex justify-content-between text-muted small">
+                    <span><i class="fa-solid fa-circle text-success me-1"></i> Estado: Activo</span>
+                </div>
+            </div>
+
+            <div class="card card-custom">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-square-check text-success me-1"></i> Confirmación de Asistencia</h6>
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>Ocupación de la sala</span>
+                    <strong th:text="${(partido.cantJugadores != null ? partido.cantJugadores : 0) + ' de ' + partido.cupoMaximo + ' confirmados'}">0 de 10</strong>
+                </div>
+
+                <!-- Barra de progreso dinámica calculada con Thymeleaf -->
+                <div class="progress mb-3" style="height: 10px; border-radius: 10px;">
+                    <div class="progress-bar bg-success"
+                         th:style="'width: ' + ${(partido.cantJugadores != null && partido.cupoMaximo > 0) ? (partido.cantJugadores * 100 / partido.cupoMaximo) : 0} + '%;'">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -11,8 +11,17 @@ public class Equipo {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id; // Cambiado a Long para consistencia con el resto
+
   private String nombre;
-  @ManyToMany(mappedBy = "equipos", fetch = FetchType.LAZY)
+
+  //@ManyToMany(mappedBy = "equipos", fetch = FetchType.LAZY)
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+    name = "equipo_jugador",
+    joinColumns = @JoinColumn(name = "equipo_id"),
+    inverseJoinColumns = @JoinColumn(name = "jugador_id")
+  )
   private List<Jugador> jugadores = new ArrayList<>();
 
   public Equipo() {}
@@ -20,10 +29,9 @@ public class Equipo {
   public Equipo(Long id, String nombre) {
     this.id = id;
     this.nombre = nombre;
-    this.jugadores = jugadores;
+    //this.jugadores = jugadores;
   }
 
-  // Getters y Setters...
   public Long getId() {
     return id;
   }

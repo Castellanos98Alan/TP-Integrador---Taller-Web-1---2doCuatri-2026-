@@ -41,7 +41,6 @@ public class Estadistica {
     this.partido = partido;
   }
 
-
   public Integer getId() {
     return id;
   }

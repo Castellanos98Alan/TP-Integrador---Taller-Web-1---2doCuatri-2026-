@@ -37,6 +37,7 @@ public class Partido {
   private Integer cupoMaximo;
   private String codigoDeAcceso;
   private Integer distancia; // valor harcodeao. en realidad se obtiene de un calculo con entre las
+  private Integer cantJugadores;
 
   // dos ubicaciones de usuario y Cancha.
   // hay que crear una entidad entre usuario y partido. ej Convocatoria.java
@@ -52,7 +53,7 @@ public class Partido {
   @ManyToOne(fetch = FetchType.EAGER)
   private Usuario organizador;
 
-  @OneToMany(fetch = FetchType.LAZY)
+  @OneToMany(fetch = FetchType.EAGER)
   private List<Usuario> confirmados = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.EAGER)
@@ -215,5 +216,13 @@ public class Partido {
 
   public void setEstadisticas(List<Estadistica> estadisticas) {
     this.estadisticas = estadisticas;
+  }
+
+  public Integer getCantJugadores() {
+    return cantJugadores;
+  }
+
+  public void setCantJugadores(Integer cantJugadores) {
+    this.cantJugadores = cantJugadores;
   }
 }

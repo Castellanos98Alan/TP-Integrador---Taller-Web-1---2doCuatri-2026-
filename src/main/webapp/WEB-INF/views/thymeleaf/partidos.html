@@ -222,14 +222,16 @@
                                 <span th:unless="${partido.esPrivado}" class="badge bg-success"><i class="fa-solid fa-lock-open"></i> Público</span>
                             </div>
 
-                            <form th:action="@{/partidos/unirse}" method="POST" class="mt-auto">
-                                <input type="hidden" name="partidoId" th:value="${partido.id}">
+                            <div class="mt-auto">
+                                <a th:href="@{/partido/{id}/sala-de-espera(id=${partido.id})}" class="btn btn-outline-success w-100 fw-bold">
+                                    Unirme <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </div>
                                 
                                 <div th:if="${partido.esPrivado}" class="mb-2">
                                     <input type="text" name="codigoAcceso" class="form-control form-control-sm" placeholder="Código de acceso" required>
                                 </div>
-                                
-                                <button type="submit" class="btn btn-outline-success w-100 fw-bold">Unirme <i class="fa-solid fa-arrow-right"></i></button>
+
                             </form>
                         </div>
                     </div>

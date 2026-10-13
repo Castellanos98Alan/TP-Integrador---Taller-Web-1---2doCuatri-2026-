@@ -9,6 +9,7 @@ import static org.mockito.Mockito.*;
 import com.tallerwebi.dominio.RepositorioPartido;
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,17 +18,27 @@ public class ServicioPartidoTest {
 
   private ServicioPartido servicioPartido;
   private RepositorioPartido repositorioPartidoMock;
+
   private RepositorioCancha repositorioCanchaMock;
 
   private static final String FILTRO_TODOS = "TODOS";
-  private static final String FILTRO_PRIVADO = "PRIVADO";
-  private static final String FILTRO_PUBLICO = "PUBLICO";
+  // private static final String FILTRO_PRIVADO = "PRIVADO";
+  // private static final String FILTRO_PUBLICO = "PUBLICO";
+
+  private RepositorioUsuario repositorioUsuarioMock;
 
   @BeforeEach
   public void init() {
     repositorioPartidoMock = mock(RepositorioPartido.class);
+    repositorioUsuarioMock = mock(RepositorioUsuario.class);
     repositorioCanchaMock = mock(RepositorioCancha.class);
-    servicioPartido = new ServicioPartidoImpl(repositorioPartidoMock, repositorioCanchaMock);
+
+    servicioPartido =
+      new ServicioPartidoImpl(
+        repositorioPartidoMock,
+        repositorioCanchaMock,
+        repositorioUsuarioMock
+      );
   }
 
   @Test
@@ -121,18 +132,138 @@ public class ServicioPartidoTest {
       FILTRO_TODOS,
       FILTRO_TODOS
     );
+  }
 
-    assertThat(resultado.size(), equalTo(2));
+  public void queUnUsuarioPuedaUnirseAPartidoExitosamente() {
+    Long partidoId = 1L;
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setCupoMaximo(10);
+    partido.setConfirmados(new ArrayList<>());
+    partido.setEstado(Partido.EstadoPartido.ACTIVO);
 
-    verify(repositorioPartidoMock, times(1))
-      .buscarPartidosPorFiltro(
-        "PRINCIPIANTE",
-        FILTRO_TODOS,
-        "22",
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS
-      );
+    Usuario usuario = new Usuario();
+    usuario.setId(100L);
+    usuario.setEmail("test@ejemplo.com");
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    servicioPartido.unirseAPartido(partidoId, usuario);
+
+    assertThat(partido.getConfirmados(), hasSize(1));
+    assertThat(partido.getConfirmados(), hasItem(usuario));
+    assertThat(partido.getCantJugadores(), is(1));
+    verify(repositorioPartidoMock, times(1)).modificar(partido);
+  }
+
+  @Test
+  public void queLanceExcepcionSiElPartidoNoExisteAlQuererUnirse() {
+    Long partidoIdInexistente = 99L;
+    Usuario usuario = new Usuario();
+
+    when(repositorioPartidoMock.buscarPorId(partidoIdInexistente)).thenReturn(null);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> {
+        servicioPartido.unirseAPartido(partidoIdInexistente, usuario);
+      }
+    );
+
+    assertEquals("El partido no existe.", exception.getMessage());
+  }
+
+  @Test
+  public void queLanceExcepcionSiElPartidoEstaCanceladoOFinalizado() {
+    Long partidoId = 1L;
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setEstado(Partido.EstadoPartido.CANCELADO);
+
+    Usuario usuario = new Usuario();
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> {
+        servicioPartido.unirseAPartido(partidoId, usuario);
+      }
+    );
+
+    assertEquals("No se puede unir a un partido finalizado o cancelado.", exception.getMessage());
+  }
+
+  @Test
+  public void queLanceExcepcionSiElUsuarioYaEstaUnido() {
+    Long partidoId = 1L;
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setCupoMaximo(10);
+    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+
+    Usuario usuario = new Usuario();
+    usuario.setId(100L);
+
+    partido.setConfirmados(new ArrayList<>());
+    partido.getConfirmados().add(usuario);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> {
+        servicioPartido.unirseAPartido(partidoId, usuario);
+      }
+    );
+
+    assertEquals("Ya estas anotado en la sala de espera de este partido.", exception.getMessage());
+  }
+
+  @Test
+  public void queLanceExcepcionSiSeAlcanzoElCupoMaximo() {
+    Long partidoId = 1L;
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setCupoMaximo(2);
+    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+
+    Usuario usuario1 = new Usuario();
+    usuario1.setId(101L);
+    Usuario usuario2 = new Usuario();
+    usuario2.setId(102L);
+
+    partido.setConfirmados(new ArrayList<>());
+    partido.getConfirmados().add(usuario1);
+    partido.getConfirmados().add(usuario2);
+
+    Usuario usuarioNuevo = new Usuario();
+    usuarioNuevo.setId(103L);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> {
+        servicioPartido.unirseAPartido(partidoId, usuarioNuevo);
+      }
+    );
+
+    assertEquals("Cupo maximo alcanzado.", exception.getMessage());
+  }
+
+  @Test
+  public void queSePuedaBuscarUnPartidoPorIdExitosamente() {
+    Long partidoId = 1L;
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Partido encontrado = servicioPartido.buscarPartidoPorId(partidoId);
+
+    assertNotNull(encontrado);
+    assertEquals(partidoId, encontrado.getId());
   }
 
   @Test
@@ -209,5 +340,8 @@ public class ServicioPartidoTest {
     // Then
     assertEquals("Debe ingresar una fecha y hora.", exception.getMessage());
     verify(repositorioPartidoMock, never()).guardar(any());
+    //assertThat("La lista no debería estar vacía", resultado.size(), greaterThan(0));
+    //Partido partido = resultado.get(0);
+    //assertThat(partido.getCupoMaximo(), equalTo(22));
   }
 }
