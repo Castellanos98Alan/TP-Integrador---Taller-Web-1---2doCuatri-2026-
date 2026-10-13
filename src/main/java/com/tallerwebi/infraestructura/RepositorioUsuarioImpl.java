@@ -1,5 +1,6 @@
 package com.tallerwebi.infraestructura;
 
+import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.RepositorioUsuario;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
@@ -53,13 +54,5 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
       throw new UsuarioNoEncontrado();
     }
     sessionFactory.getCurrentSession().merge(usuario);
-  }
-
-  @Override
-  public List<Usuario> buscarTodos() {
-    return sessionFactory
-      .getCurrentSession()
-      .createQuery("from Usuario", Usuario.class)
-      .getResultList();
   }
 }

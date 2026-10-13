@@ -13,14 +13,42 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServicioPartidoImpl implements ServicioPartido {
 
   private final RepositorioPartido repositorioPartido;
+  private final RepositorioCancha repositorioCancha;
 
   @Autowired
-  public ServicioPartidoImpl(RepositorioPartido repositorioPartido) {
+  public ServicioPartidoImpl(
+    RepositorioPartido repositorioPartido,
+    RepositorioCancha repositorioCancha
+  ) {
     this.repositorioPartido = repositorioPartido;
+    this.repositorioCancha = repositorioCancha;
   }
 
+  //spint 2
   @Override
-  public void crearPartido(DatosCrearPartido datos, Usuario creador) {}
+  public void crearPartido(DatosCrearPartido datos, Usuario creador) {
+    if (datos.getCupo() == null || datos.getCupo() <= 0) {
+      throw new RuntimeException("El cupo debe ser mayor a cero.");
+    }
+
+    if (datos.getFechaHora() == null) {
+      throw new RuntimeException("Debe ingresar una fecha y hora.");
+    }
+
+    Cancha cancha = repositorioCancha.buscarPorNombre(datos.getCancha());
+    if (cancha == null) {
+      throw new RuntimeException("La cancha ingresada no existe.");
+    }
+
+    Partido partido = new Partido();
+    partido.setCancha(cancha);
+    partido.setFecha(datos.getFechaHora());
+    partido.setCupoMaximo(datos.getCupo());
+    partido.setNivel(datos.getNivel());
+    partido.setOrganizador(creador);
+
+    repositorioPartido.guardar(partido);
+  }
 
   @Override
   public void cancelarPartido(Long partidoId, Usuario usuarioLogueado) {
@@ -64,73 +92,13 @@ public class ServicioPartidoImpl implements ServicioPartido {
     String filtroHora,
     String FiltroDistancia
   ) {
-    //Partidos harcodeados
-    List<Partido> partidosFalsos = new ArrayList<>();
-    Cancha cancha = new Cancha(1L, "Pedro");
-    cancha.setId(1L);
-    cancha.setNombre("Cancha de fútbol los leones");
-
-    Partido partido01 = new Partido();
-    partido01.setId(1L);
-    partido01.setEsPrivado(false);
-    partido01.setNivel("PRINCIPIANTE");
-    partido01.setcupoMaximo(22);
-    partido01.setCancha(cancha);
-    partido01.setCodigoDeAcceso("123");
-    partido01.setDistanciaKm(5);
-    LocalDateTime fechaFalsa = LocalDateTime.of(2026, 10, 2, 14, 30);
-    partido01.setFecha(fechaFalsa);
-    Partido partido02 = new Partido();
-
-    partido02.setId(2L);
-    partido02.setEsPrivado(true);
-    partido02.setNivel("INTERMEDIO");
-    partido02.setcupoMaximo(22);
-    partido02.setCancha(cancha);
-    LocalDateTime fechaFalsa2 = LocalDateTime.of(2026, 10, 2, 18, 00);
-    partido02.setFecha(fechaFalsa2);
-    partido02.setDistanciaKm(3);
-    partidosFalsos.add(partido01);
-
-    partidosFalsos.add(partido02);
-    List<Partido> partidosFiltrados = new ArrayList<>();
-
-    for (Partido p : partidosFalsos) {
-      Boolean coincideNivel = FILTRO_TODOS.equals(filtroNivel) || filtroNivel.equals(p.getNivel());
-
-      Boolean coincideTipo =
-        FILTRO_TODOS.equals(filtroTipo) ||
-        ("PUBLICO".equals(filtroTipo) && !p.getEsPrivado()) ||
-        ("PRIVADO".equals(filtroTipo) && p.getEsPrivado());
-
-      Boolean coincideCupo =
-        FILTRO_TODOS.equals(filtrocupoMaximo) ||
-        (p.getCupoMaximo() != null && p.getCupoMaximo().toString().equals(filtrocupoMaximo));
-
-      Boolean coincideFecha =
-        FILTRO_TODOS.equals(filtroFecha) ||
-        (p.getFecha() != null && p.getFecha().toLocalDate().toString().equals(filtroFecha));
-
-      Boolean coincideHora =
-        FILTRO_TODOS.equals(filtroHora) ||
-        (p.getFecha().toLocalTime() != null &&
-          p.getFecha().toLocalTime().toString().equals(filtroHora));
-
-      Boolean coincideDistancia =
-        FILTRO_TODOS.equals(FiltroDistancia) ||
-        (p.getDistanciaKm() != null && p.getDistanciaKm().toString().equals(FiltroDistancia));
-
-      if (
-        coincideNivel &&
-        coincideTipo &&
-        coincideCupo &&
-        coincideFecha &&
-        coincideHora &&
-        coincideDistancia
-      ) {
-        partidosFiltrados.add(p);
-      }
-    }
-    return partidosFiltrados;
+    return repositorioPartido.buscarPartidosPorFiltro(
+      filtroNivel,
+      filtroTipo,
+      filtrocupoMaximo,
+      filtroFecha,
+      filtroHora,
+      FiltroDistancia
+    );
   }
 }

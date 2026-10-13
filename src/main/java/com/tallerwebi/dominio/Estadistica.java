@@ -1,9 +1,6 @@
 package com.tallerwebi.dominio;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Estadistica {
@@ -18,23 +15,32 @@ public class Estadistica {
   private Integer rojas;
   private Integer puntaje;
 
+  @ManyToOne(fetch = FetchType.EAGER)
+  private Partido partido;
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  private Jugador jugador;
+
+  public Estadistica() {}
+
   public Estadistica(
-    Integer id,
     Integer goles,
     Integer asistencias,
     Integer amarillas,
     Integer rojas,
-    Integer puntaje
+    Integer puntaje,
+    Jugador jugador,
+    Partido partido
   ) {
-    this.id = id;
     this.goles = goles;
     this.asistencias = asistencias;
     this.amarillas = amarillas;
     this.rojas = rojas;
     this.puntaje = puntaje;
+    this.jugador = jugador;
+    this.partido = partido;
   }
 
-  public Estadistica() {}
 
   public Integer getId() {
     return id;
@@ -82,5 +88,21 @@ public class Estadistica {
 
   public void setPuntaje(Integer puntaje) {
     this.puntaje = puntaje;
+  }
+
+  public Jugador getJugador() {
+    return jugador;
+  }
+
+  public void setJugador(Jugador jugador) {
+    this.jugador = jugador;
+  }
+
+  public Partido getPartido() {
+    return partido;
+  }
+
+  public void setPartido(Partido partido) {
+    this.partido = partido;
   }
 }

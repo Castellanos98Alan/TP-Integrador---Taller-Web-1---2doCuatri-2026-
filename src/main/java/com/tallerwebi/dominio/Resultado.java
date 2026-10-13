@@ -13,11 +13,13 @@ public class Resultado {
   private Integer golesPrimerEquipo;
   private Integer golesSegundoEquipo;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @OneToOne(fetch = FetchType.EAGER)
   private Equipo ganador;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @OneToOne(fetch = FetchType.EAGER)
   private Equipo perdedor;
+
+  //agregar caso de empate
 
   private LocalDateTime fechaRegistro;
 

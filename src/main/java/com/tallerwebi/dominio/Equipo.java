@@ -11,9 +11,7 @@ public class Equipo {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id; // Cambiado a Long para consistencia con el resto
-
   private String nombre;
-
   @ManyToMany(mappedBy = "equipos", fetch = FetchType.LAZY)
   private List<Jugador> jugadores = new ArrayList<>();
 
@@ -22,6 +20,7 @@ public class Equipo {
   public Equipo(Long id, String nombre) {
     this.id = id;
     this.nombre = nombre;
+    this.jugadores = jugadores;
   }
 
   // Getters y Setters...
