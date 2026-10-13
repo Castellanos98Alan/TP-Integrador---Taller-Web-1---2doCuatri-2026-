@@ -75,6 +75,14 @@ public class PartidosController {
         filtroDistancia
       )
     );
+
+    model.put("nivelSeleccionado", filtroNivel);
+    model.put("tipoSeleccionado", filtroTipo);
+    model.put("cupoSeleccionado", filtroCupo);
+    model.put("fechaSeleccionada", filtroFecha);
+    model.put("horaSeleccionada", filtroHora);
+    model.put("distanciaSeleccionada", filtroDistancia);
+
     return new ModelAndView("partidos", model);
   }
 
