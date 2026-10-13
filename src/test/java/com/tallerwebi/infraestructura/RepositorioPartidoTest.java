@@ -2,20 +2,12 @@ package com.tallerwebi.infraestructura;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-feature/crear-partido-sprint2
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-
 
 import com.tallerwebi.dominio.Cancha;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.RepositorioPartido;
-feature/crear-partido-sprint2
 import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
-import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -33,6 +25,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = { HibernateInfraestructuraTestConfig.class })
 public class RepositorioPartidoTest {
 
+  public static final String FILTRO_TODOS = "TODOS";
+
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -42,7 +36,6 @@ public class RepositorioPartidoTest {
   public void init() {
     repositorioPartido = new RepositorioPartidoImpl(sessionFactory);
   }
-
 
   @Test
   @Transactional
@@ -59,8 +52,7 @@ public class RepositorioPartidoTest {
     assertThat(partidoObtenido.getNivel(), is(equalTo("PRINCIPIANTE")));
     assertThat(partidoObtenido.getCupoMaximo(), is(equalTo(10)));
     assertThat(partidoObtenido.getId(), is(equalTo(partido.getId())));
-
-  public static final String FILTRO_TODOS = "TODOS";
+  }
 
   @Test
   @Transactional
@@ -107,13 +99,11 @@ public class RepositorioPartidoTest {
 
     // validación
     assertThat(partidosObtenidos.size(), equalTo(2));
-
   }
 
   @Test
   @Transactional
   @Rollback
-
   public void deberiaGuardarUnPartidoConCanchaYOrganizador() {
     // Given
     Cancha cancha = givenExisteUnaCancha("Cancha Los Leones");
@@ -156,6 +146,7 @@ public class RepositorioPartidoTest {
     usuario.setRol("Organizador");
     sessionFactory.getCurrentSession().persist(usuario);
     return usuario;
+  }
 
   public void deberiaFiltrarPartidosPorNivelYDistancia() {
     // 1. Preparación

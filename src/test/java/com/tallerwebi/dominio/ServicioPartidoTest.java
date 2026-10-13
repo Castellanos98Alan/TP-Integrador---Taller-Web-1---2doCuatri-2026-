@@ -134,15 +134,16 @@ public class ServicioPartidoTest {
         FILTRO_TODOS
       );
   }
-  
-  }
 
-  //sprint2
   @Test
   public void deberiaGuardarElPartidoAlCrearPartido() {
     // Given
     when(repositorioCanchaMock.buscarPorNombre("Cancha Los Leones")).thenReturn(new Cancha());
-    DatosCrearPartido datos = new DatosCrearPartido("Cancha Los Leones", LocalDateTime.of(2026, 10, 20, 18, 30), 10, "INTERMEDIO"
+    DatosCrearPartido datos = new DatosCrearPartido(
+      "Cancha Los Leones",
+      LocalDateTime.of(2026, 10, 20, 18, 30),
+      10,
+      "INTERMEDIO"
     );
 
     // When
@@ -156,16 +157,16 @@ public class ServicioPartidoTest {
   public void noDeberiaCrearElPartidoSiLaCanchaIngresadaNoExiste() {
     // Given
     DatosCrearPartido datos = new DatosCrearPartido(
-            "Inexistente",
-            LocalDateTime.of(2026, 10, 20, 18, 30),
-            10,
-            "INTERMEDIO"
+      "Inexistente",
+      LocalDateTime.of(2026, 10, 20, 18, 30),
+      10,
+      "INTERMEDIO"
     );
 
     // When
     Exception exception = assertThrows(
-            RuntimeException.class,
-            () -> servicioPartido.crearPartido(datos, new Usuario())
+      RuntimeException.class,
+      () -> servicioPartido.crearPartido(datos, new Usuario())
     );
 
     // Then
@@ -177,16 +178,16 @@ public class ServicioPartidoTest {
   public void noDeberiaCrearElPartidoSiElCupoEsCeroONegativo() {
     // Given
     DatosCrearPartido datos = new DatosCrearPartido(
-            "Cancha Los Leones",
-            LocalDateTime.of(2026, 10, 20, 18, 30),
-            0,
-            "INTERMEDIO"
+      "Cancha Los Leones",
+      LocalDateTime.of(2026, 10, 20, 18, 30),
+      0,
+      "INTERMEDIO"
     );
 
     // When
     Exception exception = assertThrows(
-            RuntimeException.class,
-            () -> servicioPartido.crearPartido(datos, new Usuario())
+      RuntimeException.class,
+      () -> servicioPartido.crearPartido(datos, new Usuario())
     );
 
     // Then
@@ -201,8 +202,8 @@ public class ServicioPartidoTest {
 
     // When
     Exception exception = assertThrows(
-            RuntimeException.class,
-            () -> servicioPartido.crearPartido(datos, new Usuario())
+      RuntimeException.class,
+      () -> servicioPartido.crearPartido(datos, new Usuario())
     );
 
     // Then

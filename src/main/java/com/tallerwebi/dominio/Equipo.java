@@ -12,7 +12,6 @@ public class Equipo {
 
   private String nombre;
 
-
   @OneToMany(fetch = FetchType.LAZY)
   private List<Jugador> jugadores;
 
