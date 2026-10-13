@@ -49,7 +49,7 @@ public class RepositorioPartidoTest {
     Partido partido01 = new Partido();
     partido01.setEsPrivado(false);
     partido01.setNivel("PRINCIPIANTE");
-    partido01.setcupoMaximo(22);
+    partido01.setCupoMaximo(22);
     partido01.setCancha(cancha);
     partido01.setCodigoDeAcceso("123");
     partido01.setDistanciaKm(5);
@@ -59,7 +59,7 @@ public class RepositorioPartidoTest {
     Partido partido02 = new Partido();
     partido02.setEsPrivado(true);
     partido02.setNivel("INTERMEDIO");
-    partido02.setcupoMaximo(22);
+    partido02.setCupoMaximo(22);
     partido02.setCancha(cancha);
     LocalDateTime fechaFalsa2 = LocalDateTime.of(2026, 10, 2, 18, 00);
     partido02.setFecha(fechaFalsa2);
@@ -130,12 +130,12 @@ public class RepositorioPartidoTest {
 
     Partido partidoPrivado10 = new Partido();
     partidoPrivado10.setEsPrivado(true);
-    partidoPrivado10.setcupoMaximo(10);
+    partidoPrivado10.setCupoMaximo(10);
     partidoPrivado10.setCancha(cancha);
 
     Partido partidoPublico22 = new Partido();
     partidoPublico22.setEsPrivado(false);
-    partidoPublico22.setcupoMaximo(22);
+    partidoPublico22.setCupoMaximo(22);
     partidoPublico22.setCancha(cancha);
 
     repositorioPartido.guardar(partidoPrivado10);

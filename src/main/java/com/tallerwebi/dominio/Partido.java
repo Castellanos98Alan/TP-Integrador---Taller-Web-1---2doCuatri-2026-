@@ -109,7 +109,7 @@ public class Partido {
     return this.cupoMaximo;
   }
 
-  public void setcupoMaximo(Integer nuevoTopeCupos) {
+  public void setCupoMaximo(Integer nuevoTopeCupos) {
     this.cupoMaximo = nuevoTopeCupos;
   }
 
