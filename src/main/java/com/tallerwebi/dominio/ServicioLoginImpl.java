@@ -44,4 +44,9 @@ public class ServicioLoginImpl implements ServicioLogin {
     */
 
   }
+
+  @Override
+  public void modificar(Usuario usuario) {
+    repositorioUsuario.modificar(usuario);
+  }
 }

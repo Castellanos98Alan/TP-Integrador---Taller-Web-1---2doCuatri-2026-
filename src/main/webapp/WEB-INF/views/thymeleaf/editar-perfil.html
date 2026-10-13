@@ -76,12 +76,12 @@
 </section>
 
 
+
 <div class="container-fluid contenido-ranking">
 
     <div class="row">
 
         <!-- FORMULARIO -->
-
         <div class="col-lg-8">
 
             <form id="formPerfil"
@@ -94,51 +94,72 @@
                     Información personal
                 </div>
 
-                <p class="form-panel-sub">Actualizá los datos de tu perfil deportivo.</p>
+                <p class="form-panel-sub">
+                    Actualizá los datos de tu perfil deportivo.
+                </p>
 
-                <div class="form-grid">
+                <div class="campo campo-completo">
+                    <label for="nickname">Nickname</label>
+                    <input
+                            type="text"
+                            id="nickname"
+                            name="nickname"
+                            th:value="${nickname}"
+                            placeholder="Ej: Tomi R.">
 
-                    <div class="campo campo-completo">
-                        <label for="nombre">Nombre completo <span>*</span></label>
-                        <input
-                                type="text"
-                                id="nombre"
-                                name="nombre"
-                                placeholder="Ej: Santiago Navarro"
-                                required>
-                    </div>
+                    <small class="ayuda">
+                        Este será el nombre que verán los demás jugadores.
+                        Si lo dejás vacío, mostraremos tu nombre.
+                    </small>
+                </div>
 
-                    <div class="campo">
-                        <label for="posicion">Posición</label>
-                        <select id="posicion" name="posicion">
-                            <option value="" selected disabled>Seleccioná tu posición</option>
-                            <option value="Arquero">Arquero</option>
-                            <option value="Defensor">Defensor</option>
-                            <option value="Mediocampista">Mediocampista</option>
-                            <option value="Delantero">Delantero</option>
-                            <option value="Polifuncional">Polifuncional</option>
-                        </select>
-                    </div>
+                <div class="campo">
+                    <label for="posicion1">Posición principal</label>
+                    <select id="posicion1" name="posicion1">
+                        <option value="">Seleccioná tu posición</option>
+                        <option value="Arquero">Arquero</option>
+                        <option value="Defensor">Defensor</option>
+                        <option value="Mediocampista">Mediocampista</option>
+                        <option value="Delantero">Delantero</option>
+                        <option value="Polifuncional">Polifuncional</option>
+                    </select>
+                </div>
 
-                    <div class="campo">
-                        <label for="zona">Zona</label>
-                        <input
-                                type="text"
-                                id="zona"
-                                name="zona"
-                                placeholder="Ej: Laferrere">
-                    </div>
+                <div class="campo">
+                    <label for="posicion2">Posición secundaria</label>
+                    <select id="posicion2" name="posicion2">
+                        <option value="">Sin posición secundaria</option>
+                        <option value="Arquero">Arquero</option>
+                        <option value="Defensor">Defensor</option>
+                        <option value="Mediocampista">Mediocampista</option>
+                        <option value="Delantero">Delantero</option>
+                        <option value="Polifuncional">Polifuncional</option>
+                    </select>
+                </div>
 
-                    <div class="campo campo-completo">
-                        <label for="biografia">Sobre mí</label>
-                        <textarea
-                                id="biografia"
-                                name="biografia"
-                                rows="5"
-                                placeholder="Contanos sobre vos, tu experiencia o qué tipo de equipo buscás..."></textarea>
-                        <small class="ayuda">Compartí algo que te gustaría que sepan los demás jugadores.</small>
-                    </div>
+                <div class="campo">
+                    <label for="zona">Zona</label>
+                    <input
+                            type="text"
+                            id="zona"
+                            name="zona"
+                            th:value="${zona}"
+                            placeholder="Ej: Laferrere">
+                </div>
 
+                <div class="campo campo-completo">
+                    <label for="biografia">Sobre mí</label>
+                    <textarea
+                            id="biografia"
+                            name="biografia"
+                            rows="5"
+                            th:text="${biografia}"
+                            placeholder="Contanos sobre vos, tu experiencia o qué tipo de equipo buscás..."></textarea>
+
+                    <small class="ayuda">
+                        Compartí algo que te gustaría que sepan
+                        los demás jugadores.
+                    </small>
                 </div>
 
                 <div class="form-footer">
@@ -158,6 +179,10 @@
             </form>
 
         </div>
+
+    </div>
+
+</div>
 
 
         <!-- PANEL DERECHO: FOTO -->
