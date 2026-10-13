@@ -43,7 +43,15 @@ public class CrearPartidoController {
       return model;
     }
 
-    servicioPartido.crearPartido(datosPartido, usuario);
+    try {
+      servicioPartido.crearPartido(datosPartido, usuario);
+    } catch (RuntimeException e) {
+      ModelAndView model = new ModelAndView("crearPartido");
+      model.getModelMap().put("datosPartido", datosPartido);
+      model.getModelMap().put("error", e.getMessage());
+      return model;
+    }
+
     return new ModelAndView("redirect:/partidos");
   }
 }

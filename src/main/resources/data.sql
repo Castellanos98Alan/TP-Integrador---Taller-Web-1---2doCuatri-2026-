@@ -1,15 +1,7 @@
 INSERT INTO Usuario(id, email, password, rol, activo)
 VALUES(null, 'test@unlam.edu.ar', 'test', 'ADMIN', true);
 
-INSERT INTO Cancha(id, nombre)
-VALUES(null, 'Cancha Los Leones');
 
-
-INSERT INTO Cancha(id, nombre)
-VALUES(null, 'Cancha 5');
-
-INSERT INTO Cancha(id, nombre)
-VALUES(null, 'Cancha El Potrero');
 
 INSERT INTO Jugador(nombre, posicion1, posicion2, puntos, nivel)
 VALUES('Alan', 'Delantero', 'Arquero', 40, "B");
