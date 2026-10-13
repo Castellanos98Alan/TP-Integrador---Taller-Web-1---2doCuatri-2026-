@@ -31,5 +31,17 @@ public class ServicioLoginImpl implements ServicioLogin {
       throw new UsuarioExistente();
     }
     repositorioUsuario.guardar(usuario);
+    /* Jugador jugador = new Jugador(
+            nombre,
+            posicion1,
+            posicion2,
+            nivel
+    );
+
+    jugador.setUsuario(usuario);
+
+    repositorioJugador.guardar(jugador);
+    */
+
   }
 }

@@ -42,7 +42,7 @@ public class RankingControllerTest {
     when(this.servicioRankingMock.obtenerRanking()).thenReturn(rankingEsperado);
 
     // ejecucion
-    ModelAndView modelAndView = this.rankingController.mostrarRanking();
+    ModelAndView modelAndView = this.rankingController.mostrarRanking(null, null);
 
     // validacion
     assertThat(modelAndView.getViewName(), equalTo("ranking"));

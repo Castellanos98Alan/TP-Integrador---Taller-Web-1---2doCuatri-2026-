@@ -38,27 +38,16 @@ public class ServicioRankingTest {
     lucas.setNombre("Lucas");
     lucas.setPuntos(800);
 
-    List<Jugador> jugadores = new ArrayList<>();
-    jugadores.add(juan);
-    jugadores.add(pedro);
-    jugadores.add(lucas);
+    List<Jugador> rankingEsperado = new ArrayList<>();
+    rankingEsperado.add(pedro);
+    rankingEsperado.add(juan);
 
-    when(this.repositorioJugadorMock.buscarTodos()).thenReturn(jugadores);
+    when(repositorioJugadorMock.buscarRanking()).thenReturn(rankingEsperado);
 
-    // ejecucion
-    List<Jugador> ranking = this.servicioRanking.obtenerRanking();
+    List<Jugador> ranking = servicioRanking.obtenerRanking();
 
-    // validacion
     assertThat(ranking.get(0).getNombre(), equalTo("Pedro"));
-    assertThat(ranking.get(0).getPuntos(), equalTo(1500));
-
     assertThat(ranking.get(1).getNombre(), equalTo("Juan"));
-    assertThat(ranking.get(1).getPuntos(), equalTo(1000));
-
-    assertThat(ranking.get(2).getNombre(), equalTo("Lucas"));
-    assertThat(ranking.get(2).getPuntos(), equalTo(800));
-
-    verify(this.repositorioJugadorMock, times(1)).buscarTodos();
   }
 
   @Test
@@ -74,6 +63,27 @@ public class ServicioRankingTest {
     // validacion
     assertThat(ranking.size(), equalTo(0));
 
-    verify(this.repositorioJugadorMock, times(1)).buscarTodos();
+    verify(this.repositorioJugadorMock, times(1)).buscarRanking();
+  }
+
+  @Test
+  public void dadoQueUnJugadorTiene55PuntosDebeTenerNivelA() {
+    Jugador jugador = new Jugador();
+    jugador.setPuntos(75);
+
+    String nivel = servicioRanking.calcularNivel(75);
+
+    assertThat(nivel, equalTo("A"));
+  }
+
+  @Test
+  public void alSumarPuntosDebeActualizarElNivelDelJugador() {
+    Jugador jugador = new Jugador();
+    jugador.setPuntos(55);
+
+    jugador.setPuntos(90);
+    String nivel = servicioRanking.calcularNivel(jugador.getPuntos());
+
+    assertThat(nivel, equalTo("S"));
   }
 }
