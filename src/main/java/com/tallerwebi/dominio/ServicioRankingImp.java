@@ -8,21 +8,63 @@ import org.springframework.stereotype.Service;
 @Service
 public class ServicioRankingImp implements ServicioRanking {
 
-  private RepositorioUsuario repositorioUsuario;
+  private RepositorioJugador repositorioJugador;
+  private static final Integer LIMITE_D = 10;
+  private static final Integer LIMITE_C = 30;
+  private static final Integer LIMITE_B = 50;
+  private static final Integer LIMITE_A = 80;
+  private static final Integer LIMITE_S = 110;
 
-  public ServicioRankingImp(RepositorioUsuario repositorioUsuario) {
-    this.repositorioUsuario = repositorioUsuario;
+  public ServicioRankingImp(RepositorioJugador repositorioJugador) {
+    this.repositorioJugador = repositorioJugador;
   }
 
   @Transactional
   @Override
-  public List<Usuario> obtenerRanking() {
-    List<Usuario> jugadores = this.repositorioUsuario.buscarTodos();
+  public List<Jugador> obtenerRanking() {
+    return repositorioJugador.buscarRanking();
+  }
 
-    List<Usuario> ranking = new ArrayList<>(jugadores);
+  @Transactional
+  @Override
+  public List<Jugador> obtenerRankingFiltradoPorNivel(String nivel) {
+    return repositorioJugador.buscarRankingPorNivel(nivel);
+  }
 
-    ranking.sort((jugador1, jugador2) -> jugador2.getPuntos().compareTo(jugador1.getPuntos()));
+  @Transactional
+  @Override
+  public List<Jugador> obtenerRankingFiltradoPorPosicion(String posicion) {
+    return repositorioJugador.buscarRankingPorPosicion(posicion);
+  }
 
-    return ranking;
+  @Transactional
+  @Override
+  public List<Jugador> obtenerRankingFiltradoPorNivelYPosicion(String nivel, String posicion) {
+    return repositorioJugador.buscarRankingPorPosicionYNivel(nivel, posicion);
+  }
+
+  @Override
+  public String calcularNivel(Integer puntos) {
+    if (puntos < LIMITE_D) {
+      return "D";
+    }
+
+    if (puntos < LIMITE_C) {
+      return "C";
+    }
+
+    if (puntos < LIMITE_B) {
+      return "B";
+    }
+
+    if (puntos < LIMITE_A) {
+      return "A";
+    }
+
+    if (puntos < LIMITE_S) {
+      return "S";
+    }
+
+    return "SS";
   }
 }

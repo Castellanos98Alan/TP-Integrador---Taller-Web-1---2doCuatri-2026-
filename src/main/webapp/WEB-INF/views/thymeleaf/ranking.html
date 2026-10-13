@@ -586,27 +586,87 @@
 
             <!-- FILTROS VISUALES -->
 
+            <form th:action="@{/ranking}" method="GET">
+
             <div class="filtros">
 
                 <div class="filtro">
 
                     <span>Nivel</span>
 
-                    <select disabled>
-                        <option>Todos los niveles</option>
+                    <select name="nivel" onchange="this.form.submit()">
+
+                        <option value=""
+                                th:selected="${nivelSeleccionado == null or nivelSeleccionado == ''}">
+                            Todos los niveles
+                        </option>
+
+                        <option value="SS"
+                                th:selected="${nivelSeleccionado == 'SS'}">
+                            SS
+                        </option>
+
+                        <option value="S"
+                                th:selected="${nivelSeleccionado == 'S'}">
+                            S
+                        </option>
+
+                        <option value="A"
+                                th:selected="${nivelSeleccionado == 'A'}">
+                            A
+                        </option>
+
+                        <option value="B"
+                                th:selected="${nivelSeleccionado == 'B'}">
+                            B
+                        </option>
+
+                        <option value="C"
+                                th:selected="${nivelSeleccionado == 'C'}">
+                            C
+                        </option>
+
+                        <option value="D"
+                                th:selected="${nivelSeleccionado == 'D'}">
+                            D
+                        </option>
+
                     </select>
 
                 </div>
 
 
                 <div class="filtro">
-
                     <span>Posición</span>
 
-                    <select disabled>
-                        <option>Todas las posiciones</option>
-                    </select>
+                    <select name="posicion" onchange="this.form.submit()">
 
+                        <option value=""
+                                th:selected="${posicionSeleccionada == null or posicionSeleccionada == ''}">
+                            Todas las posiciones
+                        </option>
+
+                        <option value="Arquero"
+                                th:selected="${posicionSeleccionada == 'Arquero'}">
+                            Arquero
+                        </option>
+
+                        <option value="Defensor"
+                                th:selected="${posicionSeleccionada == 'Defensor'}">
+                            Defensor
+                        </option>
+
+                        <option value="Mediocampista"
+                                th:selected="${posicionSeleccionada == 'Mediocampista'}">
+                            Mediocampista
+                        </option>
+
+                        <option value="Delantero"
+                                th:selected="${posicionSeleccionada == 'Delantero'}">
+                            Delantero
+                        </option>
+
+                    </select>
                 </div>
 
 
@@ -625,13 +685,15 @@
 
                     <span>Vista</span>
 
-                    <select disabled>
-                        <option>General</option>
+                    <select onchange="this.form.submit()">
+                        <option value="General">General</option>
+                        <option value="Amigos">Amigos</option>
                     </select>
 
                 </div>
 
             </div>
+            </form>
 
 
 

@@ -1,11 +1,8 @@
-INSERT INTO Usuario(id, email, password, rol, activo, nombre, puntos)
-VALUES(null, 'test@unlam.edu.ar', 'test', 'ADMIN', true, 'Tomi', 0);
+INSERT INTO Usuario(id, email, password, rol, activo)
+VALUES(null, 'test@unlam.edu.ar', 'test', 'ADMIN', true);
 
-INSERT INTO Usuario(id, email, password, rol, activo, nombre, puntos)
-VALUES(null, 'juan@gmail.com', '1234', 'USUARIO', true, 'Juan', 50);
 
-INSERT INTO Usuario(id, email, password, rol, activo, nombre, puntos)
-VALUES(null, 'pedro@gmail.com', '1234', 'USUARIO', true, 'Pedro', 110);
+
 
 INSERT INTO Usuario(id, email, password, rol, activo, nombre, puntos)
 VALUES(null, 'lucas@gmail.com', '1234', 'USUARIO', true, 'Lucas', 25);
@@ -18,3 +15,19 @@ VALUES(null, 'Cancha 5');
 
 INSERT INTO Cancha(id, nombre)
 VALUES(null, 'Cancha El Potrero');
+
+INSERT INTO Jugador(nombre, posicion1, posicion2, puntos, nivel)
+VALUES('Alan', 'Delantero', 'Arquero', 40, "B");
+
+INSERT INTO Jugador(nombre, posicion1, posicion2,  puntos, nivel)
+VALUES('Axel', 'Delantero', 'Arquero', 50, "A");
+
+INSERT INTO Jugador(nombre, posicion1, posicion2,  puntos, nivel)
+VALUES('Santi', 'Defensor', 'Mediocampista', 70, "A");
+
+INSERT INTO Jugador(nombre, posicion1, posicion2, puntos, nivel)
+VALUES('JuanPa', 'Arquero', 'Defensor', 20, "C");
+
+INSERT INTO Jugador(nombre, posicion1, posicion2,  puntos, nivel)
+VALUES('Tomas', 'Defensor', 'Arquero', 0, "D");
+

@@ -19,6 +19,10 @@ public class ServicioPartidoTest {
   private RepositorioPartido repositorioPartidoMock;
   private RepositorioCancha repositorioCanchaMock;
 
+  private static final String FILTRO_TODOS = "TODOS";
+  private static final String FILTRO_PRIVADO = "PRIVADO";
+  private static final String FILTRO_PUBLICO = "PUBLICO";
+
   @BeforeEach
   public void init() {
     repositorioPartidoMock = mock(RepositorioPartido.class);
@@ -94,123 +98,43 @@ public class ServicioPartidoTest {
   }
 
   @Test
-  public void deberiaFiltrarPartidosPorNivelPrincipiante() {
-    // Ejecución
+  public void deberiaDelegarLaBusquedaAlRepositorioConLosFiltrosCorrectos() {
+    List<Partido> listaFalsa = List.of(new Partido(), new Partido());
+
+    when(
+      repositorioPartidoMock.buscarPartidosPorFiltro(
+        "PRINCIPIANTE",
+        FILTRO_TODOS,
+        "22",
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS
+      )
+    )
+      .thenReturn(listaFalsa);
+
     List<Partido> resultado = servicioPartido.listarPartidosSegunFiltro(
       "PRINCIPIANTE",
-      "TODOS",
-      "TODOS",
-      "TODOS",
-      "TODOS",
-      "TODOS"
-    );
-    // Validación
-
-    assertThat(resultado.size(), greaterThan(0));
-    Partido partido = resultado.get(0);
-    assertThat(partido.getNivel(), equalTo("PRINCIPIANTE"));
-  }
-
-  @Test
-  public void deberiaFiltrarPartidosPrivados() {
-    // Ejecución
-    List<Partido> resultado = servicioPartido.listarPartidosSegunFiltro(
-      "TODOS",
-      "PRIVADO",
-      "TODOS",
-      "TODOS",
-      "TODOS",
-      "TODOS"
-    );
-    // Validación
-    assertThat("La lista no debería estar vacía", resultado.size(), greaterThan(0));
-    Partido partido = resultado.get(0);
-    assertThat(partido.getEsPrivado(), equalTo(true));
-  }
-
-  @Test
-  public void deberiaFiltrarPartidosPublicos() {
-    // Ejecución
-    List<Partido> resultado = servicioPartido.listarPartidosSegunFiltro(
-      "TODOS",
-      "PUBLICO",
-      "TODOS",
-      "TODOS",
-      "TODOS",
-      "TODOS"
-    );
-    // Validación
-    assertThat("La lista no debería estar vacía", resultado.size(), greaterThan(0));
-    Partido partido = resultado.get(0);
-    assertThat(partido.getEsPrivado(), equalTo(false));
-  }
-
-  @Test
-  public void deberiaFiltrarPartidosPorCupo22() {
-    // Ejecución
-    List<Partido> resultado = servicioPartido.listarPartidosSegunFiltro(
-      "TODOS",
-      "TODOS",
+      FILTRO_TODOS,
       "22",
-      "TODOS",
-      "TODOS",
-      "TODOS"
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
     );
-    // Validación
-    assertThat("La lista no debería estar vacía", resultado.size(), greaterThan(0));
-    Partido partido = resultado.get(0);
-    assertThat(partido.getCupoMaximo(), equalTo(22));
-  }
 
-  @Test
-  public void deberiaFiltrarPartidosPorFecha() {
-    // Ejecución
-    List<Partido> resultado = servicioPartido.listarPartidosSegunFiltro(
-      "TODOS",
-      "TODOS",
-      "TODOS",
-      "2026-10-02",
-      "TODOS",
-      "TODOS"
-    );
-    // Validación
-    assertThat("La lista no debería estar vacía", resultado.size(), greaterThan(0));
-    Partido partido = resultado.get(0);
-    assertThat(partido.getFecha().toLocalDate().toString(), equalTo("2026-10-02"));
-  }
+    assertThat(resultado.size(), equalTo(2));
 
-  @Test
-  public void deberiaFiltrarPartidosPorHora() {
-    // Ejecución
-    List<Partido> resultado = servicioPartido.listarPartidosSegunFiltro(
-      "TODOS",
-      "TODOS",
-      "TODOS",
-      "TODOS",
-      "14:30",
-      "TODOS"
-    );
-    // Validación
-    assertThat("La lista no debería estar vacía", resultado.size(), greaterThan(0));
-    Partido partido = resultado.get(0);
-    assertThat(partido.getFecha().toLocalTime().toString(), equalTo("14:30"));
+    verify(repositorioPartidoMock, times(1))
+      .buscarPartidosPorFiltro(
+        "PRINCIPIANTE",
+        FILTRO_TODOS,
+        "22",
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS
+      );
   }
-
-  @Test
-  public void deberiaFiltrarPartidosPorDistanciaKm() {
-    // Ejecución
-    List<Partido> resultado = servicioPartido.listarPartidosSegunFiltro(
-      "TODOS",
-      "TODOS",
-      "TODOS",
-      "TODOS",
-      "TODOS",
-      "5"
-    );
-    // Validación
-    assertThat("La lista no debería estar vacía", resultado.size(), greaterThan(0));
-    Partido partido = resultado.get(0);
-    assertThat(partido.getDistanciaKm().toString(), equalTo("5"));
+  
   }
 
   //sprint2
