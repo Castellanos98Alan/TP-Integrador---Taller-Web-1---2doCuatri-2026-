@@ -102,9 +102,10 @@
                 <div class="nombre-fila">
 
                     <h2 class="nombre-jugador"
-                        th:text="${nickname != null and !nickname.isBlank() ? nickname : 'Jugador'}">
+                        th:text="${nickname != null and !nickname.isBlank() ? nickname : (nombreJugador != null and !nombreJugador.isBlank() ? nombreJugador : 'Jugador')}">
                         Jugador
                     </h2>
+
 
                     <a th:href="@{/editar-perfil}" class="boton-editar-hero">
                         <i class="fa-solid fa-pen"></i> Editar perfil

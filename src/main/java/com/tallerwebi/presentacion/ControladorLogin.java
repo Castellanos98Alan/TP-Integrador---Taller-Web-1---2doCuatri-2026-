@@ -11,10 +11,13 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class ControladorLogin {
+
+  private static final String ATRIBUTO_USUARIO = "usuario";
 
   private ServicioLogin servicioLogin;
 
@@ -43,34 +46,43 @@ public class ControladorLogin {
     if (usuarioBuscado != null) {
       request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
       request.getSession().setAttribute("USUARIO", usuarioBuscado);
-
       return new ModelAndView("redirect:/home");
-    } else {
-      Map<String, Object> model = new ModelMap();
-      model.put("error", "Usuario o clave incorrecta");
-      return new ModelAndView("login", model);
     }
+
+    Map<String, Object> model = new ModelMap();
+    model.put("error", "Usuario o clave incorrecta");
+    return new ModelAndView("login", model);
   }
 
+  // Registra el usuario junto con los datos del jugador.
   @RequestMapping(path = "/registrarme", method = RequestMethod.POST)
-  public ModelAndView registrarme(@ModelAttribute("usuario") Usuario usuario) {
+  public ModelAndView registrarme(
+    @ModelAttribute(ATRIBUTO_USUARIO) Usuario usuario,
+    @RequestParam("nombreJugador") String nombreJugador,
+    @RequestParam("posicion1") String posicion1,
+    @RequestParam(value = "posicion2", required = false) String posicion2
+  ) {
     Map<String, Object> model = new ModelMap();
+
     try {
-      servicioLogin.registrar(usuario);
+      servicioLogin.registrar(usuario, nombreJugador, posicion1, posicion2);
     } catch (UsuarioExistente e) {
+      model.put(ATRIBUTO_USUARIO, usuario);
       model.put("error", "El usuario ya existe");
       return new ModelAndView("nuevo-usuario", model);
     } catch (Exception e) {
+      model.put(ATRIBUTO_USUARIO, usuario);
       model.put("error", "Error al registrar el nuevo usuario");
       return new ModelAndView("nuevo-usuario", model);
     }
+
     return new ModelAndView("redirect:/login");
   }
 
   @RequestMapping(path = "/nuevo-usuario", method = RequestMethod.GET)
   public ModelAndView nuevoUsuario() {
     Map<String, Object> model = new ModelMap();
-    model.put("usuario", new Usuario());
+    model.put(ATRIBUTO_USUARIO, new Usuario());
     return new ModelAndView("nuevo-usuario", model);
   }
 

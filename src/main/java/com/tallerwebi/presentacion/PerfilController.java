@@ -43,6 +43,7 @@ public class PerfilController {
     modelAndView.addObject("rol", usuario.getRol());
     modelAndView.addObject("activo", usuario.getActivo());
     modelAndView.addObject("nickname", usuario.getNickname());
+    modelAndView.addObject("nombreJugador", jugador != null ? jugador.getNombre() : null);
     modelAndView.addObject("biografia", usuario.getBiografia());
     modelAndView.addObject("zona", usuario.getZona());
 

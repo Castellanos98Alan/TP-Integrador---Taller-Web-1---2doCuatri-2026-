@@ -35,14 +35,11 @@ public class ControladorLoginTest {
   }
 
   @Test
-  public void loginConUsuarioYPasswordInorrectosDeberiaLlevarALoginNuevamente() {
-    // preparacion
+  public void loginConUsuarioYPasswordIncorrectosDeberiaLlevarALoginNuevamente() {
     when(servicioLoginMock.consultarUsuario(anyString(), anyString())).thenReturn(null);
 
-    // ejecucion
     ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
 
-    // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("login"));
     assertThat(
       modelAndView.getModel().get("error").toString(),
@@ -52,8 +49,7 @@ public class ControladorLoginTest {
   }
 
   @Test
-  public void loginConUsuarioYPasswordCorrectosDeberiaLLevarAHome() {
-    // preparacion
+  public void loginConUsuarioYPasswordCorrectosDeberiaLlevarAHome() {
     Usuario usuarioEncontradoMock = mock(Usuario.class);
     when(usuarioEncontradoMock.getRol()).thenReturn("ADMIN");
 
@@ -61,35 +57,32 @@ public class ControladorLoginTest {
     when(servicioLoginMock.consultarUsuario(anyString(), anyString()))
       .thenReturn(usuarioEncontradoMock);
 
-    // ejecucion
     ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
 
-    // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/home"));
     verify(sessionMock, times(1)).setAttribute("ROL", usuarioEncontradoMock.getRol());
   }
 
+  // MODIFICADO: el registro ahora recibe los datos del jugador.
   @Test
-  public void registrameSiUsuarioNoExisteDeberiaCrearUsuarioYVolverAlLogin()
+  public void registrarmeSiUsuarioNoExisteDeberiaCrearUsuarioYVolverAlLogin()
     throws UsuarioExistente {
-    // ejecucion
-    ModelAndView modelAndView = controladorLogin.registrarme(usuarioMock);
+    ModelAndView modelAndView = controladorLogin.registrarme(usuarioMock, "Dami", "Defensor", null);
 
-    // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
-    verify(servicioLoginMock, times(1)).registrar(usuarioMock);
+    verify(servicioLoginMock, times(1)).registrar(usuarioMock, "Dami", "Defensor", null);
   }
 
+  // MODIFICADO: se simula el usuario existente usando la nueva firma.
   @Test
   public void registrarmeSiUsuarioExisteDeberiaVolverAFormularioYMostrarError()
     throws UsuarioExistente {
-    // preparacion
-    doThrow(UsuarioExistente.class).when(servicioLoginMock).registrar(usuarioMock);
+    doThrow(UsuarioExistente.class)
+      .when(servicioLoginMock)
+      .registrar(usuarioMock, "Dami", "Defensor", null);
 
-    // ejecucion
-    ModelAndView modelAndView = controladorLogin.registrarme(usuarioMock);
+    ModelAndView modelAndView = controladorLogin.registrarme(usuarioMock, "Dami", "Defensor", null);
 
-    // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-usuario"));
     assertThat(
       modelAndView.getModel().get("error").toString(),
@@ -97,15 +90,15 @@ public class ControladorLoginTest {
     );
   }
 
+  // MODIFICADO: se simula un error con la nueva firma del registro.
   @Test
   public void errorEnRegistrarmeDeberiaVolverAFormularioYMostrarError() throws UsuarioExistente {
-    // preparacion
-    doThrow(RuntimeException.class).when(servicioLoginMock).registrar(usuarioMock);
+    doThrow(RuntimeException.class)
+      .when(servicioLoginMock)
+      .registrar(usuarioMock, "Dami", "Defensor", null);
 
-    // ejecucion
-    ModelAndView modelAndView = controladorLogin.registrarme(usuarioMock);
+    ModelAndView modelAndView = controladorLogin.registrarme(usuarioMock, "Dami", "Defensor", null);
 
-    // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-usuario"));
     assertThat(
       modelAndView.getModel().get("error").toString(),
@@ -115,39 +108,31 @@ public class ControladorLoginTest {
 
   @Test
   public void irALoginDeberiaRetornarVistaLoginConDatosLogin() {
-    // ejecucion
     ModelAndView modelAndView = controladorLogin.irALogin();
 
-    // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("login"));
     assertThat(modelAndView.getModel().get("datosLogin"), instanceOf(DatosLogin.class));
   }
 
   @Test
   public void nuevoUsuarioDeberiaRetornarVistaNuevoUsuarioConUsuarioVacio() {
-    // ejecucion
     ModelAndView modelAndView = controladorLogin.nuevoUsuario();
 
-    // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-usuario"));
     assertThat(modelAndView.getModel().get("usuario"), instanceOf(Usuario.class));
   }
 
   @Test
   public void irAHomeDeberiaRetornarVistaHome() {
-    // ejecucion
     ModelAndView modelAndView = controladorLogin.irAHome();
 
-    // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("home"));
   }
 
   @Test
   public void inicioDeberiaRedirigirALogin() {
-    // ejecucion
     ModelAndView modelAndView = controladorLogin.inicio();
 
-    // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
   }
 }
