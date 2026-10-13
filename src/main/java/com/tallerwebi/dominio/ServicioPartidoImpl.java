@@ -47,6 +47,9 @@ public class ServicioPartidoImpl implements ServicioPartido {
     repositorioPartido.modificar(partido);
   }
 
+  //Utilice el Transactional para que no se me cierre la sesion al momento de ejecutar el metodo,
+  //con esto puedo consultar correctamente el partido mandandole el id por parametro.
+  //Tambien inicio la lista de confirmados ya que esta mapeado con LAZY en la clase Partido.
   @Transactional
   @Override
   public Partido buscarPartidoPorId(Long id) {
@@ -57,6 +60,10 @@ public class ServicioPartidoImpl implements ServicioPartido {
     return partido;
   }
 
+  //Primero utilice directamente el metodo buscarPartidoPorId en lugar de usar el repositorioPartido directamente
+  //para que cada vez que lo use me traiga el partido con su lista de confirmados inicializada. Tambien hice una validacion
+  //rapida para ver si el partido existe.
+  //Por ultimo decidi separar las validaciones en metodos privados debido a la regla de PMD y que quede mejor organizado.
   @Override
   public void unirseAPartido(Long partidoId, Usuario usuarioLogueado) {
     Partido partido = buscarPartidoPorId(partidoId);
@@ -74,6 +81,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
     repositorioPartido.modificar(partido);
   }
 
+  //Metodo privado que valida el estado del partido, con esto logro ver si el partido tiene estado Finalizado o Cancelado
+  //si es asi, entonces el usuario no podra ingresar al partido.
   private void validarEstadoDelPartido(Partido partido) {
     if (
       partido.getEstado() == Partido.EstadoPartido.FINALIZADO ||
@@ -83,6 +92,11 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
   }
 
+  //Metodo privado que valida los cupos de la lista de confirmados, donde primero valido si la lista de confirmados es nula
+  //si es asi, entonces inicializo la lista de confirmados. Luego de eso valido si el usuarioLogueado esta dentro de la lista
+  //confirmados, si es asi significa que el usuario ya esta dentro de la sala de espera.
+  //Por ultimo valido que el partido tenga un cupo maximo de jugadores, para luego validar si los usuarios anotados supera el
+  //cupo maximo de jugadores
   private void validarCuposYDisponibilidad(Partido partido, Usuario usuarioLogueado) {
     if (partido.getConfirmados() == null) {
       partido.setConfirmados(new ArrayList<>());

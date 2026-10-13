@@ -105,29 +105,25 @@ public class PartidosController {
     return new ModelAndView("partido-cancelado");
   }
 
+  // Con este metodo manejamos la visualizacion de la sala de espera de un partido especifico, esto mediante el ID de partido
+  //que lo mandamos por la URL.
+  // Utilizamos el HttpServletRequest para poder almacenar la sesion de ese momento, esto para poder traer al usuario logueado
+  //de esa sesion. Validamos si el usuario logueado existe, si no existe entonces retorna un ModelAndView que contiene la vista de login
+  //para que el usuario se loguee.
+  //Si el usuario existe, entonces se utiliza un try catch para manejar excepciones por si el partido no existe.
+  // Dentro del try utilizamos el metodo de servicioPartido para buscar el partido por su ID y que tambien nos traiga
+  //su lista de confirmados inicializada. Si el partido se encuentra entonces devuelve un ModelAndView con la vista
+  //de sala de espera
   @RequestMapping(path = "/partido/{id}/sala-de-espera", method = RequestMethod.GET)
   public ModelAndView verSalaDeEspera(
     @PathVariable("id") Long idPartido,
     HttpServletRequest request
   ) {
     HttpSession session = request.getSession();
-    Usuario usuarioLogueado = null;
-
-    java.util.Enumeration<String> attributeNames = session.getAttributeNames();
-    while (attributeNames.hasMoreElements()) {
-      String key = attributeNames.nextElement();
-      Object value = session.getAttribute(key);
-      if (value instanceof Usuario) {
-        usuarioLogueado = (Usuario) value;
-        break;
-      }
-    }
+    Usuario usuarioLogueado = (Usuario) session.getAttribute("USUARIO");
 
     if (usuarioLogueado == null) {
-      usuarioLogueado = new Usuario();
-      usuarioLogueado.setId(1L);
-      usuarioLogueado.setEmail("test@unlam.edu.ar");
-      session.setAttribute("usuario", usuarioLogueado);
+      return new ModelAndView("redirect:/login?error=Debes+iniciar+sesion+para+unirte");
     }
 
     Map<String, Object> model = new ModelMap();
@@ -142,6 +138,17 @@ public class PartidosController {
     return new ModelAndView("sala-de-espera", model);
   }
 
+
+  // Con este metodo procesamos la accion de unirse a un partido especifico mediante una peticion POST,
+  //utilizando el ID de partido que mandamos por la URL.
+  // Utilizamos el HttpServletRequest para poder almacenar la sesion de ese momento, esto para poder traer al usuario logueado
+  //de esa sesion. Validamos si el usuario logueado existe, si no existe entonces retorna un ModelAndView que contiene la vista de login
+  //para que el usuario se loguee.
+  //Si el usuario existe, entonces se utiliza un try catch para manejar excepciones por si el partido no existe.
+  // Dentro del try utilizamos el metodo de servicioPartido para unirse al partido, donde mandamos el id del partido y
+  //el usuario logueado.
+  //Si se cumplen las validaciones entonces retorna un ModelAndView con la vista de sala de espera mandando el id del partido
+  //en la URL.
   @RequestMapping(path = "/partido/{id}/unirse", method = RequestMethod.POST)
   public ModelAndView unirseAlPartido(
     @PathVariable("id") Long idPartido,

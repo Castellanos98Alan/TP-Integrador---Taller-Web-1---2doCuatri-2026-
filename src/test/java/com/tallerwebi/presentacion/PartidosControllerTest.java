@@ -51,24 +51,24 @@ public class PartidosControllerTest {
   public void deberiaRetornarLaVistaPartidosYElModeloConLaListaDePartidos() {
     List<Partido> listaMock = new ArrayList<>();
     when(
-            servicioPartidoMock.listarPartidosSegunFiltro(
-                    "TODOS",
-                    "TODOS",
-                    null,
-                    "TODOS",
-                    "TODOS",
-                    "TODOS"
-            )
+      servicioPartidoMock.listarPartidosSegunFiltro(
+        "TODOS",
+        "TODOS",
+        null,
+        "TODOS",
+        "TODOS",
+        "TODOS"
+      )
     )
-            .thenReturn(listaMock);
+      .thenReturn(listaMock);
 
     ModelAndView mav = partidosController.consultarPartidos(
-            "TODOS",
-            "TODOS",
-            null,
-            "TODOS",
-            "TODOS",
-            "TODOS"
+      "TODOS",
+      "TODOS",
+      null,
+      "TODOS",
+      "TODOS",
+      "TODOS"
     );
 
     assertThat(mav.getViewName(), equalTo("partidos"));
@@ -84,24 +84,24 @@ public class PartidosControllerTest {
     partidosPublicos.add(p);
 
     when(
-            servicioPartidoMock.listarPartidosSegunFiltro(
-                    FILTRO_TODOS,
-                    FILTRO_PUBLICO,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS
-            )
+      servicioPartidoMock.listarPartidosSegunFiltro(
+        FILTRO_TODOS,
+        FILTRO_PUBLICO,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS
+      )
     )
-            .thenReturn(partidosPublicos);
+      .thenReturn(partidosPublicos);
 
     ModelAndView mav = whenUsuarioConsultaPartidos(
-            FILTRO_TODOS,
-            FILTRO_PUBLICO,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS
+      FILTRO_TODOS,
+      FILTRO_PUBLICO,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
     );
 
     thenElModeloContienePartidosPrivados(mav);
@@ -117,24 +117,24 @@ public class PartidosControllerTest {
     partidosPrincipiantes.add(p);
 
     when(
-            servicioPartidoMock.listarPartidosSegunFiltro(
-                    NIVEL_PRINCIPIANTE,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS
-            )
+      servicioPartidoMock.listarPartidosSegunFiltro(
+        NIVEL_PRINCIPIANTE,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS
+      )
     )
-            .thenReturn(partidosPrincipiantes);
+      .thenReturn(partidosPrincipiantes);
 
     ModelAndView mav = whenUsuarioConsultaPartidos(
-            NIVEL_PRINCIPIANTE,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS
+      NIVEL_PRINCIPIANTE,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
     );
 
     thenElNivelEs(NIVEL_PRINCIPIANTE, mav);
@@ -148,24 +148,24 @@ public class PartidosControllerTest {
     partidosIntermedios.add(p);
 
     when(
-            servicioPartidoMock.listarPartidosSegunFiltro(
-                    NIVEL_INTERMEDIO,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS
-            )
+      servicioPartidoMock.listarPartidosSegunFiltro(
+        NIVEL_INTERMEDIO,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS
+      )
     )
-            .thenReturn(partidosIntermedios);
+      .thenReturn(partidosIntermedios);
 
     ModelAndView mav = whenUsuarioConsultaPartidos(
-            NIVEL_INTERMEDIO,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS
+      NIVEL_INTERMEDIO,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
     );
 
     thenElNivelEs(NIVEL_INTERMEDIO, mav);
@@ -179,24 +179,24 @@ public class PartidosControllerTest {
     partidosAvanzados.add(p);
 
     when(
-            servicioPartidoMock.listarPartidosSegunFiltro(
-                    NIVEL_AVANZADO,
-                    FILTRO_PUBLICO,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS
-            )
+      servicioPartidoMock.listarPartidosSegunFiltro(
+        NIVEL_AVANZADO,
+        FILTRO_PUBLICO,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS
+      )
     )
-            .thenReturn(partidosAvanzados);
+      .thenReturn(partidosAvanzados);
 
     ModelAndView mav = whenUsuarioConsultaPartidos(
-            NIVEL_AVANZADO,
-            FILTRO_PUBLICO,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS
+      NIVEL_AVANZADO,
+      FILTRO_PUBLICO,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
     );
 
     thenElNivelEs(NIVEL_AVANZADO, mav);
@@ -210,24 +210,24 @@ public class PartidosControllerTest {
     partidos10Jugadores.add(p);
     String cupoMaximoString = "10";
     when(
-            servicioPartidoMock.listarPartidosSegunFiltro(
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    cupoMaximoString,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS
-            )
+      servicioPartidoMock.listarPartidosSegunFiltro(
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        cupoMaximoString,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS
+      )
     )
-            .thenReturn(partidos10Jugadores);
+      .thenReturn(partidos10Jugadores);
 
     ModelAndView mav = partidosController.consultarPartidos(
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            cupoMaximoString,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      cupoMaximoString,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
     );
 
     thenLosCuposSon(cupoMaximoString, mav);
@@ -242,24 +242,24 @@ public class PartidosControllerTest {
     String cupoMaximoString = "22";
 
     when(
-            servicioPartidoMock.listarPartidosSegunFiltro(
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    cupoMaximoString,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS
-            )
+      servicioPartidoMock.listarPartidosSegunFiltro(
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        cupoMaximoString,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS
+      )
     )
-            .thenReturn(partidos22Jugadores);
+      .thenReturn(partidos22Jugadores);
 
     ModelAndView mav = partidosController.consultarPartidos(
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            cupoMaximoString,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      cupoMaximoString,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
     );
 
     thenLosCuposSon(cupoMaximoString, mav);
@@ -274,24 +274,24 @@ public class PartidosControllerTest {
     String distanciaKmString = "3";
 
     when(
-            servicioPartidoMock.listarPartidosSegunFiltro(
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    "5"
-            )
+      servicioPartidoMock.listarPartidosSegunFiltro(
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        "5"
+      )
     )
-            .thenReturn(partidosCercanos);
+      .thenReturn(partidosCercanos);
 
     ModelAndView mav = partidosController.consultarPartidos(
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            "5"
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      "5"
     );
 
     thenLaDistanciaEsMenorOIgualA(distanciaKmString, mav);
@@ -307,24 +307,24 @@ public class PartidosControllerTest {
 
     String fechaBuscada = "2026-10-02";
     when(
-            servicioPartidoMock.listarPartidosSegunFiltro(
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    fechaBuscada,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS
-            )
+      servicioPartidoMock.listarPartidosSegunFiltro(
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        fechaBuscada,
+        FILTRO_TODOS,
+        FILTRO_TODOS
+      )
     )
-            .thenReturn(partidosFecha);
+      .thenReturn(partidosFecha);
 
     ModelAndView mav = partidosController.consultarPartidos(
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            fechaBuscada,
-            FILTRO_TODOS,
-            FILTRO_TODOS
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      fechaBuscada,
+      FILTRO_TODOS,
+      FILTRO_TODOS
     );
 
     thenLaFechaCoincideCon(fechaBuscada, mav);
@@ -340,24 +340,24 @@ public class PartidosControllerTest {
 
     String horaBuscada = "14:30";
     when(
-            servicioPartidoMock.listarPartidosSegunFiltro(
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    FILTRO_TODOS,
-                    horaBuscada,
-                    FILTRO_TODOS
-            )
+      servicioPartidoMock.listarPartidosSegunFiltro(
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        horaBuscada,
+        FILTRO_TODOS
+      )
     )
-            .thenReturn(partidosHora);
+      .thenReturn(partidosHora);
 
     ModelAndView mav = partidosController.consultarPartidos(
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            FILTRO_TODOS,
-            horaBuscada,
-            FILTRO_TODOS
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      horaBuscada,
+      FILTRO_TODOS
     );
 
     thenLaHoraCoincideCon(horaBuscada, mav);
@@ -373,9 +373,9 @@ public class PartidosControllerTest {
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioLogueado);
 
     ModelAndView modelAndView = partidosController.cancelarPartido(
-            idPartido,
-            modelMock,
-            requestMock
+      idPartido,
+      modelMock,
+      requestMock
     );
 
     verify(servicioPartidoMock, times(1)).cancelarPartido(idPartido, usuarioLogueado);
@@ -390,9 +390,9 @@ public class PartidosControllerTest {
     when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
 
     ModelAndView modelAndView = partidosController.cancelarPartido(
-            idPartido,
-            modelMock,
-            requestMock
+      idPartido,
+      modelMock,
+      requestMock
     );
 
     verify(servicioPartidoMock, never()).cancelarPartido(anyLong(), any());
@@ -407,8 +407,8 @@ public class PartidosControllerTest {
     ModelAndView modelAndView = partidosController.unirseAlPartido(1L, requestMock);
 
     assertThat(
-            modelAndView.getViewName(),
-            equalToIgnoringCase("redirect:/login?error=Debes+iniciar+sesion+para+unirte")
+      modelAndView.getViewName(),
+      equalToIgnoringCase("redirect:/login?error=Debes+iniciar+sesion+para+unirte")
     );
   }
 
@@ -424,8 +424,8 @@ public class PartidosControllerTest {
 
     verify(servicioPartidoMock, times(1)).unirseAPartido(1L, usuario);
     assertThat(
-            modelAndView.getViewName(),
-            equalToIgnoringCase("redirect:/partido/1/sala-de-espera")
+      modelAndView.getViewName(),
+      equalToIgnoringCase("redirect:/partido/1/sala-de-espera")
     );
   }
 
@@ -437,17 +437,17 @@ public class PartidosControllerTest {
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
 
-
-    doThrow(new RuntimeException("Cupo maximo alcanzado")).when(servicioPartidoMock).unirseAPartido(1L, usuario);
+    doThrow(new RuntimeException("Cupo maximo alcanzado"))
+      .when(servicioPartidoMock)
+      .unirseAPartido(1L, usuario);
 
     ModelAndView modelAndView = partidosController.unirseAlPartido(1L, requestMock);
 
     verify(servicioPartidoMock, times(1)).unirseAPartido(1L, usuario);
 
-
     assertThat(
-            modelAndView.getViewName(),
-            equalToIgnoringCase("redirect:/partido/1/sala-de-espera")
+      modelAndView.getViewName(),
+      equalToIgnoringCase("redirect:/partido/1/sala-de-espera")
     );
   }
 
@@ -505,20 +505,20 @@ public class PartidosControllerTest {
   }
 
   private ModelAndView whenUsuarioConsultaPartidos(
-          String filtroNivel,
-          String filtroTipo,
-          String cupoMaximo,
-          String fecha,
-          String filtroHora,
-          String distancia
+    String filtroNivel,
+    String filtroTipo,
+    String cupoMaximo,
+    String fecha,
+    String filtroHora,
+    String distancia
   ) {
     return partidosController.consultarPartidos(
-            filtroNivel,
-            filtroTipo,
-            cupoMaximo,
-            fecha,
-            filtroHora,
-            distancia
+      filtroNivel,
+      filtroTipo,
+      cupoMaximo,
+      fecha,
+      filtroHora,
+      distancia
     );
   }
 }
