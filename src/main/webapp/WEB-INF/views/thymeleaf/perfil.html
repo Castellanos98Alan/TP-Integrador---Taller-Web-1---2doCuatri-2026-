@@ -151,22 +151,35 @@
         </div>
 
 
-        <!-- Rango y puntos -->
 
+        <!-- Rango y puntos -->
         <div class="hero-tarjetas">
 
+            <!-- Tarjeta de rango -->
             <div class="hero-vidrio">
 
-                <div class="vidrio-tile pendiente">&mdash;</div>
+                <div class="vidrio-tile pendiente"
+                     th:text="${nivel}">
+                    D
+                </div>
 
                 <div class="vidrio-texto">
                     <span class="vidrio-label">Rango actual</span>
-                    <span class="vidrio-valor">&mdash;</span>
-                    <span class="vidrio-sub">Sin rango todavía</span>
+
+                    <span class="vidrio-valor"
+                          th:text="${nivel}">
+                D
+            </span>
+
+                    <span class="vidrio-sub"
+                          th:text="${'Categoría ' + nivel}">
+                Categoría D
+            </span>
                 </div>
 
             </div>
 
+            <!-- Tarjeta de puntos -->
             <div class="hero-vidrio">
 
                 <div class="vidrio-tile trofeo">
@@ -175,18 +188,24 @@
 
                 <div class="vidrio-texto">
                     <span class="vidrio-label">Total de puntos</span>
-                    <span class="vidrio-valor">&mdash; <small>pts</small></span>
-                    <span class="vidrio-sub">Sin puntos todavía</span>
+
+                    <span class="vidrio-valor">
+                <span th:text="${puntos}">0</span>
+                <small>pts</small>
+            </span>
+
+                    <span class="vidrio-sub">
+                Puntos acumulados
+            </span>
                 </div>
 
             </div>
 
         </div>
 
-    </div>
 
 
-    <!-- Tabs (anclas a las secciones) -->
+        <!-- Tabs (anclas a las secciones) -->
 
     <div class="hero-tabs">
 
@@ -221,10 +240,12 @@
 
 <div class="container-fluid contenido-ranking">
 
-    <div class="aviso-pendiente">
+    <div class="aviso-pendiente"
+         th:if="${puntos == 0}">
         <i class="fa-solid fa-circle-info"></i>
-        Tus estadísticas estarán disponibles cuando se vincule tu jugador.
+        Todavía no sumaste puntos. ¡Jugá partidos para subir de rango!
     </div>
+
 
 
     <!-- ESTADÍSTICAS -->
@@ -455,45 +476,81 @@
 
                 <div class="rango-tiles">
 
-                    <div class="rango-tile">
+                    <div class="rango-tile"
+                         th:classappend="${nivel == 'D'} ? ' rango-actual'">
+                        <span class="rango-tu" th:if="${nivel == 'D'}">Tú</span>
                         <span class="letra-rango rango-d">D</span>
                         <small>0 - 9</small>
                     </div>
 
-                    <div class="rango-tile">
+                    <div class="rango-tile"
+                         th:classappend="${nivel == 'C'} ? ' rango-actual'">
+                        <span class="rango-tu" th:if="${nivel == 'C'}">Tú</span>
                         <span class="letra-rango rango-c">C</span>
                         <small>10 - 29</small>
                     </div>
 
-                    <div class="rango-tile">
+                    <div class="rango-tile"
+                         th:classappend="${nivel == 'B'} ? ' rango-actual'">
+                        <span class="rango-tu" th:if="${nivel == 'B'}">Tú</span>
                         <span class="letra-rango rango-b">B</span>
                         <small>30 - 49</small>
                     </div>
 
-                    <div class="rango-tile">
+                    <div class="rango-tile"
+                         th:classappend="${nivel == 'A'} ? ' rango-actual'">
+                        <span class="rango-tu" th:if="${nivel == 'A'}">Tú</span>
                         <span class="letra-rango rango-a">A</span>
                         <small>50 - 79</small>
                     </div>
 
-                    <div class="rango-tile">
+                    <div class="rango-tile"
+                         th:classappend="${nivel == 'S'} ? ' rango-actual'">
+                        <span class="rango-tu" th:if="${nivel == 'S'}">Tú</span>
                         <span class="letra-rango rango-s">S</span>
                         <small>80 - 109</small>
                     </div>
 
-                    <div class="rango-tile">
+                    <div class="rango-tile"
+                         th:classappend="${nivel == 'SS'} ? ' rango-actual'">
+                        <span class="rango-tu" th:if="${nivel == 'SS'}">Tú</span>
                         <span class="letra-rango rango-ss">SS</span>
                         <small>110+</small>
                     </div>
 
                 </div>
 
-                <div class="aviso-amarillo">
-                    <i class="fa-solid fa-trophy"></i>
-                    <div>
-                        <strong>Todavía no tenés rango</strong>
-                        ¡Jugá partidos y sumá puntos para empezar a subir!
+                <th:block th:with="siguiente=${nivel == 'D' ? 10 : (nivel == 'C' ? 30 : (nivel == 'B' ? 50 : (nivel == 'A' ? 80 : (nivel == 'S' ? 110 : null))))},
+                                   proximoRango=${nivel == 'D' ? 'C' : (nivel == 'C' ? 'B' : (nivel == 'B' ? 'A' : (nivel == 'A' ? 'S' : (nivel == 'S' ? 'SS' : null))))}">
+
+                    <!-- Sin puntos todavía -->
+                    <div class="aviso-amarillo" th:if="${puntos == 0}">
+                        <i class="fa-solid fa-trophy"></i>
+                        <div>
+                            <strong>Todavía no sumaste puntos</strong>
+                            ¡Jugá partidos y sumá puntos para empezar a subir!
+                        </div>
                     </div>
-                </div>
+
+                    <!-- Con puntos: rango actual y cuánto falta -->
+                    <div class="aviso-amarillo" th:if="${puntos > 0}">
+                        <i class="fa-solid fa-trophy"></i>
+                        <div>
+                            <strong th:text="${'Estás en el rango ' + nivel}">Estás en el rango A</strong>
+
+                            <span th:if="${siguiente != null}">
+                                ¡Seguí sumando puntos para llegar al rango
+                                <span th:text="${proximoRango}">S</span>!
+                                Te faltan <span th:text="${siguiente - puntos}">0</span> pts.
+                            </span>
+
+                            <span th:unless="${siguiente != null}">
+                                ¡Llegaste al rango máximo!
+                            </span>
+                        </div>
+                    </div>
+
+                </th:block>
 
             </div>
 
