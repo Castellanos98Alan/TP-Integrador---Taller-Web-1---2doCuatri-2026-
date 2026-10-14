@@ -107,6 +107,15 @@ public class PerfilController {
     HttpSession session = request.getSession();
     Usuario usuario = (Usuario) session.getAttribute("USUARIO");
 
+    if (usuario == null) {
+      return new ModelAndView("redirect:/login");
+    }
+
+    usuario.setNickname(nickname);
+    usuario.setBiografia(biografia);
+    usuario.setZona(zona);
+    servicioLogin.modificar(usuario);
+
     Jugador jugador = servicioJugador.buscarPorUsuarioId(usuario.getId());
 
     if (jugador == null) {

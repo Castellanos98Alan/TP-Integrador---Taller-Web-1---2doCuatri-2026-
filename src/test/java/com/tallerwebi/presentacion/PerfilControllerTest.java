@@ -1,3 +1,4 @@
+
 package com.tallerwebi.presentacion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,9 +34,7 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
 
     PerfilController controlador = new PerfilController(
-      servicioLogin,
-      servicioJugador,
-      servicioRanking
+            servicioLogin, servicioJugador, servicioRanking
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -59,9 +58,7 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
 
     PerfilController controlador = new PerfilController(
-      servicioLogin,
-      servicioJugador,
-      servicioRanking
+            servicioLogin, servicioJugador, servicioRanking
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -91,9 +88,7 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
 
     PerfilController controlador = new PerfilController(
-      servicioLogin,
-      servicioJugador,
-      servicioRanking
+            servicioLogin, servicioJugador, servicioRanking
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -113,9 +108,7 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
 
     PerfilController controlador = new PerfilController(
-      servicioLogin,
-      servicioJugador,
-      servicioRanking
+            servicioLogin, servicioJugador, servicioRanking
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -137,9 +130,7 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
 
     PerfilController controlador = new PerfilController(
-      servicioLogin,
-      servicioJugador,
-      servicioRanking
+            servicioLogin, servicioJugador, servicioRanking
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -159,9 +150,7 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
 
     PerfilController controlador = new PerfilController(
-      servicioLogin,
-      servicioJugador,
-      servicioRanking
+            servicioLogin, servicioJugador, servicioRanking
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -174,12 +163,12 @@ public class PerfilControllerTest {
     when(servicioJugador.buscarPorUsuarioId(usuario.getId())).thenReturn(jugador);
 
     ModelAndView modelAndView = controlador.guardarPerfil(
-      "Santiago",
-      "delantero",
-      "arquero",
-      "Lafe",
-      "Naci para este deporte",
-      request
+            "Santiago",
+            "delantero",
+            "arquero",
+            "Lafe",
+            "Naci para este deporte",
+            request
     );
 
     verify(servicioLogin).modificar(usuario);
@@ -187,7 +176,10 @@ public class PerfilControllerTest {
 
     assertThat(usuario.getNickname(), equalToIgnoringCase("Santiago"));
     assertThat(usuario.getZona(), equalToIgnoringCase("Lafe"));
-    assertThat(usuario.getBiografia(), equalToIgnoringCase("Naci para este deporte"));
+    assertThat(
+            usuario.getBiografia(),
+            equalToIgnoringCase("Naci para este deporte")
+    );
 
     assertThat(jugador.getPosicion1(), equalToIgnoringCase("delantero"));
     assertThat(jugador.getPosicion2(), equalToIgnoringCase("arquero"));
@@ -202,9 +194,7 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
 
     PerfilController controlador = new PerfilController(
-      servicioLogin,
-      servicioJugador,
-      servicioRanking
+            servicioLogin, servicioJugador, servicioRanking
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -213,15 +203,16 @@ public class PerfilControllerTest {
     when(request.getSession()).thenReturn(session);
 
     ModelAndView modelAndView = controlador.guardarPerfil(
-      "Santiago",
-      "delantero",
-      "arquero",
-      "Lafe",
-      "Naci para este deporte",
-      request
+            "Santiago",
+            "delantero",
+            "arquero",
+            "Lafe",
+            "Naci para este deporte",
+            request
     );
 
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_LOGIN));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_LOGIN)
+    );
   }
 
   @Test
@@ -231,9 +222,7 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
 
     PerfilController controlador = new PerfilController(
-      servicioLogin,
-      servicioJugador,
-      servicioRanking
+            servicioLogin, servicioJugador, servicioRanking
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -245,16 +234,20 @@ public class PerfilControllerTest {
     when(servicioJugador.buscarPorUsuarioId(usuario.getId())).thenReturn(null);
 
     ModelAndView modelAndView = controlador.guardarPerfil(
-      "Santiago",
-      "delantero",
-      "arquero",
-      "Lafe",
-      "Naci para este deporte",
-      request
+            "Santiago",
+            "delantero",
+            "arquero",
+            "Lafe",
+            "Naci para este deporte",
+            request
     );
 
     verify(servicioLogin).modificar(usuario);
+    verify(servicioJugador).guardar(
+            org.mockito.ArgumentMatchers.any(Jugador.class)
+    );
 
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_EDITAR));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL)
+    );
   }
 }
