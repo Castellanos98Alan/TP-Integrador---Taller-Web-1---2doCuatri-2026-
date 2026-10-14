@@ -149,7 +149,9 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
     }
 
     if (!FILTRO_TODOS.equals(filtroHora)) {
-      hql.append("and hour(p.fecha) = :hora and minute(p.fecha) = :minuto ");
+      hql.append(
+        "and EXTRACT(HOUR FROM p.fecha) = :hora and EXTRACT(MINUTE FROM p.fecha) = :minuto "
+      );
     }
 
     return hql.toString();
