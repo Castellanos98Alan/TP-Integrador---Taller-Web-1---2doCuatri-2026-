@@ -3,10 +3,12 @@ package com.tallerwebi.dominio;
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.util.List;
 
-//@SuppressWarnings("PMD.ImplicitFunctionalInterface")
+// @SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface ServicioPartido {
   void crearPartido(DatosCrearPartido datos, Usuario creador);
   void cancelarPartido(Long partidoId, Usuario usuarioLogueado);
+  void unirseAPartido(Long partidoId, Usuario usuarioLogueado);
+  Partido buscarPartidoPorId(Long id);
 
   List<Partido> listarPartidosSegunFiltro(
     String filtroNivel,
@@ -16,4 +18,9 @@ public interface ServicioPartido {
     String filtroHora,
     String distancia
   );
+
+  List<String> obtenerFechasDisponibles();
+  List<String> obtenerHorasDisponibles();
+  List<Integer> obtenerDistanciasDisponibles();
+  List<Integer> obtenerCuposDisponibles();
 }

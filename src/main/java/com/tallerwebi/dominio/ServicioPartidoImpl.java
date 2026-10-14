@@ -4,6 +4,8 @@ import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,14 +15,45 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServicioPartidoImpl implements ServicioPartido {
 
   private final RepositorioPartido repositorioPartido;
+  private final RepositorioCancha repositorioCancha;
+  private final RepositorioUsuario repositorioUsuario;
 
   @Autowired
-  public ServicioPartidoImpl(RepositorioPartido repositorioPartido) {
+  public ServicioPartidoImpl(
+    RepositorioPartido repositorioPartido,
+    RepositorioCancha repositorioCancha,
+    RepositorioUsuario repositorioUsuario
+  ) {
+    this.repositorioCancha = repositorioCancha;
     this.repositorioPartido = repositorioPartido;
+    this.repositorioUsuario = repositorioUsuario;
   }
 
+  //spint 2
   @Override
-  public void crearPartido(DatosCrearPartido datos, Usuario creador) {}
+  public void crearPartido(DatosCrearPartido datos, Usuario creador) {
+    if (datos.getCupo() == null || datos.getCupo() <= 0) {
+      throw new RuntimeException("El cupo debe ser mayor a cero.");
+    }
+
+    if (datos.getFechaHora() == null) {
+      throw new RuntimeException("Debe ingresar una fecha y hora.");
+    }
+
+    Cancha cancha = repositorioCancha.buscarPorNombre(datos.getCancha());
+    if (cancha == null) {
+      throw new RuntimeException("La cancha ingresada no existe.");
+    }
+
+    Partido partido = new Partido();
+    partido.setCancha(cancha);
+    partido.setFecha(datos.getFechaHora());
+    partido.setCupoMaximo(datos.getCupo());
+    partido.setNivel(datos.getNivel());
+    partido.setOrganizador(creador);
+
+    repositorioPartido.guardar(partido);
+  }
 
   @Override
   public void cancelarPartido(Long partidoId, Usuario usuarioLogueado) {
@@ -42,16 +75,71 @@ public class ServicioPartidoImpl implements ServicioPartido {
     repositorioPartido.modificar(partido);
   }
 
-  //@Override
-  //public void crearPartido(DatosCrearPartido datos, Usuario creador) {
-  // Lo hice para q no falle la inyección del contenedor Spring
+  //Utilice el Transactional para que no se me cierre la sesion al momento de ejecutar el metodo,
+  //con esto puedo consultar correctamente el partido mandandole el id por parametro.
+  //Tambien inicio la lista de confirmados ya que esta mapeado con LAZY en la clase Partido.
+  @Transactional
+  @Override
+  public Partido buscarPartidoPorId(Long id) {
+    Partido partido = repositorioPartido.buscarPorId(id);
+    if (partido != null && partido.getConfirmados() != null) {
+      org.hibernate.Hibernate.initialize(partido.getConfirmados());
+    }
+    return partido;
+  }
 
-  // mas adelante va a tener la funcion en el sistema de:
-  // el partido en la base de datos
-  // Controlar el cupo y los suplentes
-  // Armado automático de equipos equilibrados
-  // Carga y  validación del resultado final
-  // }
+  //Primero utilice directamente el metodo buscarPartidoPorId en lugar de usar el repositorioPartido directamente
+  //para que cada vez que lo use me traiga el partido con su lista de confirmados inicializada. Tambien hice una validacion
+  //rapida para ver si el partido existe.
+  //Por ultimo decidi separar las validaciones en metodos privados debido a la regla de PMD y que quede mejor organizado.
+  @Override
+  public void unirseAPartido(Long partidoId, Usuario usuarioLogueado) {
+    Partido partido = buscarPartidoPorId(partidoId);
+
+    if (partido == null) {
+      throw new RuntimeException("El partido no existe.");
+    }
+
+    validarEstadoDelPartido(partido);
+    validarCuposYDisponibilidad(partido, usuarioLogueado);
+
+    partido.getConfirmados().add(usuarioLogueado);
+    partido.setCantJugadores(partido.getConfirmados().size());
+
+    repositorioPartido.modificar(partido);
+  }
+
+  //Metodo privado que valida el estado del partido, con esto logro ver si el partido tiene estado Finalizado o Cancelado
+  //si es asi, entonces el usuario no podra ingresar al partido.
+  private void validarEstadoDelPartido(Partido partido) {
+    if (
+      partido.getEstado() == Partido.EstadoPartido.FINALIZADO ||
+      partido.getEstado() == Partido.EstadoPartido.CANCELADO
+    ) {
+      throw new RuntimeException("No se puede unir a un partido finalizado o cancelado.");
+    }
+  }
+
+  //Metodo privado que valida los cupos de la lista de confirmados, donde primero valido si la lista de confirmados es nula
+  //si es asi, entonces inicializo la lista de confirmados. Luego de eso valido si el usuarioLogueado esta dentro de la lista
+  //confirmados, si es asi significa que el usuario ya esta dentro de la sala de espera.
+  //Por ultimo valido que el partido tenga un cupo maximo de jugadores, para luego validar si los usuarios anotados supera el
+  //cupo maximo de jugadores
+  private void validarCuposYDisponibilidad(Partido partido, Usuario usuarioLogueado) {
+    if (partido.getConfirmados() == null) {
+      partido.setConfirmados(new ArrayList<>());
+    }
+
+    if (partido.getConfirmados().contains(usuarioLogueado)) {
+      throw new RuntimeException("Ya estas anotado en la sala de espera de este partido.");
+    }
+
+    if (
+      partido.getCupoMaximo() != null && partido.getConfirmados().size() >= partido.getCupoMaximo()
+    ) {
+      throw new RuntimeException("Cupo maximo alcanzado.");
+    }
+  }
 
   public static final String FILTRO_TODOS = "TODOS";
 
@@ -64,73 +152,99 @@ public class ServicioPartidoImpl implements ServicioPartido {
     String filtroHora,
     String FiltroDistancia
   ) {
-    //Partidos harcodeados
-    List<Partido> partidosFalsos = new ArrayList<>();
-    Cancha cancha = new Cancha();
-    cancha.setId(1L);
-    cancha.setNombre("Cancha de fútbol los leones");
+    return repositorioPartido.buscarPartidosPorFiltro(
+      filtroNivel,
+      filtroTipo,
+      filtrocupoMaximo,
+      filtroFecha,
+      filtroHora,
+      FiltroDistancia
+    );
+  }
 
-    Partido partido01 = new Partido();
-    partido01.setId(1L);
-    partido01.setEsPrivado(false);
-    partido01.setNivel("PRINCIPIANTE");
-    partido01.setcupoMaximo(22);
-    partido01.setCancha(cancha);
-    partido01.setCodigoDeAcceso("123");
-    partido01.setDistanciaKm(5);
-    LocalDateTime fechaFalsa = LocalDateTime.of(2026, 10, 2, 14, 30);
-    partido01.setFecha(fechaFalsa);
-    Partido partido02 = new Partido();
+  @Override
+  public List<String> obtenerFechasDisponibles() {
+    List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
+    );
 
-    partido02.setId(2L);
-    partido02.setEsPrivado(true);
-    partido02.setNivel("INTERMEDIO");
-    partido02.setcupoMaximo(22);
-    partido02.setCancha(cancha);
-    LocalDateTime fechaFalsa2 = LocalDateTime.of(2026, 10, 2, 18, 00);
-    partido02.setFecha(fechaFalsa2);
-    partido02.setDistanciaKm(3);
-    partidosFalsos.add(partido01);
-
-    partidosFalsos.add(partido02);
-    List<Partido> partidosFiltrados = new ArrayList<>();
-
-    for (Partido p : partidosFalsos) {
-      Boolean coincideNivel = FILTRO_TODOS.equals(filtroNivel) || filtroNivel.equals(p.getNivel());
-
-      Boolean coincideTipo =
-        FILTRO_TODOS.equals(filtroTipo) ||
-        ("PUBLICO".equals(filtroTipo) && !p.getEsPrivado()) ||
-        ("PRIVADO".equals(filtroTipo) && p.getEsPrivado());
-
-      Boolean coincideCupo =
-        FILTRO_TODOS.equals(filtrocupoMaximo) ||
-        (p.getCupoMaximo() != null && p.getCupoMaximo().toString().equals(filtrocupoMaximo));
-
-      Boolean coincideFecha =
-        FILTRO_TODOS.equals(filtroFecha) ||
-        (p.getFecha() != null && p.getFecha().toLocalDate().toString().equals(filtroFecha));
-
-      Boolean coincideHora =
-        FILTRO_TODOS.equals(filtroHora) ||
-        (p.getFecha().toLocalTime() != null &&
-          p.getFecha().toLocalTime().toString().equals(filtroHora));
-
-      Boolean coincideDistancia =
-        FILTRO_TODOS.equals(FiltroDistancia) ||
-        (p.getDistanciaKm() != null && p.getDistanciaKm().toString().equals(FiltroDistancia));
-
-      if (
-        coincideNivel &&
-        coincideTipo &&
-        coincideCupo &&
-        coincideFecha &&
-        coincideHora &&
-        coincideDistancia
-      ) {
-        partidosFiltrados.add(p);
+    Set<String> fechasUnicas = new TreeSet<>();
+    for (Partido p : partidos) {
+      if (p.getFecha() != null) {
+        fechasUnicas.add(p.getFecha().toLocalDate().toString());
       }
     }
-    return partidosFiltrados;
+    return new ArrayList<>(fechasUnicas);
+  }
+
+  @Override
+  public List<String> obtenerHorasDisponibles() {
+    List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
+    );
+
+    Set<String> horasYMinutosUnicas = new TreeSet<>();
+    for (Partido p : partidos) {
+      if (p.getFecha() != null) {
+        String horaFormateada = String.format(
+          "%02d:%02d",
+          p.getFecha().getHour(),
+          p.getFecha().getMinute()
+        );
+        horasYMinutosUnicas.add(horaFormateada);
+      }
+    }
+    return new ArrayList<>(horasYMinutosUnicas);
+  }
+
+  @Override
+  public List<Integer> obtenerDistanciasDisponibles() {
+    List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
+    );
+
+    Set<Integer> distanciasUnicas = new TreeSet<>();
+    for (Partido p : partidos) {
+      if (p.getDistancia() != null) {
+        distanciasUnicas.add(p.getDistancia());
+      }
+    }
+    return new ArrayList<>(distanciasUnicas);
+  }
+
+  @Override
+  public List<Integer> obtenerCuposDisponibles() {
+    List<Partido> todosLosPartidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
+    );
+
+    Set<Integer> cuposUnicos = new TreeSet<>();
+
+    for (Partido partido : todosLosPartidos) {
+      if (partido.getCupoMaximo() != null) {
+        cuposUnicos.add(partido.getCupoMaximo());
+      }
+    }
+    return new ArrayList<>(cuposUnicos);
   }
 }

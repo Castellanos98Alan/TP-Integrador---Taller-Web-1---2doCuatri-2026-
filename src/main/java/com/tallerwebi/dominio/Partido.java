@@ -1,20 +1,18 @@
 package com.tallerwebi.dominio;
 
-//import jakarta.persistence.Entity;
-//import jakarta.persistence.GeneratedValue;
-//import jakarta.persistence.GenerationType;
-//import jakarta.persistence.Id;
 //import jakarta.persistence.ManyToMany;
 //import jakarta.persistence.ManyToOne;
 //import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Partido
- */
-//@Entity
+@Entity
 @SuppressWarnings("PMD.TooManyFields")
 public class Partido {
 
@@ -22,36 +20,62 @@ public class Partido {
     ACTIVO,
     FINALIZADO,
     CANCELADO,
+    PENDIENTE,
   }
 
-  // @Id
-  //  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   private String nivel;
   private Boolean esPrivado = false;
   private LocalDateTime fecha;
 
-  // @ManyToOne
+  @ManyToOne(fetch = FetchType.EAGER)
   private Cancha cancha;
+
   private Integer cupoMaximo;
   private String codigoDeAcceso;
-  private Integer distancia; // valor harcodeao. en realidad se obtiene de un calculo con entre las dos ubicaciones de usuario y Cancha.
+  private Integer distancia; // valor harcodeao. en realidad se obtiene de un calculo con entre las
+  private Integer cantJugadores;
+
+  // dos ubicaciones de usuario y Cancha.
   // hay que crear una entidad entre usuario y partido. ej Convocatoria.java
   // por ahora lo voy a dejar en ManyToMany
   // @ManyToMany
 
+  @Enumerated(EnumType.STRING)
   private EstadoPartido estado;
+
   //private String modalidad;
-  //private String nivel;
-  private Integer cantJugadores;
   //private String descripcion;
+
+  @ManyToOne(fetch = FetchType.EAGER)
   private Usuario organizador;
 
+  @OneToMany(fetch = FetchType.EAGER)
   private List<Usuario> confirmados = new ArrayList<>();
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  private Equipo equipo1;
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  private Equipo equipo2;
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  private Resultado resultado;
+
+  @OneToMany(fetch = FetchType.LAZY)
+  private List<Estadistica> estadisticas;
 
   public Partido() {
     this.estado = EstadoPartido.ACTIVO;
+  }
+
+  public Partido(String nivel, Boolean esPrivado, LocalDateTime fecha) {
+    this.nivel = nivel;
+    this.esPrivado = esPrivado;
+    this.fecha = fecha;
   }
 
   public void iniciarPartido() {
@@ -86,7 +110,7 @@ public class Partido {
     return this.cupoMaximo;
   }
 
-  public void setcupoMaximo(Integer nuevoTopeCupos) {
+  public void setCupoMaximo(Integer nuevoTopeCupos) {
     this.cupoMaximo = nuevoTopeCupos;
   }
 
@@ -152,6 +176,46 @@ public class Partido {
 
   public void setOrganizador(Usuario organizador) {
     this.organizador = organizador;
+  }
+
+  public Integer getDistancia() {
+    return distancia;
+  }
+
+  public void setDistancia(Integer distancia) {
+    this.distancia = distancia;
+  }
+
+  public Equipo getEquipo1() {
+    return equipo1;
+  }
+
+  public void setEquipo1(Equipo equipo1) {
+    this.equipo1 = equipo1;
+  }
+
+  public Equipo getEquipo2() {
+    return equipo2;
+  }
+
+  public void setEquipo2(Equipo equipo2) {
+    this.equipo2 = equipo2;
+  }
+
+  public Resultado getResultado() {
+    return resultado;
+  }
+
+  public void setResultado(Resultado resultado) {
+    this.resultado = resultado;
+  }
+
+  public List<Estadistica> getEstadisticas() {
+    return estadisticas;
+  }
+
+  public void setEstadisticas(List<Estadistica> estadisticas) {
+    this.estadisticas = estadisticas;
   }
 
   public Integer getCantJugadores() {

@@ -13,11 +13,11 @@ public class Usuario {
   private String password;
   private String rol;
   private Boolean activo = false;
+  private String zona;
+  private String biografia;
+  private String nickname;
 
-  private String nombre;
-
-  @Column(nullable = false)
-  private Integer puntos = 0;
+  public Usuario() {}
 
   public Long getId() {
     return id;
@@ -59,23 +59,31 @@ public class Usuario {
     this.activo = activo;
   }
 
-  public String getNombre() {
-    return nombre;
-  }
-
-  public Integer getPuntos() {
-    return puntos;
-  }
-
-  public void setNombre(String nombre) {
-    this.nombre = nombre;
-  }
-
-  public void setPuntos(Integer puntos) {
-    this.puntos = puntos;
-  }
-
   public void activar() {
     activo = true;
+  }
+
+  public String getZona() {
+    return zona;
+  }
+
+  public void setZona(String zona) {
+    this.zona = zona;
+  }
+
+  public String getBiografia() {
+    return biografia;
+  }
+
+  public void setBiografia(String biografia) {
+    this.biografia = biografia;
+  }
+
+  public String getNickname() {
+    return nickname;
+  }
+
+  public void setNickname(String nickname) {
+    this.nickname = nickname;
   }
 }

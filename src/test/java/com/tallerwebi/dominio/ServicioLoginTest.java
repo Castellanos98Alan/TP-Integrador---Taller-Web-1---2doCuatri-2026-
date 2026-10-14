@@ -13,56 +13,82 @@ public class ServicioLoginTest {
 
   private ServicioLogin servicioLogin;
   private RepositorioUsuario repositorioUsuarioMock;
+  private RepositorioJugador repositorioJugadorMock;
 
   @BeforeEach
   public void init() {
-    this.repositorioUsuarioMock = mock(RepositorioUsuario.class);
-    this.servicioLogin = new ServicioLoginImpl(this.repositorioUsuarioMock);
+    repositorioUsuarioMock = mock(RepositorioUsuario.class);
+    repositorioJugadorMock = mock(RepositorioJugador.class);
+
+    // MODIFICADO: se usa el constructor principal con ambos repositorios.
+    servicioLogin = new ServicioLoginImpl(repositorioUsuarioMock, repositorioJugadorMock);
   }
 
   @Test
   public void consultarUsuarioDeberiaLlamarAlRepositorio() {
-    // preparacion
     String email = "test@test.com";
     String password = "password";
     Usuario usuarioEsperado = new Usuario();
-    when(this.repositorioUsuarioMock.buscarUsuario(email, password)).thenReturn(usuarioEsperado);
 
-    // ejecucion
-    Usuario usuarioObtenido = this.servicioLogin.consultarUsuario(email, password);
+    when(repositorioUsuarioMock.buscarUsuario(email, password)).thenReturn(usuarioEsperado);
 
-    // validacion
+    Usuario usuarioObtenido = servicioLogin.consultarUsuario(email, password);
+
     assertThat(usuarioObtenido, equalTo(usuarioEsperado));
-    verify(this.repositorioUsuarioMock, times(1)).buscarUsuario(email, password);
+    verify(repositorioUsuarioMock).buscarUsuario(email, password);
   }
 
   @Test
   public void registrarUsuarioSiNoExisteDeberiaGuardarlo() throws UsuarioExistente {
-    // preparacion
     Usuario usuario = new Usuario();
     usuario.setEmail("nuevo@test.com");
     usuario.setPassword("123");
-    when(this.repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
+
+    when(repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
       .thenReturn(null);
 
-    // ejecucion
-    this.servicioLogin.registrar(usuario);
+    servicioLogin.registrar(usuario);
 
-    // validacion
-    verify(this.repositorioUsuarioMock, times(1)).guardar(usuario);
+    verify(repositorioUsuarioMock).guardar(usuario);
   }
 
   @Test
   public void registrarUsuarioSiExisteDeberiaLanzarExcepcion() {
-    // preparacion
     Usuario usuario = new Usuario();
     usuario.setEmail("existe@test.com");
     usuario.setPassword("123");
-    when(this.repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
+
+    when(repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
       .thenReturn(new Usuario());
 
-    // ejecucion y validacion
-    assertThrows(UsuarioExistente.class, () -> this.servicioLogin.registrar(usuario));
-    verify(this.repositorioUsuarioMock, times(0)).guardar(usuario);
+    assertThrows(UsuarioExistente.class, () -> servicioLogin.registrar(usuario));
+
+    verify(repositorioUsuarioMock, never()).guardar(usuario);
+  }
+
+  // MODIFICADO: verifica que se cree y vincule el jugador al usuario.
+  @Test
+  public void registrarUsuarioConJugadorDeberiaGuardarAmbos() throws UsuarioExistente {
+    Usuario usuario = new Usuario();
+    usuario.setEmail("jugador@test.com");
+    usuario.setPassword("123");
+
+    when(repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
+      .thenReturn(null);
+
+    servicioLogin.registrar(usuario, "Juan", "Defensor", null);
+
+    verify(repositorioUsuarioMock).guardar(usuario);
+
+    verify(repositorioJugadorMock)
+      .guardar(
+        argThat(jugador ->
+          jugador != null &&
+          "Juan".equals(jugador.getNombre()) &&
+          "Defensor".equals(jugador.getPosicion1()) &&
+          "Principiante".equals(jugador.getNivel()) &&
+          jugador.getUsuario() == usuario
+        )
+      );
   }
 }

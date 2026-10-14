@@ -16,74 +16,38 @@
     <link rel="stylesheet" th:href="@{/css/perfil.css}">
 </head>
 
-
 <body>
 
-<!-- NAVBAR -->
-
 <nav class="navbar navbar-expand-lg navbar-ranking">
-
     <div class="container-fluid">
-
         <a class="marca" th:href="@{/home}">
             <i class="fa-solid fa-futbol"></i>
             ArmoLaCancha
         </a>
 
         <div class="navbar-nav ms-auto me-auto">
-
-            <a class="nav-link" th:href="@{/home}">
-                Inicio
-            </a>
-
-            <a class="nav-link" th:href="@{/partidos}">
-                Partidos
-            </a>
-
-            <a class="nav-link" th:href="@{/ranking}">
-                Ranking
-            </a>
-
-            <a class="nav-link active" th:href="@{/perfil}">
-                Mi Perfil
-            </a>
-
+            <a class="nav-link" th:href="@{/home}">Inicio</a>
+            <a class="nav-link" th:href="@{/partidos}">Partidos</a>
+            <a class="nav-link" th:href="@{/ranking}">Ranking</a>
+            <a class="nav-link active" th:href="@{/perfil}">Mi Perfil</a>
         </div>
 
         <a class="boton-crear" th:href="@{/crearPartido}">
             ＋ Crear partido
         </a>
-
     </div>
-
 </nav>
 
-
-<!-- HERO -->
-
 <section class="hero-ranking">
-
     <small>MI CUENTA</small>
-
-    <h1>
-        EDITAR <span>PERFIL</span>
-    </h1>
-
-    <p>
-        Personalizá tu perfil y contales a los demás un poco sobre vos.
-    </p>
-
+    <h1>EDITAR <span>PERFIL</span></h1>
+    <p>Personalizá tu perfil y contales a los demás un poco sobre vos.</p>
 </section>
 
-
 <div class="container-fluid contenido-ranking">
-
     <div class="row">
 
-        <!-- FORMULARIO -->
-
         <div class="col-lg-8">
-
             <form id="formPerfil"
                   class="form-panel"
                   th:action="@{/guardar-perfil}"
@@ -94,51 +58,85 @@
                     Información personal
                 </div>
 
-                <p class="form-panel-sub">Actualizá los datos de tu perfil deportivo.</p>
+                <p class="form-panel-sub">
+                    Actualizá los datos de tu perfil deportivo.
+                </p>
 
-                <div class="form-grid">
+                <div class="campo campo-completo">
+                    <label for="nickname">Nickname</label>
+                    <input type="text"
+                           id="nickname"
+                           name="nickname"
+                           th:value="${nickname}"
+                           placeholder="Ej: Tomi R.">
 
-                    <div class="campo campo-completo">
-                        <label for="nombre">Nombre completo <span>*</span></label>
-                        <input
-                                type="text"
-                                id="nombre"
-                                name="nombre"
-                                placeholder="Ej: Santiago Navarro"
-                                required>
-                    </div>
+                    <small class="ayuda">
+                        Este será el nombre que verán los demás jugadores.
+                        Si lo dejás vacío, mostraremos tu nombre.
+                    </small>
+                </div>
 
-                    <div class="campo">
-                        <label for="posicion">Posición</label>
-                        <select id="posicion" name="posicion">
-                            <option value="" selected disabled>Seleccioná tu posición</option>
-                            <option value="Arquero">Arquero</option>
-                            <option value="Defensor">Defensor</option>
-                            <option value="Mediocampista">Mediocampista</option>
-                            <option value="Delantero">Delantero</option>
-                            <option value="Polifuncional">Polifuncional</option>
-                        </select>
-                    </div>
+                <div class="campo">
+                    <label for="posicion1">Posición principal</label>
+                    <select id="posicion1" name="posicion1">
+                        <option value=""
+                                th:selected="${posicion1 == null or posicion1 == ''}">
+                            Seleccioná tu posición
+                        </option>
+                        <option value="Arquero"
+                                th:selected="${posicion1 == 'Arquero'}">Arquero</option>
+                        <option value="Defensor"
+                                th:selected="${posicion1 == 'Defensor'}">Defensor</option>
+                        <option value="Mediocampista"
+                                th:selected="${posicion1 == 'Mediocampista'}">Mediocampista</option>
+                        <option value="Delantero"
+                                th:selected="${posicion1 == 'Delantero'}">Delantero</option>
+                        <option value="Polifuncional"
+                                th:selected="${posicion1 == 'Polifuncional'}">Polifuncional</option>
+                    </select>
+                </div>
 
-                    <div class="campo">
-                        <label for="zona">Zona</label>
-                        <input
-                                type="text"
-                                id="zona"
-                                name="zona"
-                                placeholder="Ej: Laferrere">
-                    </div>
+                <div class="campo">
+                    <label for="posicion2">Posición secundaria</label>
+                    <select id="posicion2" name="posicion2">
+                        <option value=""
+                                th:selected="${posicion2 == null or posicion2 == ''}">
+                            Sin posición secundaria
+                        </option>
+                        <option value="Arquero"
+                                th:selected="${posicion2 == 'Arquero'}">Arquero</option>
+                        <option value="Defensor"
+                                th:selected="${posicion2 == 'Defensor'}">Defensor</option>
+                        <option value="Mediocampista"
+                                th:selected="${posicion2 == 'Mediocampista'}">Mediocampista</option>
+                        <option value="Delantero"
+                                th:selected="${posicion2 == 'Delantero'}">Delantero</option>
+                        <option value="Polifuncional"
+                                th:selected="${posicion2 == 'Polifuncional'}">Polifuncional</option>
+                    </select>
+                </div>
 
-                    <div class="campo campo-completo">
-                        <label for="biografia">Sobre mí</label>
-                        <textarea
-                                id="biografia"
-                                name="biografia"
-                                rows="5"
-                                placeholder="Contanos sobre vos, tu experiencia o qué tipo de equipo buscás..."></textarea>
-                        <small class="ayuda">Compartí algo que te gustaría que sepan los demás jugadores.</small>
-                    </div>
+                <div class="campo">
+                    <label for="zona">Zona</label>
+                    <input type="text"
+                           id="zona"
+                           name="zona"
+                           th:value="${zona}"
+                           placeholder="Ej: Laferrere">
+                </div>
 
+                <div class="campo campo-completo">
+                    <label for="biografia">Sobre mí</label>
+                    <textarea id="biografia"
+                              name="biografia"
+                              rows="5"
+                              th:text="${biografia}"
+                              placeholder="Contanos sobre vos, tu experiencia o qué tipo de equipo buscás..."></textarea>
+
+                    <small class="ayuda">
+                        Compartí algo que te gustaría que sepan
+                        los demás jugadores.
+                    </small>
                 </div>
 
                 <div class="form-footer">
@@ -154,26 +152,17 @@
                         </button>
                     </div>
                 </div>
-
             </form>
-
         </div>
 
-
-        <!-- PANEL DERECHO: FOTO -->
-
         <div class="col-lg-4 panel-lateral">
-
             <div class="tarjeta-posicion foto-card">
-
                 <h5>
                     <i class="fa-solid fa-camera"></i>
                     <label for="fotoArchivo" style="margin:0;">Foto de perfil</label>
                 </h5>
 
-                <div class="foto-preview">
-                    ⚽
-                </div>
+                <div class="foto-preview">⚽</div>
 
                 <p>Elegí una imagen para personalizar tu perfil.</p>
 
@@ -181,31 +170,26 @@
                     ＋ Seleccionar imagen
                 </label>
 
-                <input
-                        type="file"
-                        id="fotoArchivo"
-                        form="formPerfil"
-                        accept="image/*"
-                        class="input-archivo">
+                <input type="file"
+                       id="fotoArchivo"
+                       form="formPerfil"
+                       accept="image/*"
+                       class="input-archivo">
 
                 <small>JPG o PNG. Funcionalidad próximamente.</small>
-
             </div>
-
         </div>
 
     </div>
-
 </div>
 
-
 <footer class="footer">
-    <p class="mb-0">ArmoLaCancha <span>•</span> Conectando jugadores, creando equipos.</p>
+    <p class="mb-0">
+        ArmoLaCancha <span>•</span> Conectando jugadores, creando equipos.
+    </p>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
-
 </html>

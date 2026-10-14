@@ -61,52 +61,176 @@
 
 <!-- HERO -->
 
-<section class="hero-ranking">
+<section class="hero-ranking hero-perfil-pagina">
 
-    <div class="hero-perfil">
+    <div class="migas">
+        <a th:href="@{/perfil}">Mi Perfil</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>Resumen</span>
+    </div>
 
-        <div class="avatar-hero">
-            &#9917;
+    <div class="hero-grid">
+
+        <!-- Título -->
+
+        <div class="hero-titulo">
+            <h1>MI <span>PERFIL</span></h1>
+            <p>Tu evolución, partido a partido.</p>
         </div>
 
-        <div class="hero-perfil-info">
 
-            <small>PERFIL DE JUGADOR</small>
+        <!-- Jugador -->
 
-            <h1 th:text="${nombre != null and !nombre.isEmpty() ? nombre : 'Jugador'}">
-                Jugador
-            </h1>
+        <div class="hero-jugador">
 
-            <div class="datos-hero">
+            <div class="avatar-wrap">
 
-                <div class="dato-hero"
-                     th:if="${posicion != null and !posicion.isEmpty()}">
-                    <i class="fa-solid fa-futbol"></i>
-
-                    <div>
-                        <strong>Posición</strong>
-                        <br>
-                        <small th:text="${posicion}">Posición</small>
-                    </div>
+                <div class="avatar-hero">
+                    &#9917;
                 </div>
 
-                <div class="dato-hero"
-                     th:if="${zona != null and !zona.isEmpty()}">
-                    <i class="fa-solid fa-location-dot"></i>
+                <a class="avatar-camara"
+                   th:href="@{/editar-perfil}"
+                   title="Cambiar foto">
+                    <i class="fa-solid fa-camera"></i>
+                </a>
 
-                    <div>
-                        <strong>Zona</strong>
-                        <br>
-                        <small th:text="${zona}">Zona</small>
+            </div>
+
+            <div class="hero-jugador-info">
+
+                <div class="nombre-fila">
+
+                    <h2 class="nombre-jugador"
+                        th:text="${nickname != null and !nickname.isBlank() ? nickname : (nombreJugador != null and !nombreJugador.isBlank() ? nombreJugador : 'Jugador')}">
+                        Jugador
+                    </h2>
+
+
+                    <a th:href="@{/editar-perfil}" class="boton-editar-hero">
+                        <i class="fa-solid fa-pen"></i> Editar perfil
+                    </a>
+
+                </div>
+
+                <div class="datos-hero">
+
+                    <div class="dato-hero"
+                         th:if="${posicion1 != null and !posicion1.isEmpty()}">
+                        <i class="fa-solid fa-futbol"></i>
+                        <span th:text="${posicion1}">Posición principal</span>
                     </div>
+
+                    <div class="dato-hero"
+                         th:if="${posicion2 != null and !posicion2.isEmpty()}">
+                        <i class="fa-solid fa-futbol"></i>
+                        <span th:text="${posicion2}">Posición secundaria</span>
+                    </div>
+
+                    <div class="dato-hero"
+                         th:if="${zona != null and !zona.isEmpty()}">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span th:text="${zona}">Zona</span>
+                    </div>
+
+                </div>
+
+                <p class="hero-frase"
+                   th:if="${biografia != null and !biografia.isEmpty()}"
+                   th:text="${biografia}">
+                    Más fútbol. Más amigos. Menos lío.
+                </p>
+
+                <p class="hero-frase"
+                   th:unless="${biografia != null and !biografia.isEmpty()}">
+                    Más fútbol. Más amigos. Menos lío.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Rango y puntos -->
+        <div class="hero-tarjetas">
+
+            <!-- Tarjeta de rango -->
+            <div class="hero-vidrio">
+
+                <div class="vidrio-tile pendiente"
+                     th:text="${nivel}">
+                    D
+                </div>
+
+                <div class="vidrio-texto">
+                    <span class="vidrio-label">Rango actual</span>
+
+                    <span class="vidrio-valor"
+                          th:text="${nivel}">
+                D
+            </span>
+
+                    <span class="vidrio-sub"
+                          th:text="${'Categoría ' + nivel}">
+                Categoría D
+            </span>
+                </div>
+
+            </div>
+
+            <!-- Tarjeta de puntos -->
+            <div class="hero-vidrio">
+
+                <div class="vidrio-tile trofeo">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+
+                <div class="vidrio-texto">
+                    <span class="vidrio-label">Total de puntos</span>
+
+                    <span class="vidrio-valor">
+                <span th:text="${puntos}">0</span>
+                <small>pts</small>
+            </span>
+
+                    <span class="vidrio-sub">
+                Puntos acumulados
+            </span>
                 </div>
 
             </div>
 
         </div>
 
-        <a th:href="@{/editar-perfil}" class="boton-crear">
-            <i class="fa-solid fa-pen"></i> Editar perfil
+
+
+        <!-- Tabs (anclas a las secciones) -->
+
+    <div class="hero-tabs">
+
+        <a class="hero-tab activo" href="#resumen">
+            <i class="fa-solid fa-chart-simple"></i>Resumen
+        </a>
+
+        <a class="hero-tab" href="#rendimiento">
+            <i class="fa-solid fa-chart-line"></i>Rendimiento
+        </a>
+
+        <a class="hero-tab" href="#rangos">
+            <i class="fa-solid fa-ranking-star"></i>Ranking
+        </a>
+
+        <a class="hero-tab" href="#fairplay">
+            <i class="fa-solid fa-shield-halved"></i>Fair Play
+        </a>
+
+        <a class="hero-tab" href="#partidos">
+            <i class="fa-solid fa-calendar-days"></i>Partidos
+        </a>
+
+        <a class="hero-tab" href="#cuenta">
+            <i class="fa-solid fa-gear"></i>Mi cuenta
         </a>
 
     </div>
@@ -116,47 +240,402 @@
 
 <div class="container-fluid contenido-ranking">
 
-    <div class="row">
+    <div class="aviso-pendiente"
+         th:if="${puntos == 0}">
+        <i class="fa-solid fa-circle-info"></i>
+        Todavía no sumaste puntos. ¡Jugá partidos para subir de rango!
+    </div>
 
-        <!-- CONTENIDO PRINCIPAL -->
 
-        <div class="col-lg-8">
 
-            <!-- SOBRE MÍ -->
+    <!-- ESTADÍSTICAS -->
 
-            <div class="tarjeta">
+    <div class="stats-grid" id="resumen">
 
-                <h5>
-                    <i class="fa-solid fa-user"></i>
-                    Sobre mí
-                </h5>
+        <div class="stat-card">
+            <div class="stat-icono"><i class="fa-solid fa-calendar-check"></i></div>
+            <div>
+                <span class="stat-label">Partidos jugados</span>
+                <span class="stat-valor">&mdash;</span>
+                <span class="stat-sub">Sin datos</span>
+            </div>
+        </div>
 
-                <p class="tarjeta-sub">Conocé un poco más sobre este jugador.</p>
+        <div class="stat-card">
+            <div class="stat-icono"><i class="fa-solid fa-trophy"></i></div>
+            <div>
+                <span class="stat-label">Victorias</span>
+                <span class="stat-valor">&mdash;</span>
+                <span class="stat-sub">Sin datos</span>
+            </div>
+        </div>
 
-                <p class="biografia"
-                   th:if="${biografia != null and !biografia.isEmpty()}"
-                   th:text="${biografia}">
-                </p>
+        <div class="stat-card">
+            <div class="stat-icono rojo"><i class="fa-solid fa-xmark"></i></div>
+            <div>
+                <span class="stat-label">Derrotas</span>
+                <span class="stat-valor">&mdash;</span>
+                <span class="stat-sub">Sin datos</span>
+            </div>
+        </div>
 
-                <div class="vacio"
-                     th:if="${biografia == null or biografia.isEmpty()}">
-                    <p>Todavía no agregaste una biografía.</p>
-                    <a th:href="@{/editar-perfil}">Completá tu perfil &rarr;</a>
+        <div class="stat-card">
+            <div class="stat-icono"><i class="fa-solid fa-chart-simple"></i></div>
+            <div>
+                <span class="stat-label">Win rate</span>
+                <span class="stat-valor">&mdash;</span>
+                <span class="stat-sub">Sin datos</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icono"><i class="fa-solid fa-futbol"></i></div>
+            <div>
+                <span class="stat-label">Goles</span>
+                <span class="stat-valor">&mdash;</span>
+                <span class="stat-sub">Sin datos</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icono"><i class="fa-solid fa-shoe-prints"></i></div>
+            <div>
+                <span class="stat-label">Asistencias</span>
+                <span class="stat-valor">&mdash;</span>
+                <span class="stat-sub">Sin datos</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icono"><i class="fa-solid fa-star"></i></div>
+            <div>
+                <span class="stat-label">Promedio</span>
+                <span class="stat-valor">&mdash;</span>
+                <span class="stat-sub">Calificación media</span>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- RENDIMIENTO / COMPARATIVA / RANKING -->
+
+    <div class="row g-3 mb-3" id="rendimiento">
+
+        <!-- Evolución -->
+
+        <div class="col-lg-5">
+
+            <div class="panel">
+
+                <div class="panel-encabezado">
+                    <span class="panel-icono"><i class="fa-solid fa-chart-column"></i></span>
+                    <h5>Evolución de rendimiento</h5>
+                </div>
+
+                <div class="grafico">
+
+                    <svg viewBox="0 0 520 230" role="img"
+                         aria-label="Gráfico de evolución sin datos">
+
+                        <g stroke="#dfe7e3" stroke-width="1">
+                            <line x1="34" y1="20" x2="510" y2="20"/>
+                            <line x1="34" y1="56" x2="510" y2="56"/>
+                            <line x1="34" y1="92" x2="510" y2="92"/>
+                            <line x1="34" y1="128" x2="510" y2="128"/>
+                            <line x1="34" y1="164" x2="510" y2="164"/>
+                            <line x1="34" y1="200" x2="510" y2="200"/>
+                        </g>
+
+                        <g fill="#7b8d86" font-size="12" text-anchor="end">
+                            <text x="26" y="24">10</text>
+                            <text x="26" y="60">8</text>
+                            <text x="26" y="96">6</text>
+                            <text x="26" y="132">4</text>
+                            <text x="26" y="168">2</text>
+                            <text x="26" y="204">0</text>
+                        </g>
+
+                        <g fill="#7b8d86" font-size="12" text-anchor="middle">
+                            <text x="56" y="222">Ene</text>
+                            <text x="97" y="222">Feb</text>
+                            <text x="138" y="222">Mar</text>
+                            <text x="179" y="222">Abr</text>
+                            <text x="220" y="222">May</text>
+                            <text x="261" y="222">Jun</text>
+                            <text x="302" y="222">Jul</text>
+                            <text x="343" y="222">Ago</text>
+                            <text x="384" y="222">Sep</text>
+                            <text x="425" y="222">Oct</text>
+                            <text x="466" y="222">Nov</text>
+                        </g>
+
+                        <line x1="34" y1="200" x2="510" y2="200"
+                              stroke="#9fb3aa" stroke-width="2"
+                              stroke-dasharray="6 6"/>
+
+                        <text x="272" y="112" text-anchor="middle"
+                              fill="#536762" font-size="14" font-weight="bold">
+                            Sin datos todavía
+                        </text>
+
+                    </svg>
+
+                </div>
+
+                <div class="franja-info">
+                    <i class="fa-solid fa-arrow-trend-up"></i>
+                    Tu evolución aparecerá cuando juegues tus primeros partidos.
                 </div>
 
             </div>
 
+        </div>
 
-            <!-- MI ACTIVIDAD -->
 
-            <div class="tarjeta">
+        <!-- Frente al promedio -->
 
-                <h5>
-                    <i class="fa-solid fa-futbol"></i>
-                    Mi actividad
-                </h5>
+        <div class="col-lg-4">
 
-                <p class="tarjeta-sub">Tu participación en ArmoLaCancha.</p>
+            <div class="panel">
+
+                <div class="panel-encabezado">
+                    <span class="panel-icono"><i class="fa-solid fa-user-group"></i></span>
+                    <h5>Frente al promedio del grupo</h5>
+
+                    <div class="leyenda">
+                        <span><i class="punto punto-tu"></i>Tú</span>
+                        <span><i class="punto punto-grupo"></i>Promedio grupo</span>
+                    </div>
+                </div>
+
+                <div class="barra-bloque">
+                    <div class="barra-titulo">Goles por partido</div>
+                    <div class="barra-linea">
+                        <div class="barra-pista"><div class="barra-relleno barra-tu"></div></div>
+                        <span class="barra-valor">&mdash;</span>
+                    </div>
+                    <div class="barra-linea">
+                        <div class="barra-pista"><div class="barra-relleno barra-grupo"></div></div>
+                        <span class="barra-valor">&mdash;</span>
+                    </div>
+                </div>
+
+                <div class="barra-bloque">
+                    <div class="barra-titulo">Asistencias por partido</div>
+                    <div class="barra-linea">
+                        <div class="barra-pista"><div class="barra-relleno barra-tu"></div></div>
+                        <span class="barra-valor">&mdash;</span>
+                    </div>
+                    <div class="barra-linea">
+                        <div class="barra-pista"><div class="barra-relleno barra-grupo"></div></div>
+                        <span class="barra-valor">&mdash;</span>
+                    </div>
+                </div>
+
+                <div class="barra-bloque">
+                    <div class="barra-titulo">Win rate</div>
+                    <div class="barra-linea">
+                        <div class="barra-pista"><div class="barra-relleno barra-tu"></div></div>
+                        <span class="barra-valor">&mdash;</span>
+                    </div>
+                    <div class="barra-linea">
+                        <div class="barra-pista"><div class="barra-relleno barra-grupo"></div></div>
+                        <span class="barra-valor">&mdash;</span>
+                    </div>
+                </div>
+
+                <div class="barra-bloque">
+                    <div class="barra-titulo">Calificación promedio</div>
+                    <div class="barra-linea">
+                        <div class="barra-pista"><div class="barra-relleno barra-tu"></div></div>
+                        <span class="barra-valor">&mdash;</span>
+                    </div>
+                    <div class="barra-linea">
+                        <div class="barra-pista"><div class="barra-relleno barra-grupo"></div></div>
+                        <span class="barra-valor">&mdash;</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Ranking por puntos -->
+
+        <div class="col-lg-3" id="rangos">
+
+            <div class="panel">
+
+                <div class="panel-encabezado">
+                    <span class="panel-icono amarillo"><i class="fa-solid fa-trophy"></i></span>
+                    <h5>Ranking por puntos</h5>
+                    <a class="panel-link" th:href="@{/ranking}">Ver ranking</a>
+                </div>
+
+                <div class="rango-tiles">
+
+                    <div class="rango-tile"
+                         th:classappend="${nivel == 'D'} ? ' rango-actual'">
+                        <span class="rango-tu" th:if="${nivel == 'D'}">Tú</span>
+                        <span class="letra-rango rango-d">D</span>
+                        <small>0 - 9</small>
+                    </div>
+
+                    <div class="rango-tile"
+                         th:classappend="${nivel == 'C'} ? ' rango-actual'">
+                        <span class="rango-tu" th:if="${nivel == 'C'}">Tú</span>
+                        <span class="letra-rango rango-c">C</span>
+                        <small>10 - 29</small>
+                    </div>
+
+                    <div class="rango-tile"
+                         th:classappend="${nivel == 'B'} ? ' rango-actual'">
+                        <span class="rango-tu" th:if="${nivel == 'B'}">Tú</span>
+                        <span class="letra-rango rango-b">B</span>
+                        <small>30 - 49</small>
+                    </div>
+
+                    <div class="rango-tile"
+                         th:classappend="${nivel == 'A'} ? ' rango-actual'">
+                        <span class="rango-tu" th:if="${nivel == 'A'}">Tú</span>
+                        <span class="letra-rango rango-a">A</span>
+                        <small>50 - 79</small>
+                    </div>
+
+                    <div class="rango-tile"
+                         th:classappend="${nivel == 'S'} ? ' rango-actual'">
+                        <span class="rango-tu" th:if="${nivel == 'S'}">Tú</span>
+                        <span class="letra-rango rango-s">S</span>
+                        <small>80 - 109</small>
+                    </div>
+
+                    <div class="rango-tile"
+                         th:classappend="${nivel == 'SS'} ? ' rango-actual'">
+                        <span class="rango-tu" th:if="${nivel == 'SS'}">Tú</span>
+                        <span class="letra-rango rango-ss">SS</span>
+                        <small>110+</small>
+                    </div>
+
+                </div>
+
+                <th:block th:with="siguiente=${nivel == 'D' ? 10 : (nivel == 'C' ? 30 : (nivel == 'B' ? 50 : (nivel == 'A' ? 80 : (nivel == 'S' ? 110 : null))))},
+                                   proximoRango=${nivel == 'D' ? 'C' : (nivel == 'C' ? 'B' : (nivel == 'B' ? 'A' : (nivel == 'A' ? 'S' : (nivel == 'S' ? 'SS' : null))))}">
+
+                    <!-- Sin puntos todavía -->
+                    <div class="aviso-amarillo" th:if="${puntos == 0}">
+                        <i class="fa-solid fa-trophy"></i>
+                        <div>
+                            <strong>Todavía no sumaste puntos</strong>
+                            ¡Jugá partidos y sumá puntos para empezar a subir!
+                        </div>
+                    </div>
+
+                    <!-- Con puntos: rango actual y cuánto falta -->
+                    <div class="aviso-amarillo" th:if="${puntos > 0}">
+                        <i class="fa-solid fa-trophy"></i>
+                        <div>
+                            <strong th:text="${'Estás en el rango ' + nivel}">Estás en el rango A</strong>
+
+                            <span th:if="${siguiente != null}">
+                                ¡Seguí sumando puntos para llegar al rango
+                                <span th:text="${proximoRango}">S</span>!
+                                Te faltan <span th:text="${siguiente - puntos}">0</span> pts.
+                            </span>
+
+                            <span th:unless="${siguiente != null}">
+                                ¡Llegaste al rango máximo!
+                            </span>
+                        </div>
+                    </div>
+
+                </th:block>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FAIR PLAY / ÚLTIMOS PARTIDOS -->
+
+    <div class="row g-3 mb-3">
+
+        <!-- Fair play -->
+
+        <div class="col-lg-5" id="fairplay">
+
+            <div class="panel">
+
+                <div class="panel-encabezado">
+                    <span class="panel-icono"><i class="fa-solid fa-shield-halved"></i></span>
+                    <h5>Fair Play / Sanciones</h5>
+                </div>
+
+                <div class="fair-grid">
+
+                    <div class="fair-card">
+                        <div class="stat-icono rojo"><i class="fa-solid fa-hand"></i></div>
+                        <span class="stat-label">Faltas cometidas</span>
+                        <span class="stat-valor">&mdash;</span>
+                    </div>
+
+                    <div class="fair-card">
+                        <div class="stat-icono"><i class="fa-solid fa-coins"></i></div>
+                        <span class="stat-label">Multas</span>
+                        <span class="stat-valor">&mdash;</span>
+                    </div>
+
+                    <div class="fair-card">
+                        <div class="stat-icono rojo"><i class="fa-solid fa-arrow-down"></i></div>
+                        <span class="stat-label">Puntos descontados</span>
+                        <span class="stat-valor">&mdash;</span>
+                    </div>
+
+                    <div class="fair-card">
+                        <div class="stat-icono"><i class="fa-solid fa-scale-balanced"></i></div>
+                        <span class="stat-label">Estado de penitencia</span>
+                        <span class="stat-valor">&mdash;</span>
+                    </div>
+
+                </div>
+
+                <div class="franja-info">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Acá vas a ver tu comportamiento dentro de la cancha.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Últimos partidos -->
+
+        <div class="col-lg-7" id="partidos">
+
+            <div class="panel">
+
+                <div class="panel-encabezado">
+                    <span class="panel-icono"><i class="fa-solid fa-calendar-days"></i></span>
+                    <h5>Últimos partidos</h5>
+                    <a class="panel-link" th:href="@{/partidos}">
+                        Ver todos los partidos &rarr;
+                    </a>
+                </div>
+
+                <div class="tabla-scroll">
+                    <div class="tabla-partidos-cabecera">
+                        <span>FECHA</span>
+                        <span>PARTIDO</span>
+                        <span>RESULTADO</span>
+                        <span>G</span>
+                        <span>A</span>
+                        <span>CALIF.</span>
+                    </div>
+                </div>
 
                 <div class="actividad-vacia">
                     <div class="actividad-icono">
@@ -170,54 +649,78 @@
 
         </div>
 
+    </div>
 
-        <!-- PANEL DERECHO -->
 
-        <div class="col-lg-4 panel-lateral">
+    <!-- SOBRE MÍ / CUENTA -->
 
-            <div class="tarjeta-posicion">
+    <div class="row g-3" id="cuenta">
 
-                <h5>
-                    <i class="fa-solid fa-id-card"></i>
-                    Mi perfil
-                </h5>
+        <div class="col-lg-7">
 
-                <p>Tu perfil deportivo en ArmoLaCancha.</p>
+            <div class="panel">
 
-                <span class="posicion-destacada"
-                      th:text="${nombre != null and !nombre.isEmpty() ? nombre : 'Jugador'}">
-                    Jugador
-                </span>
+                <div class="panel-encabezado">
+                    <span class="panel-icono"><i class="fa-solid fa-user"></i></span>
+                    <h5>Sobre mí</h5>
+                </div>
+
+                <div class="tarjeta mb-0">
+
+                    <p class="biografia"
+                       th:if="${biografia != null and !biografia.isEmpty()}"
+                       th:text="${biografia}">
+                    </p>
+
+                    <div class="vacio"
+                         th:if="${biografia == null or biografia.isEmpty()}">
+                        <p>Todavía no agregaste una biografía.</p>
+                        <a th:href="@{/editar-perfil}">Completá tu perfil &rarr;</a>
+                    </div>
+
+                </div>
 
             </div>
 
+        </div>
 
-            <div class="tarjeta">
 
-                <h5>
-                    <i class="fa-solid fa-gear"></i>
-                    Información de la cuenta
-                </h5>
+        <div class="col-lg-5">
 
-                <div class="dato-cuenta">
-                    <span class="dato-label">Correo electrónico</span>
-                    <p th:text="${email}">correo@ejemplo.com</p>
+            <div class="panel">
+
+                <div class="panel-encabezado">
+                    <span class="panel-icono"><i class="fa-solid fa-gear"></i></span>
+                    <h5>Información de la cuenta</h5>
                 </div>
 
-                <div class="dato-cuenta">
-                    <span class="dato-label">Tipo de usuario</span>
-                    <p th:text="${rol}">Jugador</p>
-                </div>
+                <div class="tarjeta mb-0">
 
-                <div class="dato-cuenta">
-                    <span class="dato-label">Estado de la cuenta</span>
-                    <p>
-                        <span class="estado-cuenta"
-                              th:classappend="${activo == true ? ' estado-activo' : ' estado-inactivo'}"
-                              th:text="${activo == true ? 'Activo' : 'Inactivo'}">
-                            Activo
-                        </span>
-                    </p>
+                    <div class="datos-cuenta">
+
+                        <div class="dato-cuenta">
+                            <span class="dato-label">Correo electrónico</span>
+                            <p th:text="${email}">correo@ejemplo.com</p>
+                        </div>
+
+                        <div class="dato-cuenta">
+                            <span class="dato-label">Tipo de usuario</span>
+                            <p th:text="${rol}">Jugador</p>
+                        </div>
+
+                        <div class="dato-cuenta">
+                            <span class="dato-label">Estado de la cuenta</span>
+                            <p>
+                                <span class="estado-cuenta"
+                                      th:classappend="${activo == true ? ' estado-activo' : ' estado-inactivo'}"
+                                      th:text="${activo == true ? 'Activo' : 'Inactivo'}">
+                                    Activo
+                                </span>
+                            </p>
+                        </div>
+
+                    </div>
+
                 </div>
 
             </div>
@@ -234,6 +737,17 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+<script>
+    document.querySelectorAll('.hero-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            document.querySelectorAll('.hero-tab').forEach(function (t) {
+                t.classList.remove('activo');
+            });
+            tab.classList.add('activo');
+        });
+    });
 </script>
 
 </body>

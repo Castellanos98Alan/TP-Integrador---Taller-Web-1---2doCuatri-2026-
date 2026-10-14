@@ -10,8 +10,18 @@ import org.springframework.stereotype.Service;
 public class ServicioLoginImpl implements ServicioLogin {
 
   private RepositorioUsuario repositorioUsuario;
+  private RepositorioJugador repositorioJugador;
 
   @Autowired
+  public ServicioLoginImpl(
+    RepositorioUsuario repositorioUsuario,
+    RepositorioJugador repositorioJugador
+  ) {
+    this.repositorioUsuario = repositorioUsuario;
+    this.repositorioJugador = repositorioJugador;
+  }
+
+  // MODIFICADO: se conserva para compatibilidad con llamadas existentes.
   public ServicioLoginImpl(RepositorioUsuario repositorioUsuario) {
     this.repositorioUsuario = repositorioUsuario;
   }
@@ -23,13 +33,36 @@ public class ServicioLoginImpl implements ServicioLogin {
 
   @Override
   public void registrar(Usuario usuario) throws UsuarioExistente {
+    validarUsuarioNuevo(usuario);
+    repositorioUsuario.guardar(usuario);
+  }
+
+  // MODIFICADO: registra el usuario y crea su jugador asociado.
+  @Override
+  public void registrar(Usuario usuario, String nombreJugador, String posicion1, String posicion2)
+    throws UsuarioExistente {
+    validarUsuarioNuevo(usuario);
+    repositorioUsuario.guardar(usuario);
+
+    Jugador jugador = new Jugador(nombreJugador, posicion1, posicion2, "Principiante");
+
+    jugador.setUsuario(usuario);
+    repositorioJugador.guardar(jugador);
+  }
+
+  private void validarUsuarioNuevo(Usuario usuario) throws UsuarioExistente {
     Usuario usuarioEncontrado = repositorioUsuario.buscarUsuario(
       usuario.getEmail(),
       usuario.getPassword()
     );
+
     if (usuarioEncontrado != null) {
       throw new UsuarioExistente();
     }
-    repositorioUsuario.guardar(usuario);
+  }
+
+  @Override
+  public void modificar(Usuario usuario) {
+    repositorioUsuario.modificar(usuario);
   }
 }
