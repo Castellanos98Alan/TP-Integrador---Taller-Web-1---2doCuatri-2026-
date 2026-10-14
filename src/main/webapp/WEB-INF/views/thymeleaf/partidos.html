@@ -126,81 +126,81 @@
 
             <!-- FORMULARIO DE FILTROS -->
             <div class="filtros-busqueda shadow-sm">
-                <form th:action="@{/partidos}" method="GET">
-                    <div class="row g-3 align-items-end">
-                        
-                        <div class="col-md-4 col-lg-2">
-                            <label for="filtroNivel" class="form-label small fw-bold mb-1">Rango mínimo</label>
-                            <select name="filtroNivel" id="filtroNivel" class="form-select form-select-sm">
-                                <option value="TODOS" th:selected="${nivelSeleccionado == null or nivelSeleccionado == 'TODOS'}">Cualquier rango</option>
-                                <option value="PRINCIPIANTE" th:selected="${nivelSeleccionado == 'PRINCIPIANTE'}">Principiante</option>
-                                <option value="INTERMEDIO" th:selected="${nivelSeleccionado == 'INTERMEDIO'}">Intermedio</option>
-                                <option value="AVANZADO" th:selected="${nivelSeleccionado == 'AVANZADO'}">Avanzado</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 col-lg-2">
-                            <label for="filtroDistancia" class="form-label small fw-bold mb-1">Distancia máx.</label>
-                            <select name="filtroDistancia" id="filtroDistancia" class="form-select form-select-sm">
-                                <option value="TODOS" th:selected="${distanciaSeleccionada == null or distanciaSeleccionada == 'TODOS'}">Cualquiera</option>
-                                <option th:each="fecha : ${distanciasDisponibles}" 
-                                        th:value="${fecha}" 
-                                        th:text="${fecha}"
-                                        th:selected="${fechaSeleccionada == fecha}">
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 col-lg-2">
-                            <label for="filtroTipo" class="form-label small fw-bold mb-1">Tipo de partido</label>
-                            <select name="filtroTipo" id="filtroTipo" class="form-select form-select-sm">
-                                <option value="TODOS" th:selected="${tipoSeleccionado == null or tipoSeleccionado == 'TODOS'}">Todos</option>
-                                <option value="PUBLICO" th:selected="${tipoSeleccionado == 'PUBLICO'}">Público</option>
-                                <option value="PRIVADO" th:selected="${tipoSeleccionado == 'PRIVADO'}">Privado</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 col-lg-2">
-                            <label for="filtroCupo" class="form-label small fw-bold mb-1">Jugadores</label>
-                            <select name="filtroCupo" id="filtroCupo" class="form-select form-select-sm">
-                                <option value="TODOS" th:selected="${cupoSeleccionado == null or cupoSeleccionado == 'TODOS'}">Cualquiera</option>
-                               <option th:each="fecha : ${cuposDisponibles}" 
-                                        th:value="${fecha}" 
-                                        th:text="${fecha}"
-                                        th:selected="${fechaSeleccionada == fecha}">
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 col-lg-2">
-                            <label for="filtroFecha" class="form-label small fw-bold mb-1">Fecha</label>
-                            <select name="filtroFecha" id="filtroFecha" class="form-select form-select-sm">
-                                <option value="TODOS" th:selected="${fechaSeleccionada == null or fechaSeleccionada == 'TODOS'}">Cualquier día</option>
-                                <option th:each="fecha : ${fechasDisponibles}" 
-                                        th:value="${fecha}" 
-                                        th:text="${fecha}"
-                                        th:selected="${fechaSeleccionada == fecha}">
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 col-lg-2">
-                            <label for="filtroHora" class="form-label small fw-bold mb-1">Horario</label>
-                            <select name="filtroHora" id="filtroHora" class="form-select form-select-sm">
-                                <option value="TODOS" th:selected="${horaSeleccionada == null or horaSeleccionada == 'TODOS'}">Cualquier horario</option>
-                                <option th:each="fecha : ${horasDisponibles}" 
-                                        th:value="${fecha}" 
-                                        th:text="${fecha}"
-                                        th:selected="${fechaSeleccionada == fecha}">
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="col-12 mt-3 text-end">
-                            <button type="submit" class="btn btn-success btn-sm px-4 fw-bold">Aplicar Filtros</button>
-                        </div>
+            <form th:action="@{/partidos}" method="GET">
+                <div class="row g-3 align-items-end">
+                    
+                    <div class="col-md-4 col-lg-2">
+                        <label for="filtroNivel" class="form-label small fw-bold mb-1">Rango mínimo</label>
+                        <select name="filtroNivel" id="filtroNivel" class="form-select form-select-sm">
+                            <option value="TODOS" th:selected="${nivelSeleccionado == null or nivelSeleccionado == 'TODOS'}">Cualquier rango</option>
+                            <option value="PRINCIPIANTE" th:selected="${nivelSeleccionado == 'PRINCIPIANTE'}">Principiante</option>
+                            <option value="INTERMEDIO" th:selected="${nivelSeleccionado == 'INTERMEDIO'}">Intermedio</option>
+                            <option value="AVANZADO" th:selected="${nivelSeleccionado == 'AVANZADO'}">Avanzado</option>
+                        </select>
                     </div>
-                </form>
+
+                    <div class="col-md-4 col-lg-2">
+                        <label for="filtroDistancia" class="form-label small fw-bold mb-1">Distancia máx.</label>
+                        <select name="filtroDistancia" id="filtroDistancia" class="form-select form-select-sm">
+                            <option value="TODOS" th:selected="${distanciaSeleccionada == null or distanciaSeleccionada == 'TODOS'}">Cualquiera</option>
+                            <option th:each="distancia : ${distanciasDisponibles}" 
+                                    th:value="${distancia}" 
+                                    th:text="|Hasta ${distancia} km|"
+                                    th:selected="${distanciaSeleccionada == distancia.toString()}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 col-lg-2">
+                        <label for="filtroTipo" class="form-label small fw-bold mb-1">Tipo de partido</label>
+                        <select name="filtroTipo" id="filtroTipo" class="form-select form-select-sm">
+                            <option value="TODOS" th:selected="${tipoSeleccionado == null or tipoSeleccionado == 'TODOS'}">Todos</option>
+                            <option value="PUBLICO" th:selected="${tipoSeleccionado == 'PUBLICO'}">Público</option>
+                            <option value="PRIVADO" th:selected="${tipoSeleccionado == 'PRIVADO'}">Privado</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 col-lg-2">
+                        <label for="filtroCupo" class="form-label small fw-bold mb-1">Jugadores</label>
+                        <select name="filtroCupo" id="filtroCupo" class="form-select form-select-sm">
+                            <option value="TODOS" th:selected="${cupoSeleccionado == null or cupoSeleccionado == 'TODOS'}">Cualquiera</option>
+                            <option th:each="cupo : ${cuposDisponibles}" 
+                                    th:value="${cupo}" 
+                                    th:text="|Fútbol de ${cupo}|"
+                                    th:selected="${cupoSeleccionado == cupo.toString()}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 col-lg-2">
+                        <label for="filtroFecha" class="form-label small fw-bold mb-1">Fecha</label>
+                        <select name="filtroFecha" id="filtroFecha" class="form-select form-select-sm">
+                            <option value="TODOS" th:selected="${fechaSeleccionada == null or fechaSeleccionada == 'TODOS'}">Cualquier día</option>
+                            <option th:each="fecha : ${fechasDisponibles}" 
+                                    th:value="${fecha}" 
+                                    th:text="${fecha}"
+                                    th:selected="${fechaSeleccionada == fecha}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 col-lg-2">
+                        <label for="filtroHora" class="form-label small fw-bold mb-1">Horario</label>
+                        <select name="filtroHora" id="filtroHora" class="form-select form-select-sm">
+                            <option value="TODOS" th:selected="${horaSeleccionada == null or horaSeleccionada == 'TODOS'}">Cualquier horario</option>
+                            <option th:each="hora : ${horasDisponibles}" 
+                                    th:value="${hora}" 
+                                    th:text="|${hora} hs|"
+                                    th:selected="${horaSeleccionada == hora}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 mt-3 text-end">
+                        <button type="submit" class="btn btn-success btn-sm px-4 fw-bold">Aplicar Filtros</button>
+                    </div>
+                </div>
+            </form>
             </div>
 
             <!-- GRILLA DE PARTIDOS -->
