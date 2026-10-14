@@ -4,6 +4,8 @@ import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -158,5 +160,91 @@ public class ServicioPartidoImpl implements ServicioPartido {
       filtroHora,
       FiltroDistancia
     );
+  }
+
+  @Override
+  public List<String> obtenerFechasDisponibles() {
+    List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
+    );
+
+    Set<String> fechasUnicas = new TreeSet<>();
+    for (Partido p : partidos) {
+      if (p.getFecha() != null) {
+        fechasUnicas.add(p.getFecha().toLocalDate().toString());
+      }
+    }
+    return new ArrayList<>(fechasUnicas);
+  }
+
+  @Override
+  public List<String> obtenerHorasDisponibles() {
+    List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
+    );
+
+    Set<String> horasYMinutosUnicas = new TreeSet<>();
+    for (Partido p : partidos) {
+      if (p.getFecha() != null) {
+        String horaFormateada = String.format(
+          "%02d:%02d",
+          p.getFecha().getHour(),
+          p.getFecha().getMinute()
+        );
+        horasYMinutosUnicas.add(horaFormateada);
+      }
+    }
+    return new ArrayList<>(horasYMinutosUnicas);
+  }
+
+  @Override
+  public List<Integer> obtenerDistanciasDisponibles() {
+    List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
+    );
+
+    Set<Integer> distanciasUnicas = new TreeSet<>();
+    for (Partido p : partidos) {
+      if (p.getDistancia() != null) {
+        distanciasUnicas.add(p.getDistancia());
+      }
+    }
+    return new ArrayList<>(distanciasUnicas);
+  }
+
+  @Override
+  public List<Integer> obtenerCuposDisponibles() {
+    List<Partido> todosLosPartidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
+    );
+
+    Set<Integer> cuposUnicos = new TreeSet<>();
+
+    for (Partido partido : todosLosPartidos) {
+      if (partido.getCupoMaximo() != null) {
+        cuposUnicos.add(partido.getCupoMaximo());
+      }
+    }
+    return new ArrayList<>(cuposUnicos);
   }
 }

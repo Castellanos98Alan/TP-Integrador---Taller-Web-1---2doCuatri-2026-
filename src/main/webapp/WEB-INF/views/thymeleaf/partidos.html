@@ -143,9 +143,11 @@
                             <label for="filtroDistancia" class="form-label small fw-bold mb-1">Distancia máx.</label>
                             <select name="filtroDistancia" id="filtroDistancia" class="form-select form-select-sm">
                                 <option value="TODOS" th:selected="${distanciaSeleccionada == null or distanciaSeleccionada == 'TODOS'}">Cualquiera</option>
-                                <option value="3" th:selected="${distanciaSeleccionada == '3'}">Hasta 3 km</option>
-                                <option value="5" th:selected="${distanciaSeleccionada == '5'}">Hasta 5 km</option>
-                                <option value="10" th:selected="${distanciaSeleccionada == '10'}">Hasta 10 km</option>
+                                <option th:each="fecha : ${distanciasDisponibles}" 
+                                        th:value="${fecha}" 
+                                        th:text="${fecha}"
+                                        th:selected="${fechaSeleccionada == fecha}">
+                                </option>
                             </select>
                         </div>
 
@@ -162,9 +164,11 @@
                             <label for="filtroCupo" class="form-label small fw-bold mb-1">Jugadores</label>
                             <select name="filtroCupo" id="filtroCupo" class="form-select form-select-sm">
                                 <option value="TODOS" th:selected="${cupoSeleccionado == null or cupoSeleccionado == 'TODOS'}">Cualquiera</option>
-                                <option value="10" th:selected="${cupoSeleccionado == '10'}">Fútbol 5 (10)</option>
-                                <option value="14" th:selected="${cupoSeleccionado == '14'}">Fútbol 7 (14)</option>
-                                <option value="22" th:selected="${cupoSeleccionado == '22'}">Fútbol 11 (22)</option>
+                               <option th:each="fecha : ${cuposDisponibles}" 
+                                        th:value="${fecha}" 
+                                        th:text="${fecha}"
+                                        th:selected="${fechaSeleccionada == fecha}">
+                                </option>
                             </select>
                         </div>
 
@@ -172,10 +176,11 @@
                             <label for="filtroFecha" class="form-label small fw-bold mb-1">Fecha</label>
                             <select name="filtroFecha" id="filtroFecha" class="form-select form-select-sm">
                                 <option value="TODOS" th:selected="${fechaSeleccionada == null or fechaSeleccionada == 'TODOS'}">Cualquier día</option>
-                                <!-- Ajustá estas fechas a las que tengas creadas en tu base de datos local -->
-                                <option value="2026-10-14" th:selected="${fechaSeleccionada == '2026-10-14'}">14 Octubre</option>
-                                <option value="2026-10-15" th:selected="${fechaSeleccionada == '2026-10-15'}">15 Octubre</option>
-                                <option value="2026-10-18" th:selected="${fechaSeleccionada == '2026-10-18'}">18 Octubre</option>
+                                <option th:each="fecha : ${fechasDisponibles}" 
+                                        th:value="${fecha}" 
+                                        th:text="${fecha}"
+                                        th:selected="${fechaSeleccionada == fecha}">
+                                </option>
                             </select>
                         </div>
 
@@ -183,9 +188,11 @@
                             <label for="filtroHora" class="form-label small fw-bold mb-1">Horario</label>
                             <select name="filtroHora" id="filtroHora" class="form-select form-select-sm">
                                 <option value="TODOS" th:selected="${horaSeleccionada == null or horaSeleccionada == 'TODOS'}">Cualquier horario</option>
-                                <option value="14:30" th:selected="${horaSeleccionada == '14:30'}">14:30 hs</option>
-                                <option value="18:00" th:selected="${horaSeleccionada == '18:00'}">18:00 hs</option>
-                                <option value="20:00" th:selected="${horaSeleccionada == '20:00'}">20:00 hs</option>
+                                <option th:each="fecha : ${horasDisponibles}" 
+                                        th:value="${fecha}" 
+                                        th:text="${fecha}"
+                                        th:selected="${fechaSeleccionada == fecha}">
+                                </option>
                             </select>
                         </div>
 

@@ -18,4 +18,9 @@ public interface ServicioPartido {
     String filtroHora,
     String distancia
   );
+
+  List<String> obtenerFechasDisponibles();
+  List<String> obtenerHorasDisponibles();
+  List<Integer> obtenerDistanciasDisponibles();
+  List<Integer> obtenerCuposDisponibles();
 }
