@@ -21,7 +21,7 @@ public class HibernateConfig {
     String dbPort = System.getenv("DB_PORT");
     String dbName = System.getenv("DB_NAME");
     String dbUser = System.getenv("DB_USER");
-    String dbPassword = System.getenv("DB_PASSWORD");
+    String dbPassword = System.getenv("DB_PASSWORD");git status
 
     if (dbHost == null) dbHost = "localhost";
     if (dbPort == null) dbPort = "3306";
