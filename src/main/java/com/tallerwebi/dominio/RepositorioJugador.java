@@ -12,4 +12,8 @@ public interface RepositorioJugador {
   List<Jugador> buscarRankingPorPosicion(String posicion);
 
   List<Jugador> buscarRankingPorPosicionYNivel(String nivel, String posicion);
+
+  Jugador buscarPorUsuarioId(Long usuarioId);
+
+  void modificar(Jugador jugador);
 }

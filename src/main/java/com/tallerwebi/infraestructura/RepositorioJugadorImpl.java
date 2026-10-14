@@ -71,6 +71,7 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
       .setParameter("posicion", posicion)
       .getResultList();
   }
+
   //  @Override
   //  public List<Jugador> buscarRankingPorVista(String vista) {
   //    String query = "SELECT j FROM Jugador j WHERE j.vista = :nivel ORDER BY j.puntos DESC";
@@ -80,4 +81,22 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
   //            .setParameter("vista", vista)
   //            .getResultList();
   //  }
+
+  @Override
+  public Jugador buscarPorUsuarioId(Long usuarioId) {
+    String query = "SELECT j FROM Jugador j WHERE j.usuario.id = :usuarioId";
+
+    List<Jugador> jugadores = sessionFactory
+      .getCurrentSession()
+      .createQuery(query, Jugador.class)
+      .setParameter("usuarioId", usuarioId)
+      .getResultList();
+
+    return jugadores.isEmpty() ? null : jugadores.get(0);
+  }
+
+  @Override
+  public void modificar(Jugador jugador) {
+    sessionFactory.getCurrentSession().merge(jugador);
+  }
 }

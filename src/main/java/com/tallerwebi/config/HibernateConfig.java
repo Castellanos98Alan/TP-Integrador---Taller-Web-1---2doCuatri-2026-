@@ -21,17 +21,17 @@ public class HibernateConfig {
     String dbPort = System.getenv("DB_PORT");
     String dbName = System.getenv("DB_NAME");
     String dbUser = System.getenv("DB_USER");
-    String dbPassword = System.getenv("DB_PASSWORD");
+    String dbPassword = System.getenv("DB_PASSWORD");git status
 
     if (dbHost == null) dbHost = "localhost";
     if (dbPort == null) dbPort = "3306";
     if (dbName == null) dbName = "tallerwebi";
 
     if (dbUser == null) dbUser = "root";
-    if (dbPassword == null) dbPassword = "root123";
+    if (dbPassword == null) dbPassword = "41005584Alan";
 
     String url = String.format(
-      "jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=America/Buenos_Aires&allowPublicKeyRetrieval=true",
+      "jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true",
       dbHost,
       dbPort,
       dbName

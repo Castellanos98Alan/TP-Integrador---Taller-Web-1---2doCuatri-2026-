@@ -2,10 +2,15 @@ package com.tallerwebi.presentacion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.tallerwebi.dominio.Jugador;
+import com.tallerwebi.dominio.ServicioJugador;
+import com.tallerwebi.dominio.ServicioLogin;
+import com.tallerwebi.dominio.ServicioRanking;
 import com.tallerwebi.dominio.Usuario;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -18,16 +23,20 @@ public class PerfilControllerTest {
   private static final String VISTA_EDITAR = "editar-perfil";
   private static final String REDIRECT_LOGIN = "redirect:/login";
   private static final String REDIRECT_PERFIL = "redirect:/perfil";
-
+  private static final String REDIRECT_EDITAR = "redirect:/editar-perfil";
   private static final String USUARIO = "USUARIO";
-  private static final String NOMBRE = "nombre";
-  private static final String POSICION = "posicion";
-  private static final String ZONA = "zona";
-  private static final String BIOGRAFIA = "biografia";
 
   @Test
   public void irAPerfilDeberiaRetornarVisitarPerfil() {
-    PerfilController controlador = new PerfilController();
+    ServicioLogin servicioLogin = mock(ServicioLogin.class);
+    ServicioJugador servicioJugador = mock(ServicioJugador.class);
+    ServicioRanking servicioRanking = mock(ServicioRanking.class);
+
+    PerfilController controlador = new PerfilController(
+      servicioLogin,
+      servicioJugador,
+      servicioRanking
+    );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpSession session = mock(HttpSession.class);
@@ -39,11 +48,53 @@ public class PerfilControllerTest {
     ModelAndView modelAndView = controlador.mostrarFormulario(request);
 
     assertThat(modelAndView.getViewName(), equalToIgnoringCase(VISTA_PERFIL));
+    assertEquals(0, modelAndView.getModel().get("puntos"));
+    assertEquals("D", modelAndView.getModel().get("nivel"));
+  }
+
+  @Test
+  public void irAPerfilDeberiaMostrarPuntosYRangoDelJugador() {
+    ServicioLogin servicioLogin = mock(ServicioLogin.class);
+    ServicioJugador servicioJugador = mock(ServicioJugador.class);
+    ServicioRanking servicioRanking = mock(ServicioRanking.class);
+
+    PerfilController controlador = new PerfilController(
+      servicioLogin,
+      servicioJugador,
+      servicioRanking
+    );
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpSession session = mock(HttpSession.class);
+    Usuario usuario = new Usuario();
+    Jugador jugador = new Jugador();
+
+    jugador.setPuntos(50);
+
+    when(request.getSession()).thenReturn(session);
+    when(session.getAttribute(USUARIO)).thenReturn(usuario);
+    when(servicioJugador.buscarPorUsuarioId(usuario.getId())).thenReturn(jugador);
+    when(servicioRanking.calcularNivel(50)).thenReturn("A");
+
+    ModelAndView modelAndView = controlador.mostrarFormulario(request);
+
+    assertEquals(50, modelAndView.getModel().get("puntos"));
+    assertEquals("A", modelAndView.getModel().get("nivel"));
+
+    verify(servicioRanking).calcularNivel(50);
   }
 
   @Test
   public void irAPerfilSinSesionDeberiaRedirigirALogin() {
-    PerfilController controlador = new PerfilController();
+    ServicioLogin servicioLogin = mock(ServicioLogin.class);
+    ServicioJugador servicioJugador = mock(ServicioJugador.class);
+    ServicioRanking servicioRanking = mock(ServicioRanking.class);
+
+    PerfilController controlador = new PerfilController(
+      servicioLogin,
+      servicioJugador,
+      servicioRanking
+    );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpSession session = mock(HttpSession.class);
@@ -57,7 +108,15 @@ public class PerfilControllerTest {
 
   @Test
   public void irAEditarPerfilDeberiaRetornarVisitarEditarPerfil() {
-    PerfilController controlador = new PerfilController();
+    ServicioLogin servicioLogin = mock(ServicioLogin.class);
+    ServicioJugador servicioJugador = mock(ServicioJugador.class);
+    ServicioRanking servicioRanking = mock(ServicioRanking.class);
+
+    PerfilController controlador = new PerfilController(
+      servicioLogin,
+      servicioJugador,
+      servicioRanking
+    );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpSession session = mock(HttpSession.class);
@@ -73,7 +132,15 @@ public class PerfilControllerTest {
 
   @Test
   public void irAEditarPerfilSinSesionDeberiaRedirigirALogin() {
-    PerfilController controlador = new PerfilController();
+    ServicioLogin servicioLogin = mock(ServicioLogin.class);
+    ServicioJugador servicioJugador = mock(ServicioJugador.class);
+    ServicioRanking servicioRanking = mock(ServicioRanking.class);
+
+    PerfilController controlador = new PerfilController(
+      servicioLogin,
+      servicioJugador,
+      servicioRanking
+    );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpSession session = mock(HttpSession.class);
@@ -86,8 +153,88 @@ public class PerfilControllerTest {
   }
 
   @Test
-  public void guardarPerfilDeberiaGuardarDatosEnSesionYRedirigirAPerfil() {
-    PerfilController controlador = new PerfilController();
+  public void guardarPerfilDeberiaActualizarUsuarioYJugador() {
+    ServicioLogin servicioLogin = mock(ServicioLogin.class);
+    ServicioJugador servicioJugador = mock(ServicioJugador.class);
+    ServicioRanking servicioRanking = mock(ServicioRanking.class);
+
+    PerfilController controlador = new PerfilController(
+      servicioLogin,
+      servicioJugador,
+      servicioRanking
+    );
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpSession session = mock(HttpSession.class);
+    Usuario usuario = new Usuario();
+    Jugador jugador = new Jugador();
+
+    when(request.getSession()).thenReturn(session);
+    when(session.getAttribute(USUARIO)).thenReturn(usuario);
+    when(servicioJugador.buscarPorUsuarioId(usuario.getId())).thenReturn(jugador);
+
+    ModelAndView modelAndView = controlador.guardarPerfil(
+      "Santiago",
+      "delantero",
+      "arquero",
+      "Lafe",
+      "Naci para este deporte",
+      request
+    );
+
+    verify(servicioLogin).modificar(usuario);
+    verify(servicioJugador).modificar(jugador);
+
+    assertThat(usuario.getNickname(), equalToIgnoringCase("Santiago"));
+    assertThat(usuario.getZona(), equalToIgnoringCase("Lafe"));
+    assertThat(usuario.getBiografia(), equalToIgnoringCase("Naci para este deporte"));
+
+    assertThat(jugador.getPosicion1(), equalToIgnoringCase("delantero"));
+    assertThat(jugador.getPosicion2(), equalToIgnoringCase("arquero"));
+
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
+  }
+
+  @Test
+  public void guardarPerfilSinSesionDeberiaRedirigirALogin() {
+    ServicioLogin servicioLogin = mock(ServicioLogin.class);
+    ServicioJugador servicioJugador = mock(ServicioJugador.class);
+    ServicioRanking servicioRanking = mock(ServicioRanking.class);
+
+    PerfilController controlador = new PerfilController(
+      servicioLogin,
+      servicioJugador,
+      servicioRanking
+    );
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpSession session = mock(HttpSession.class);
+
+    when(request.getSession()).thenReturn(session);
+
+    ModelAndView modelAndView = controlador.guardarPerfil(
+      "Santiago",
+      "delantero",
+      "arquero",
+      "Lafe",
+      "Naci para este deporte",
+      request
+    );
+
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_LOGIN));
+  }
+
+  @Test
+  public void guardarPerfilSinJugadorDeberiaRedirigirAEditarPerfil() {
+    ServicioLogin servicioLogin = mock(ServicioLogin.class);
+    ServicioJugador servicioJugador = mock(ServicioJugador.class);
+    ServicioRanking servicioRanking = mock(ServicioRanking.class);
+
+    PerfilController controlador = new PerfilController(
+      servicioLogin,
+      servicioJugador,
+      servicioRanking
+    );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpSession session = mock(HttpSession.class);
@@ -95,40 +242,19 @@ public class PerfilControllerTest {
 
     when(request.getSession()).thenReturn(session);
     when(session.getAttribute(USUARIO)).thenReturn(usuario);
+    when(servicioJugador.buscarPorUsuarioId(usuario.getId())).thenReturn(null);
 
     ModelAndView modelAndView = controlador.guardarPerfil(
       "Santiago",
       "delantero",
+      "arquero",
       "Lafe",
-      "Naci para este deporte...",
+      "Naci para este deporte",
       request
     );
 
-    verify(session).setAttribute(NOMBRE, "Santiago");
-    verify(session).setAttribute(POSICION, "delantero");
-    verify(session).setAttribute(ZONA, "Lafe");
-    verify(session).setAttribute(BIOGRAFIA, "Naci para este deporte...");
+    verify(servicioLogin).modificar(usuario);
 
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
-  }
-
-  @Test
-  public void guardarPerfilSinSesionDeberiaRedirigirALogin() {
-    PerfilController controlador = new PerfilController();
-
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    HttpSession session = mock(HttpSession.class);
-
-    when(request.getSession()).thenReturn(session);
-
-    ModelAndView modelAndView = controlador.guardarPerfil(
-      "Santiago",
-      "delantero",
-      "Lafe",
-      "Naci para este deporte...",
-      request
-    );
-
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_LOGIN));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_EDITAR));
   }
 }

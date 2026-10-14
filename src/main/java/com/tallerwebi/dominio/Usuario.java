@@ -13,6 +13,9 @@ public class Usuario {
   private String password;
   private String rol;
   private Boolean activo = false;
+  private String zona;
+  private String biografia;
+  private String nickname;
 
   public Usuario() {}
 
@@ -58,5 +61,29 @@ public class Usuario {
 
   public void activar() {
     activo = true;
+  }
+
+  public String getZona() {
+    return zona;
+  }
+
+  public void setZona(String zona) {
+    this.zona = zona;
+  }
+
+  public String getBiografia() {
+    return biografia;
+  }
+
+  public void setBiografia(String biografia) {
+    this.biografia = biografia;
+  }
+
+  public String getNickname() {
+    return nickname;
+  }
+
+  public void setNickname(String nickname) {
+    this.nickname = nickname;
   }
 }
