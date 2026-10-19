@@ -21,7 +21,6 @@ public class ServicioLoginImpl implements ServicioLogin {
     this.repositorioJugador = repositorioJugador;
   }
 
-  // MODIFICADO: se conserva para compatibilidad con llamadas existentes.
   public ServicioLoginImpl(RepositorioUsuario repositorioUsuario) {
     this.repositorioUsuario = repositorioUsuario;
   }
@@ -37,7 +36,6 @@ public class ServicioLoginImpl implements ServicioLogin {
     repositorioUsuario.guardar(usuario);
   }
 
-  // MODIFICADO: registra el usuario y crea su jugador asociado.
   @Override
   public void registrar(Usuario usuario, String nombreJugador, String posicion1, String posicion2)
     throws UsuarioExistente {
