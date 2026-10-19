@@ -145,17 +145,18 @@ public class ServicioPartidoTest {
       );
   }
 
+  @Test
   public void queUnUsuarioPuedaUnirseAPartidoExitosamente() {
     Long partidoId = 1L;
     Partido partido = new Partido();
     partido.setId(partidoId);
     partido.setCupoMaximo(10);
-    partido.setConfirmados(new ArrayList<>());
+    partido.setInscripciones(new ArrayList<>());
     partido.setEstado(Partido.EstadoPartido.ACTIVO);
 
     Usuario usuario = new Usuario();
     usuario.setId(100L);
-    usuario.setEmail("test@ejemplo.com");
+    usuario.setEmail("test@unlam.edu.ar");
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
 
@@ -212,12 +213,15 @@ public class ServicioPartidoTest {
     partido.setId(partidoId);
     partido.setCupoMaximo(10);
     partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setInscripciones(new ArrayList<>());
 
     Usuario usuario = new Usuario();
     usuario.setId(100L);
 
-    partido.setConfirmados(new ArrayList<>());
-    partido.getConfirmados().add(usuario);
+    InscripcionPartido inscripcionExistente = new InscripcionPartido();
+    inscripcionExistente.setPartido(partido);
+    inscripcionExistente.setUsuario(usuario);
+    partido.getInscripciones().add(inscripcionExistente);
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
 
@@ -238,15 +242,22 @@ public class ServicioPartidoTest {
     partido.setId(partidoId);
     partido.setCupoMaximo(2);
     partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setInscripciones(new ArrayList<>());
 
     Usuario usuario1 = new Usuario();
     usuario1.setId(101L);
     Usuario usuario2 = new Usuario();
     usuario2.setId(102L);
 
-    partido.setConfirmados(new ArrayList<>());
-    partido.getConfirmados().add(usuario1);
-    partido.getConfirmados().add(usuario2);
+    InscripcionPartido inscripcion1 = new InscripcionPartido();
+    inscripcion1.setPartido(partido);
+    inscripcion1.setUsuario(usuario1);
+    partido.getInscripciones().add(inscripcion1);
+
+    InscripcionPartido inscripcion2 = new InscripcionPartido();
+    inscripcion2.setPartido(partido);
+    inscripcion2.setUsuario(usuario2);
+    partido.getInscripciones().add(inscripcion2);
 
     Usuario usuarioNuevo = new Usuario();
     usuarioNuevo.setId(103L);
@@ -261,6 +272,36 @@ public class ServicioPartidoTest {
     );
 
     assertEquals("Cupo maximo alcanzado.", exception.getMessage());
+  }
+
+  @Test
+  public void quePermitaUnirseSiHayMasDeTresHorasDeDiferencia() {
+    Long partidoIdNuevo = 1L;
+    Long partidoIdExistente = 2L;
+
+    Partido partidoNuevo = new Partido();
+    partidoNuevo.setId(partidoIdNuevo);
+    partidoNuevo.setCupoMaximo(10);
+    partidoNuevo.setEstado(Partido.EstadoPartido.ACTIVO);
+    partidoNuevo.setFecha(LocalDateTime.of(2026, 6, 6, 19, 0));
+    partidoNuevo.setInscripciones(new ArrayList<>());
+
+    Partido partidoExistente = new Partido();
+    partidoExistente.setId(partidoIdExistente);
+    partidoExistente.setFecha(LocalDateTime.of(2026, 6, 6, 15, 0));
+
+    Usuario usuario = new Usuario();
+    usuario.setId(100L);
+
+    when(repositorioPartidoMock.buscarPorId(partidoIdNuevo)).thenReturn(partidoNuevo);
+    when(repositorioPartidoMock.buscarPartidosPorUsuario(usuario.getId()))
+      .thenReturn(List.of(partidoExistente));
+
+    servicioPartido.unirseAPartido(partidoIdNuevo, usuario);
+
+    assertThat(partidoNuevo.getConfirmados(), hasSize(1));
+    assertThat(partidoNuevo.getConfirmados(), hasItem(usuario));
+    verify(repositorioPartidoMock, times(1)).modificar(partidoNuevo);
   }
 
   @Test
