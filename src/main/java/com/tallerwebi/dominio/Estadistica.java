@@ -18,7 +18,7 @@ public class Estadistica {
   @ManyToOne(fetch = FetchType.EAGER)
   private Partido partido;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne
   private Jugador jugador;
 
   public Estadistica() {}
