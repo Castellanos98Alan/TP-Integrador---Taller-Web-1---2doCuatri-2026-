@@ -50,9 +50,18 @@
 
         </div>
 
-        <a class="boton-crear" th:href="@{/crearPartido}">
-            &#65291; Crear partido
-        </a>
+        <div class="navbar-acciones">
+
+            <a class="boton-crear" th:href="@{/crearPartido}">
+                &#65291; Crear partido
+            </a>
+
+            <a class="boton-logout" th:href="@{/login}"
+               title="Cerrar sesión" aria-label="Cerrar sesión">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </a>
+
+        </div>
 
     </div>
 
@@ -85,9 +94,18 @@
 
             <div class="avatar-wrap">
 
-                <div class="avatar-hero">
-                    &#9917;
+
+                <div class="avatar-hero" style="overflow: hidden;">
+                    <img th:if="${foto != null and !foto.isEmpty()}"
+                         th:src="@{'/' + ${foto}}"
+                         th:style="'width:100%; height:100%; object-fit:cover; object-position:' + ${fotoPosicionX} + '% ' + ${fotoPosicionY} + '%;'"
+                         alt="Foto de perfil">
+
+                        <span th:unless="${foto != null and !foto.isEmpty()}">
+                        &#9917;
+                    </span>
                 </div>
+
 
                 <a class="avatar-camara"
                    th:href="@{/editar-perfil}"
@@ -246,77 +264,109 @@
         Todavía no sumaste puntos. ¡Jugá partidos para subir de rango!
     </div>
 
-
-
     <!-- ESTADÍSTICAS -->
 
-    <div class="stats-grid" id="resumen">
+    <div class="stats-grid" id="resumen"
+         th:if="${partidosJugados != null and partidosJugados > 0}">
 
         <div class="stat-card">
-            <div class="stat-icono"><i class="fa-solid fa-calendar-check"></i></div>
+            <div class="stat-icono">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
             <div>
                 <span class="stat-label">Partidos jugados</span>
-                <span class="stat-valor">&mdash;</span>
-                <span class="stat-sub">Sin datos</span>
+                <span class="stat-valor" th:text="${partidosJugados}">0</span>
+                <span class="stat-sub">Total de partidos</span>
             </div>
         </div>
 
         <div class="stat-card">
-            <div class="stat-icono"><i class="fa-solid fa-trophy"></i></div>
+            <div class="stat-icono">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
             <div>
                 <span class="stat-label">Victorias</span>
-                <span class="stat-valor">&mdash;</span>
-                <span class="stat-sub">Sin datos</span>
+                <span class="stat-valor" th:text="${victorias}">0</span>
+                <span class="stat-sub">Partidos ganados</span>
             </div>
         </div>
 
         <div class="stat-card">
-            <div class="stat-icono rojo"><i class="fa-solid fa-xmark"></i></div>
+            <div class="stat-icono rojo">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
             <div>
                 <span class="stat-label">Derrotas</span>
-                <span class="stat-valor">&mdash;</span>
-                <span class="stat-sub">Sin datos</span>
+                <span class="stat-valor" th:text="${derrotas}">0</span>
+                <span class="stat-sub">Partidos perdidos</span>
             </div>
         </div>
 
         <div class="stat-card">
-            <div class="stat-icono"><i class="fa-solid fa-chart-simple"></i></div>
+            <div class="stat-icono">
+                <i class="fa-solid fa-chart-simple"></i>
+            </div>
             <div>
                 <span class="stat-label">Win rate</span>
-                <span class="stat-valor">&mdash;</span>
-                <span class="stat-sub">Sin datos</span>
+                <span class="stat-valor"
+                      th:text="${#numbers.formatDecimal(victorias * 100.0 / partidosJugados, 1, 1) + '%'}">0%</span>
+                <span class="stat-sub">Porcentaje de victorias</span>
             </div>
         </div>
 
         <div class="stat-card">
-            <div class="stat-icono"><i class="fa-solid fa-futbol"></i></div>
+            <div class="stat-icono">
+                <i class="fa-solid fa-futbol"></i>
+            </div>
             <div>
                 <span class="stat-label">Goles</span>
-                <span class="stat-valor">&mdash;</span>
-                <span class="stat-sub">Sin datos</span>
+                <span class="stat-valor" th:text="${goles}">0</span>
+                <span class="stat-sub">Total de goles</span>
             </div>
         </div>
 
         <div class="stat-card">
-            <div class="stat-icono"><i class="fa-solid fa-shoe-prints"></i></div>
+            <div class="stat-icono">
+                <i class="fa-solid fa-shoe-prints"></i>
+            </div>
             <div>
                 <span class="stat-label">Asistencias</span>
-                <span class="stat-valor">&mdash;</span>
-                <span class="stat-sub">Sin datos</span>
+                <span class="stat-valor" th:text="${asistencias}">0</span>
+                <span class="stat-sub">Total de asistencias</span>
             </div>
         </div>
 
         <div class="stat-card">
-            <div class="stat-icono"><i class="fa-solid fa-star"></i></div>
+            <div class="stat-icono">
+                <i class="fa-solid fa-star"></i>
+            </div>
             <div>
                 <span class="stat-label">Promedio</span>
-                <span class="stat-valor">&mdash;</span>
-                <span class="stat-sub">Calificación media</span>
+                <span class="stat-valor"
+                      th:text="${#numbers.formatDecimal(puntajeTotal * 1.0 / partidosJugados, 1, 1)}">0</span>
+                <span class="stat-sub">Puntos por partido</span>
             </div>
         </div>
 
     </div>
 
+    <!-- MENSAJE CUANDO NO HAY ESTADÍSTICAS -->
+
+    <div class="stats-vacio"
+         th:if="${partidosJugados == null or partidosJugados == 0}">
+
+        <div class="stats-vacio-icono">
+            <i class="fa-solid fa-chart-simple"></i>
+        </div>
+
+        <h3>Todavía no hay estadísticas</h3>
+
+        <p>
+            Cuando juegues tus primeros partidos,
+            vas a poder ver tus goles, asistencias y rendimiento acá.
+        </p>
+
+    </div>
 
     <!-- RENDIMIENTO / COMPARATIVA / RANKING -->
 

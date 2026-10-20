@@ -23,3 +23,56 @@ VALUES('JuanPa', 'Arquero', 'Defensor', 20, "C");
 
 INSERT INTO Jugador(nombre, posicion1, posicion2,  puntos, nivel)
 VALUES('Tomas', 'Defensor', 'Arquero', 0, "D");
+
+
+-- Crear un jugador exclusivo para el usuario de prueba
+INSERT INTO Jugador (
+    nombre,
+    posicion1,
+    posicion2,
+    puntos,
+    nivel,
+    usuario_id,
+    partidosJugados,
+    partidosGanados,
+    partidosPerdidos
+)
+VALUES (
+           'Jugador Test',
+           'Delantero',
+           'Mediocampista',
+           60,
+           'B',
+           (SELECT id FROM Usuario WHERE email = 'test@unlam.edu.ar'),
+           3,
+           2,
+           1
+       );
+
+-- Cargar estadísticas de ejemplo para ese jugador
+INSERT INTO Estadistica (
+    goles,
+    asistencias,
+    amarillas,
+    rojas,
+    puntaje,
+    jugador_id,
+    partido_id
+)
+VALUES (
+           3,
+           2,
+           0,
+           0,
+           8,
+           (
+               SELECT id
+               FROM Jugador
+               WHERE usuario_id = (
+                   SELECT id
+                   FROM Usuario
+                   WHERE email = 'test@unlam.edu.ar'
+               )
+           ),
+           NULL
+       );

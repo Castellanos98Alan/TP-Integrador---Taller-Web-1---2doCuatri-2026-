@@ -57,6 +57,12 @@ public class ServicioLoginImpl implements ServicioLogin {
     if (usuarioEncontrado != null) {
       throw new UsuarioExistente();
     }
+
+    Usuario usuarioConDni = repositorioUsuario.buscarPorDni(usuario.getDni());
+
+    if (usuarioConDni != null) {
+      throw new UsuarioExistente();
+    }
   }
 
   @Override
