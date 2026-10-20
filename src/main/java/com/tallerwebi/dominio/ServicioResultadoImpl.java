@@ -1,8 +1,3 @@
 package com.tallerwebi.dominio;
 
-public class ServicioResultadoImpl implements ServicioResultado {
-
-
-
-
-}
+public class ServicioResultadoImpl implements ServicioResultado {}

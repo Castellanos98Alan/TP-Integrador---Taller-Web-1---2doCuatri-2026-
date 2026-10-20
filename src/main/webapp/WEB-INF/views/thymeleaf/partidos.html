@@ -11,8 +11,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
-        * { box-sizing: border-box; }
-        
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             background-color: #f4f7f6;
@@ -25,21 +27,28 @@
             background-color: #003c2e;
             padding: 12px 35px;
         }
+
         .marca {
             color: white;
             font-size: 25px;
             font-weight: bold;
             text-decoration: none;
         }
-        .marca span { color: #50e3a4; }
+
+        .marca span {
+            color: #50e3a4;
+        }
+
         .nav-link {
             color: white !important;
             margin: 0 10px;
         }
+
         .nav-link.active {
             color: #ffe600 !important;
             border-bottom: 3px solid #ffe600;
         }
+
         .boton-crear {
             background-color: #ffe600;
             color: #18352c;
@@ -56,18 +65,24 @@
             color: white;
             background: linear-gradient(90deg, rgba(0, 67, 50, 0.98), rgba(0, 67, 50, 0.78), rgba(0, 67, 50, 0.55));
         }
+
         .hero-seccion small {
             color: #67e6ad;
             font-weight: bold;
             letter-spacing: 2px;
         }
+
         .hero-seccion h1 {
             font-size: 45px;
             font-weight: 800;
             margin-top: 10px;
             margin-bottom: 5px;
         }
-        .hero-seccion h1 span { color: #61e7ae; }
+
+        .hero-seccion h1 span {
+            color: #61e7ae;
+        }
+
         .hero-seccion p {
             font-size: 18px;
             margin-bottom: 5px;
@@ -108,8 +123,128 @@
             <a class="nav-link" th:href="@{/ranking}">Ranking</a>
             <a class="nav-link" th:href="@{/perfil}">Mi Perfil</a>
         </div>
-        <a class="boton-crear" th:href="@{/crearPartido}">＋ Crear partido</a>
-    </div>
+        <div class="d-flex align-items-center">
+
+            <!-- CAMPANITA -->
+                <div class="dropdown me-3">
+
+                    <button
+                            type="button"
+                            class="btn text-white position-relative"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+
+                        <i class="fa-solid fa-bell"></i>
+
+                        <span
+                                th:if="${solicitudesPendientes != null
+                        and !solicitudesPendientes.isEmpty()}"
+                                class="position-absolute top-0 start-100
+                       translate-middle badge rounded-pill bg-danger"
+                                th:text="${solicitudesPendientes.size()}">
+
+            0
+
+        </span>
+
+                    </button>
+
+
+                    <div
+                            class="dropdown-menu dropdown-menu-end p-3"
+                            style="width: 340px;">
+
+                        <h6 class="fw-bold mb-3">
+                            Solicitudes de amistad
+                        </h6>
+
+
+                        <div
+                                th:if="${solicitudesPendientes == null
+                        or solicitudesPendientes.isEmpty()}"
+                                class="text-muted">
+
+                            No tenés solicitudes pendientes.
+
+                        </div>
+
+
+                        <div
+                                th:if="${solicitudesPendientes != null}"
+                                th:each="solicitud : ${solicitudesPendientes}"
+                                class="border-bottom py-2">
+
+                            <div>
+
+                                <strong
+                                        th:text="${solicitud.emisor.nickname}">
+                                    Usuario
+                                </strong>
+
+                                <span>
+                    quiere agregarte como amigo.
+                </span>
+
+                            </div>
+
+
+                            <div class="d-flex gap-2 mt-2">
+
+                                <form
+                                        th:action="@{/amistad/aceptar}"
+                                        method="post">
+
+                                    <input
+                                            type="hidden"
+                                            name="idSolicitud"
+                                            th:value="${solicitud.id}">
+
+                                    <button
+                                            type="submit"
+                                            class="btn btn-success btn-sm">
+
+                                        Aceptar
+
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                        th:action="@{/amistad/rechazar}"
+                                        method="post">
+
+                                    <input
+                                            type="hidden"
+                                            name="idSolicitud"
+                                            th:value="${solicitud.id}">
+
+                                    <button
+                                            type="submit"
+                                            class="btn btn-outline-danger btn-sm">
+
+                                        Rechazar
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                </div>
+
+
+            <!-- CREAR PARTIDO -->
+            <a class="boton-crear" th:href="@{/crearPartido}">
+                + Crear partido
+            </a>
+
+        </div>
 </nav>
 
 <!-- HERO -->
@@ -126,119 +261,152 @@
 
             <!-- FORMULARIO DE FILTROS -->
             <div class="filtros-busqueda shadow-sm">
-            <form th:action="@{/partidos}" method="GET">
-                <div class="row g-3 align-items-end">
-                    
-                    <div class="col-md-4 col-lg-2">
-                        <label for="filtroNivel" class="form-label small fw-bold mb-1">Rango mínimo</label>
-                        <select name="filtroNivel" id="filtroNivel" class="form-select form-select-sm">
-                            <option value="TODOS" th:selected="${nivelSeleccionado == null or nivelSeleccionado == 'TODOS'}">Cualquier rango</option>
-                            <option value="PRINCIPIANTE" th:selected="${nivelSeleccionado == 'PRINCIPIANTE'}">Principiante</option>
-                            <option value="INTERMEDIO" th:selected="${nivelSeleccionado == 'INTERMEDIO'}">Intermedio</option>
-                            <option value="AVANZADO" th:selected="${nivelSeleccionado == 'AVANZADO'}">Avanzado</option>
-                        </select>
-                    </div>
+                <form th:action="@{/partidos}" method="GET">
+                    <div class="row g-3 align-items-end">
 
-                    <div class="col-md-4 col-lg-2">
-                        <label for="filtroDistancia" class="form-label small fw-bold mb-1">Distancia máx.</label>
-                        <select name="filtroDistancia" id="filtroDistancia" class="form-select form-select-sm">
-                            <option value="TODOS" th:selected="${distanciaSeleccionada == null or distanciaSeleccionada == 'TODOS'}">Cualquiera</option>
-                            <option th:each="distancia : ${distanciasDisponibles}" 
-                                    th:value="${distancia}" 
-                                    th:text="|Hasta ${distancia} km|"
-                                    th:selected="${distanciaSeleccionada == distancia.toString()}">
-                            </option>
-                        </select>
-                    </div>
+                        <div class="col-md-4 col-lg-2">
+                            <label for="filtroNivel" class="form-label small fw-bold mb-1">Rango mínimo</label>
+                            <select name="filtroNivel" id="filtroNivel" class="form-select form-select-sm">
+                                <option value="TODOS"
+                                        th:selected="${nivelSeleccionado == null or nivelSeleccionado == 'TODOS'}">
+                                    Cualquier rango
+                                </option>
+                                <option value="PRINCIPIANTE" th:selected="${nivelSeleccionado == 'PRINCIPIANTE'}">
+                                    Principiante
+                                </option>
+                                <option value="INTERMEDIO" th:selected="${nivelSeleccionado == 'INTERMEDIO'}">
+                                    Intermedio
+                                </option>
+                                <option value="AVANZADO" th:selected="${nivelSeleccionado == 'AVANZADO'}">Avanzado
+                                </option>
+                            </select>
+                        </div>
 
-                    <div class="col-md-4 col-lg-2">
-                        <label for="filtroTipo" class="form-label small fw-bold mb-1">Tipo de partido</label>
-                        <select name="filtroTipo" id="filtroTipo" class="form-select form-select-sm">
-                            <option value="TODOS" th:selected="${tipoSeleccionado == null or tipoSeleccionado == 'TODOS'}">Todos</option>
-                            <option value="PUBLICO" th:selected="${tipoSeleccionado == 'PUBLICO'}">Público</option>
-                            <option value="PRIVADO" th:selected="${tipoSeleccionado == 'PRIVADO'}">Privado</option>
-                        </select>
-                    </div>
+                        <div class="col-md-4 col-lg-2">
+                            <label for="filtroDistancia" class="form-label small fw-bold mb-1">Distancia máx.</label>
+                            <select name="filtroDistancia" id="filtroDistancia" class="form-select form-select-sm">
+                                <option value="TODOS"
+                                        th:selected="${distanciaSeleccionada == null or distanciaSeleccionada == 'TODOS'}">
+                                    Cualquiera
+                                </option>
+                                <option th:each="distancia : ${distanciasDisponibles}"
+                                        th:value="${distancia}"
+                                        th:text="|Hasta ${distancia} km|"
+                                        th:selected="${distanciaSeleccionada == distancia.toString()}">
+                                </option>
+                            </select>
+                        </div>
 
-                    <div class="col-md-4 col-lg-2">
-                        <label for="filtroCupo" class="form-label small fw-bold mb-1">Jugadores</label>
-                        <select name="filtroCupo" id="filtroCupo" class="form-select form-select-sm">
-                            <option value="TODOS" th:selected="${cupoSeleccionado == null or cupoSeleccionado == 'TODOS'}">Cualquiera</option>
-                            <option th:each="cupo : ${cuposDisponibles}" 
-                                    th:value="${cupo}" 
-                                    th:text="|Fútbol de ${cupo}|"
-                                    th:selected="${cupoSeleccionado == cupo.toString()}">
-                            </option>
-                        </select>
-                    </div>
+                        <div class="col-md-4 col-lg-2">
+                            <label for="filtroTipo" class="form-label small fw-bold mb-1">Tipo de partido</label>
+                            <select name="filtroTipo" id="filtroTipo" class="form-select form-select-sm">
+                                <option value="TODOS"
+                                        th:selected="${tipoSeleccionado == null or tipoSeleccionado == 'TODOS'}">Todos
+                                </option>
+                                <option value="PUBLICO" th:selected="${tipoSeleccionado == 'PUBLICO'}">Público</option>
+                                <option value="PRIVADO" th:selected="${tipoSeleccionado == 'PRIVADO'}">Privado</option>
+                            </select>
+                        </div>
 
-                    <div class="col-md-4 col-lg-2">
-                        <label for="filtroFecha" class="form-label small fw-bold mb-1">Fecha</label>
-                        <select name="filtroFecha" id="filtroFecha" class="form-select form-select-sm">
-                            <option value="TODOS" th:selected="${fechaSeleccionada == null or fechaSeleccionada == 'TODOS'}">Cualquier día</option>
-                            <option th:each="fecha : ${fechasDisponibles}" 
-                                    th:value="${fecha}" 
-                                    th:text="${fecha}"
-                                    th:selected="${fechaSeleccionada == fecha}">
-                            </option>
-                        </select>
-                    </div>
+                        <div class="col-md-4 col-lg-2">
+                            <label for="filtroCupo" class="form-label small fw-bold mb-1">Jugadores</label>
+                            <select name="filtroCupo" id="filtroCupo" class="form-select form-select-sm">
+                                <option value="TODOS"
+                                        th:selected="${cupoSeleccionado == null or cupoSeleccionado == 'TODOS'}">
+                                    Cualquiera
+                                </option>
+                                <option th:each="cupo : ${cuposDisponibles}"
+                                        th:value="${cupo}"
+                                        th:text="|Fútbol de ${cupo}|"
+                                        th:selected="${cupoSeleccionado == cupo.toString()}">
+                                </option>
+                            </select>
+                        </div>
 
-                    <div class="col-md-4 col-lg-2">
-                        <label for="filtroHora" class="form-label small fw-bold mb-1">Horario</label>
-                        <select name="filtroHora" id="filtroHora" class="form-select form-select-sm">
-                            <option value="TODOS" th:selected="${horaSeleccionada == null or horaSeleccionada == 'TODOS'}">Cualquier horario</option>
-                            <option th:each="hora : ${horasDisponibles}" 
-                                    th:value="${hora}" 
-                                    th:text="|${hora} hs|"
-                                    th:selected="${horaSeleccionada == hora}">
-                            </option>
-                        </select>
-                    </div>
+                        <div class="col-md-4 col-lg-2">
+                            <label for="filtroFecha" class="form-label small fw-bold mb-1">Fecha</label>
+                            <select name="filtroFecha" id="filtroFecha" class="form-select form-select-sm">
+                                <option value="TODOS"
+                                        th:selected="${fechaSeleccionada == null or fechaSeleccionada == 'TODOS'}">
+                                    Cualquier día
+                                </option>
+                                <option th:each="fecha : ${fechasDisponibles}"
+                                        th:value="${fecha}"
+                                        th:text="${fecha}"
+                                        th:selected="${fechaSeleccionada == fecha}">
+                                </option>
+                            </select>
+                        </div>
 
-                    <div class="col-12 mt-3 text-end">
-                        <button type="submit" class="btn btn-success btn-sm px-4 fw-bold">Aplicar Filtros</button>
+                        <div class="col-md-4 col-lg-2">
+                            <label for="filtroHora" class="form-label small fw-bold mb-1">Horario</label>
+                            <select name="filtroHora" id="filtroHora" class="form-select form-select-sm">
+                                <option value="TODOS"
+                                        th:selected="${horaSeleccionada == null or horaSeleccionada == 'TODOS'}">
+                                    Cualquier horario
+                                </option>
+                                <option th:each="hora : ${horasDisponibles}"
+                                        th:value="${hora}"
+                                        th:text="|${hora} hs|"
+                                        th:selected="${horaSeleccionada == hora}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 mt-3 text-end">
+                            <button type="submit" class="btn btn-success btn-sm px-4 fw-bold">Aplicar Filtros</button>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
             </div>
 
             <!-- GRILLA DE PARTIDOS -->
             <div class="row">
                 <!-- Mensaje si no hay partidos -->
                 <div th:if="${listaPartidos == null or listaPartidos.isEmpty()}" class="col-12 text-center py-5">
-                    <h4 class="text-muted"><i class="fa-solid fa-futbol"></i> No se encontraron partidos con esos filtros</h4>
+                    <h4 class="text-muted"><i class="fa-solid fa-futbol"></i> No se encontraron partidos con esos
+                        filtros</h4>
                 </div>
 
                 <!-- Tarjetas -->
                 <div th:each="partido : ${listaPartidos}" class="col-md-6 col-lg-4 mb-4">
                     <div class="card shadow-sm h-100 border-0" style="border: 1px solid #e3ece8 !important;">
                         <div class="card-body d-flex flex-column">
-                            
-                            <h5 class="card-title text-success fw-bold mb-3" th:text="${partido.cancha.nombre}">Cancha</h5>
-                            
+
+                            <h5 class="card-title text-success fw-bold mb-3" th:text="${partido.cancha.nombre}">
+                                Cancha</h5>
+
                             <div class="card-text mb-3 text-secondary" style="font-size: 14px;">
-                                <strong><i class="fa-regular fa-calendar"></i> Fecha:</strong> <span th:text="${#temporals.format(partido.fecha, 'dd/MM/yyyy')}"></span><br>
-                                <strong><i class="fa-regular fa-clock"></i> Hora:</strong> <span th:text="${#temporals.format(partido.fecha, 'HH:mm')} + ' hs'"></span><br>
-                                <strong><i class="fa-solid fa-location-dot"></i> Distancia:</strong> a <span th:text="${partido.distanciaKm}"></span> km<br>
-                                <strong><i class="fa-solid fa-ranking-star"></i> Nivel:</strong> <span th:text="${partido.nivel}"></span><br>
-                                <strong><i class="fa-solid fa-users"></i> Cupo:</strong> <span th:text="${partido.confirmados.size()} + '/' + ${partido.cupoMaximo}"></span>
+                                <strong><i class="fa-regular fa-calendar"></i> Fecha:</strong> <span
+                                    th:text="${#temporals.format(partido.fecha, 'dd/MM/yyyy')}"></span><br>
+                                <strong><i class="fa-regular fa-clock"></i> Hora:</strong> <span
+                                    th:text="${#temporals.format(partido.fecha, 'HH:mm')} + ' hs'"></span><br>
+                                <strong><i class="fa-solid fa-location-dot"></i> Distancia:</strong> a <span
+                                    th:text="${partido.distanciaKm}"></span> km<br>
+                                <strong><i class="fa-solid fa-ranking-star"></i> Nivel:</strong> <span
+                                    th:text="${partido.nivel}"></span><br>
+                                <strong><i class="fa-solid fa-users"></i> Cupo:</strong> <span
+                                    th:text="${partido.confirmados.size()} + '/' + ${partido.cupoMaximo}"></span>
                             </div>
-                            
+
                             <div class="mb-3">
-                                <span th:if="${partido.esPrivado}" class="badge bg-warning text-dark"><i class="fa-solid fa-lock"></i> Privado</span>
-                                <span th:unless="${partido.esPrivado}" class="badge bg-success"><i class="fa-solid fa-lock-open"></i> Público</span>
+                                <span th:if="${partido.esPrivado}" class="badge bg-warning text-dark"><i
+                                        class="fa-solid fa-lock"></i> Privado</span>
+                                <span th:unless="${partido.esPrivado}" class="badge bg-success"><i
+                                        class="fa-solid fa-lock-open"></i> Público</span>
                             </div>
 
                             <div class="mt-auto">
-                                <a th:href="@{/partido/{id}/sala-de-espera(id=${partido.id})}" class="btn btn-outline-success w-100 fw-bold">
+                                <a th:href="@{/partido/{id}/sala-de-espera(id=${partido.id})}"
+                                   class="btn btn-outline-success w-100 fw-bold">
                                     Unirme <i class="fa-solid fa-arrow-right"></i>
                                 </a>
                             </div>
-                                
-                                <div th:if="${partido.esPrivado}" class="mb-2">
-                                    <input type="text" name="codigoAcceso" class="form-control form-control-sm" placeholder="Código de acceso" required>
-                                </div>
+
+                            <div th:if="${partido.esPrivado}" class="mb-2">
+                                <input type="text" name="codigoAcceso" class="form-control form-control-sm"
+                                       placeholder="Código de acceso" required>
+                            </div>
 
                             </form>
                         </div>

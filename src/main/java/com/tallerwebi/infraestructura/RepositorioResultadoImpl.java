@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.RepositorioResultado;
 import com.tallerwebi.dominio.Resultado;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -11,6 +12,7 @@ public class RepositorioResultadoImpl implements RepositorioResultado {
 
   private final SessionFactory sessionFactory;
 
+  @Autowired
   public RepositorioResultadoImpl(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
   }
@@ -32,7 +34,7 @@ public class RepositorioResultadoImpl implements RepositorioResultado {
 
   @Override
   public Resultado buscarPorPartido(Partido partido) {
-    String query = "SELECT p.resultado FROM Partido p " + "WHERE p = :partido";
+    String query = "SELECT p.resultado FROM Partido p WHERE p = :partido";
 
     return sessionFactory
       .getCurrentSession()
