@@ -2,10 +2,7 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +32,6 @@ public class ServicioPartidoImpl implements ServicioPartido {
     if (datos.getCupo() == null || datos.getCupo() <= 0) {
       throw new RuntimeException("El cupo debe ser mayor a cero.");
     }
-
     if (datos.getFechaHora() == null) {
       throw new RuntimeException("Debe ingresar una fecha y hora.");
     }
@@ -51,8 +47,23 @@ public class ServicioPartidoImpl implements ServicioPartido {
     partido.setCupoMaximo(datos.getCupo());
     partido.setNivel(datos.getNivel());
     partido.setOrganizador(creador);
+    partido.setEsPrivado(datos.getEsPrivado());
+
+    if (Boolean.TRUE.equals(datos.getEsPrivado())) {
+      partido.setCodigoDeAcceso(UUID.randomUUID().toString().substring(0, 8));
+    }
 
     repositorioPartido.guardar(partido);
+  }
+
+  @Override
+  public List<Cancha> listarCanchas() {
+    return repositorioCancha.buscarTodas();
+  }
+
+  @Override
+  public List<String> listarLocalidades() {
+    return repositorioCancha.buscarLocalidades();
   }
 
   @Override

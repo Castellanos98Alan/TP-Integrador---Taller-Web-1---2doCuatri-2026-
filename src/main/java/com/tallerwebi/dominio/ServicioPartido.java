@@ -8,7 +8,10 @@ public interface ServicioPartido {
   void crearPartido(DatosCrearPartido datos, Usuario creador);
   void cancelarPartido(Long partidoId, Usuario usuarioLogueado);
   void unirseAPartido(Long partidoId, Usuario usuarioLogueado);
+
   Partido buscarPartidoPorId(Long id);
+  List<Cancha> listarCanchas(); // NUEVO
+  List<String> listarLocalidades(); // NUEVO
 
   List<Partido> listarPartidosSegunFiltro(
     String filtroNivel,

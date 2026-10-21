@@ -1,6 +1,11 @@
 package com.tallerwebi.dominio;
 
-@SuppressWarnings("PMD.ImplicitFunctionalInterface") //sin esto no me levanta (preguntar al profe )
+import java.util.List;
+
 public interface RepositorioCancha {
   Cancha buscarPorNombre(String nombre);
+
+  List<Cancha> buscarTodas();
+
+  List<String> buscarLocalidades();
 }
