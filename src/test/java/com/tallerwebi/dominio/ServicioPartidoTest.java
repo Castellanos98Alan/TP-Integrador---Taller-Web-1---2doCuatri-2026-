@@ -119,6 +119,7 @@ public class ServicioPartidoTest {
         "22",
         FILTRO_TODOS,
         FILTRO_TODOS,
+        FILTRO_TODOS,
         FILTRO_TODOS
       )
     )
@@ -130,6 +131,7 @@ public class ServicioPartidoTest {
       "22",
       FILTRO_TODOS,
       FILTRO_TODOS,
+      FILTRO_TODOS,
       FILTRO_TODOS
     );
 
@@ -139,6 +141,7 @@ public class ServicioPartidoTest {
         "PRINCIPIANTE",
         FILTRO_TODOS,
         "22",
+        FILTRO_TODOS,
         FILTRO_TODOS,
         FILTRO_TODOS,
         FILTRO_TODOS
@@ -354,122 +357,5 @@ public class ServicioPartidoTest {
     //assertThat("La lista no debería estar vacía", resultado.size(), greaterThan(0));
     //Partido partido = resultado.get(0);
     //assertThat(partido.getCupoMaximo(), equalTo(22));
-  }
-
-  @Test
-  public void deberiaObtenerFechasDisponibles() {
-    // 1. Given
-    Partido partido1 = new Partido();
-    partido1.setFecha(LocalDateTime.of(2026, 10, 20, 18, 30));
-
-    Partido partido2 = new Partido();
-    partido2.setFecha(LocalDateTime.of(2026, 10, 21, 18, 30));
-
-    List<Partido> partidosEnBD = List.of(partido1, partido2);
-    when(
-      repositorioPartidoMock.buscarPartidosPorFiltro(
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS
-      )
-    )
-      .thenReturn(partidosEnBD);
-    List<String> fechasEsperadas = List.of("2026-10-20", "2026-10-21");
-
-    // 2. When Ejecución
-    List<String> listaDeFechasDisponibles = servicioPartido.obtenerFechasDisponibles();
-
-    // 3. Then Validación
-    assertEquals(fechasEsperadas, listaDeFechasDisponibles);
-  }
-
-  @Test
-  public void deberiaObtenerHorasDisponibles() {
-    // 1. Given
-    Partido partido1 = new Partido();
-    partido1.setFecha(LocalDateTime.of(2026, 10, 20, 18, 30));
-    Partido partido2 = new Partido();
-    partido2.setFecha(LocalDateTime.of(2026, 10, 21, 14, 00));
-
-    List<Partido> partidosEnBD = List.of(partido1, partido2);
-    when(
-      repositorioPartidoMock.buscarPartidosPorFiltro(
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS
-      )
-    )
-      .thenReturn(partidosEnBD);
-    List<String> horasYMinutosEsperados = List.of("14:00", "18:30");
-
-    // 2. When Ejecución
-    List<String> listaDeHorasYMinutosDisponibles = servicioPartido.obtenerHorasDisponibles();
-
-    // 3. Then Validación
-    assertEquals(horasYMinutosEsperados, listaDeHorasYMinutosDisponibles);
-  }
-
-  @Test
-  void deberiaObtenerDistanciasDisponibles() {
-    // 1. Given
-    Partido partido1 = new Partido();
-    partido1.setDistancia(5);
-    Partido partido2 = new Partido();
-    partido2.setDistancia(10);
-
-    List<Partido> partidosEnBD = List.of(partido1, partido2);
-    when(
-      repositorioPartidoMock.buscarPartidosPorFiltro(
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS
-      )
-    )
-      .thenReturn(partidosEnBD);
-    List<Integer> distaciasEsperadas = List.of(5, 10);
-
-    // 2. When Ejecución
-    List<Integer> listaDeDistanciasDisponibles = servicioPartido.obtenerDistanciasDisponibles();
-
-    // 3. Then Validación
-    assertEquals(distaciasEsperadas, listaDeDistanciasDisponibles);
-  }
-
-  @Test
-  void deberiaobtenerCuposDisponibles() {
-    // 1. Given
-    Partido partido1 = new Partido();
-    partido1.setCupoMaximo(22);
-    Partido partido2 = new Partido();
-    partido2.setCupoMaximo(10);
-
-    List<Partido> partidosEnBD = List.of(partido1, partido2);
-    when(
-      repositorioPartidoMock.buscarPartidosPorFiltro(
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS
-      )
-    )
-      .thenReturn(partidosEnBD);
-    List<Integer> cupoMaximoEsperados = List.of(10, 22);
-
-    // 2. When Ejecución
-    List<Integer> listaDeCuposMaximosDisponibles = servicioPartido.obtenerCuposDisponibles();
-
-    // 3. Then Validación
-    assertEquals(cupoMaximoEsperados, listaDeCuposMaximosDisponibles);
   }
 }

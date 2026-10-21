@@ -47,7 +47,8 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
     String filtroCupoMaximo,
     String filtroFecha,
     String filtroHora,
-    String filtroDistancia
+    String filtroProvincia,
+    String filtroLocalidad
   ) {
     String hql = armarConsultaHql(
       filtroNivel,
@@ -55,7 +56,8 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       filtroCupoMaximo,
       filtroFecha,
       filtroHora,
-      filtroDistancia
+      filtroProvincia,
+      filtroLocalidad
     );
 
     Query<Partido> query = sessionFactory
@@ -68,7 +70,8 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       filtroCupoMaximo,
       filtroFecha,
       filtroHora,
-      filtroDistancia
+      filtroProvincia,
+      filtroLocalidad
     );
 
     return query.getResultList();
@@ -90,7 +93,8 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
     String filtroCupoMaximo,
     String filtroFecha,
     String filtroHora,
-    String filtroDistancia
+    String filtroProvincia,
+    String filtroLocalidad
   ) {
     if (!FILTRO_TODOS.equals(filtroNivel)) {
       query.setParameter("nivel", filtroNivel);
@@ -100,8 +104,11 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       query.setParameter("cupoMaximo", Integer.parseInt(filtroCupoMaximo));
     }
 
-    if (!FILTRO_TODOS.equals(filtroDistancia)) {
-      query.setParameter("distancia", Integer.parseInt(filtroDistancia));
+    if (!FILTRO_TODOS.equals(filtroProvincia)) {
+      query.setParameter("provincia", filtroProvincia);
+    }
+    if (!FILTRO_TODOS.equals(filtroLocalidad)) {
+      query.setParameter("localidad", filtroLocalidad);
     }
 
     if (!FILTRO_TODOS.equals(filtroFecha)) {
@@ -124,7 +131,8 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
     String filtroCupoMaximo,
     String filtroFecha,
     String filtroHora,
-    String filtroDistancia
+    String filtroProvincia,
+    String filtroLocalidad
   ) {
     StringBuilder hql = new StringBuilder("from Partido p where 1=1 ");
     if (!FILTRO_TODOS.equals(filtroNivel)) {
@@ -140,8 +148,11 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       hql.append("and p.cupoMaximo = :cupoMaximo ");
     }
 
-    if (!FILTRO_TODOS.equals(filtroDistancia)) {
-      hql.append("and p.distancia = :distancia ");
+    if (!FILTRO_TODOS.equals(filtroProvincia)) {
+      hql.append("and p.cancha.provincia = :provincia ");
+    }
+    if (!FILTRO_TODOS.equals(filtroLocalidad)) {
+      hql.append("and p.cancha.localidad = :localidad ");
     }
 
     if (!FILTRO_TODOS.equals(filtroFecha)) {

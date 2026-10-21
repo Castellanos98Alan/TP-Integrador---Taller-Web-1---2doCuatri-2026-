@@ -49,6 +49,7 @@ public class PartidosControllerTest {
         FILTRO_TODOS,
         FILTRO_TODOS,
         FILTRO_TODOS,
+        FILTRO_TODOS,
         FILTRO_TODOS
       )
     )
@@ -56,6 +57,7 @@ public class PartidosControllerTest {
 
     // Ejecución
     ModelAndView mav = whenUsuarioConsultaPartidos(
+      FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
@@ -171,7 +173,8 @@ public class PartidosControllerTest {
     String cupoMaximo,
     String fecha,
     String filtroHora,
-    String distancia
+    String filtroPartido,
+    String filtroLocalidad
   ) {
     return partidosController.consultarPartidos(
       filtroNivel,
@@ -179,7 +182,8 @@ public class PartidosControllerTest {
       cupoMaximo,
       fecha,
       filtroHora,
-      distancia
+      filtroPartido,
+      filtroLocalidad
     );
   }
 }
