@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service("servicioLogin")
 @Transactional
-public class ServicioLoginImpl implements ServicioLogin {
+public class gServicioLoginImpl implements ServicioLogin {
 
   private RepositorioUsuario repositorioUsuario;
   private RepositorioJugador repositorioJugador;
