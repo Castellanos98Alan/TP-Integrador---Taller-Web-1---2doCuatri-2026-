@@ -16,11 +16,13 @@ public interface ServicioPartido {
     String cupoMaximo,
     String fecha,
     String filtroHora,
-    String distancia
+    String filtroPartido,
+    String filtroLocalidad
   );
 
   List<String> obtenerFechasDisponibles();
   List<String> obtenerHorasDisponibles();
-  List<Integer> obtenerDistanciasDisponibles();
+  List<String> obtenerProvinciasDisponibles();
+  List<String> obtenerLocalidadesDisponibles();
   List<Integer> obtenerCuposDisponibles();
 }

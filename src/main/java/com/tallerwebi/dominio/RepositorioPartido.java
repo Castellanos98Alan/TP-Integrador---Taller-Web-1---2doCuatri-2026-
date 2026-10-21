@@ -10,7 +10,8 @@ public interface RepositorioPartido {
     String filtroCupoMaximo,
     String filtroFecha,
     String filtroHora,
-    String filtroDistancia
+    String filtroProvincia,
+    String filtroLocalidad
   );
 
   void guardar(Partido partido);

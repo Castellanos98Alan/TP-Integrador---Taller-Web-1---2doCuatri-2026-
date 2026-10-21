@@ -58,10 +58,15 @@ public class PartidosController {
       defaultValue = FILTRO_TODOS
     ) String filtroHora,
     @RequestParam(
-      value = "filtroDistancia",
+      value = "filtroProvincia",
       required = false,
       defaultValue = FILTRO_TODOS
-    ) String filtroDistancia
+    ) String filtroProvincia,
+    @RequestParam(
+      value = "filtroLocalidad",
+      required = false,
+      defaultValue = FILTRO_TODOS
+    ) String filtroLocalidad
   ) {
     Map<String, Object> model = new ModelMap();
     model.put(
@@ -72,7 +77,8 @@ public class PartidosController {
         filtroCupo,
         filtroFecha,
         filtroHora,
-        filtroDistancia
+        filtroProvincia,
+        filtroLocalidad
       )
     );
 
@@ -81,12 +87,14 @@ public class PartidosController {
     model.put("cupoSeleccionado", filtroCupo);
     model.put("fechaSeleccionada", filtroFecha);
     model.put("horaSeleccionada", filtroHora);
-    model.put("distanciaSeleccionada", filtroDistancia);
+    model.put("provinciaSeleccionada", filtroProvincia);
+    model.put("localidadSeleccionada", filtroLocalidad);
 
     // Datos Dinamico segun partidos
     model.put("fechasDisponibles", servicioPartido.obtenerFechasDisponibles());
     model.put("horasDisponibles", servicioPartido.obtenerHorasDisponibles());
-    model.put("distanciasDisponibles", servicioPartido.obtenerDistanciasDisponibles());
+    model.put("provinciasDisponibles", servicioPartido.obtenerProvinciasDisponibles());
+    model.put("localidadesDisponibles", servicioPartido.obtenerLocalidadesDisponibles());
     model.put("cuposDisponibles", servicioPartido.obtenerCuposDisponibles());
 
     return new ModelAndView("partidos", model);

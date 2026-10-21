@@ -10,11 +10,13 @@ public class CanchaTest {
   @Test
   public void queSePuedaCrearCanchaConConstructorParametrizado() {
     // Ejecución
-    Cancha cancha = new Cancha(1L, "Los Leones");
+    Cancha cancha = new Cancha(1L, "Los Leones", "BUENOS AIRES", "LA MATANZA");
 
     // Validación
     assertThat(cancha.getId(), equalTo(1L));
     assertThat(cancha.getNombre(), equalTo("Los Leones"));
+    assertThat(cancha.getProvincia(), equalTo("BUENOS AIRES"));
+    assertThat(cancha.getLocalidad(), equalTo("LA MATANZA"));
   }
 
   @Test
