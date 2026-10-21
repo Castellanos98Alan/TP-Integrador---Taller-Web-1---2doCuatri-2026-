@@ -75,6 +75,7 @@ public class PerfilControllerTest {
       servicioJugador,
       servicioRanking,
       servicioEstadistica
+      //
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);

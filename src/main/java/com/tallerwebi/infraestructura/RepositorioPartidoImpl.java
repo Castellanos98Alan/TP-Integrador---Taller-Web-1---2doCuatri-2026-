@@ -1,10 +1,14 @@
 package com.tallerwebi.infraestructura;
 
+import com.tallerwebi.dominio.InscripcionPartido;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.RepositorioPartido;
 import com.tallerwebi.dominio.Usuario;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -15,6 +19,9 @@ import org.springframework.stereotype.Repository;
 public class RepositorioPartidoImpl implements RepositorioPartido {
 
   private SessionFactory sessionFactory;
+
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Autowired
   public RepositorioPartidoImpl(SessionFactory sessionFactory) {
@@ -85,6 +92,22 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
   @Override
   public void modificar(Partido partido) {
     sessionFactory.getCurrentSession().merge(partido);
+  }
+
+  //Este metodo lo que hace es comunicarse con la base de datos para poder ver los partidos
+  //que tiene un usuario en especifico. Utilice una query para poder consultarle a la tabla intermedia
+  //InscripcionPartido filtrandolo por el ID de usuario. Esto lo que devuelve es la lista de partidos
+  //asociado a las inscripciones del usuario.
+  @Override
+  public List<Partido> buscarPartidosPorUsuario(Long idUsuario) {
+    if (idUsuario == null) {
+      return new ArrayList<>();
+    }
+    String query = "SELECT i.partido FROM InscripcionPartido i WHERE i.usuario.id = :idUsuario";
+    return entityManager
+      .createQuery(query, Partido.class)
+      .setParameter("idUsuario", idUsuario)
+      .getResultList();
   }
 
   private void inyectarParametrosFiltro(
