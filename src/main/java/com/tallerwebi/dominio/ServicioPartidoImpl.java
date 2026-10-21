@@ -2,10 +2,7 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +14,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
   private final RepositorioPartido repositorioPartido;
   private final RepositorioCancha repositorioCancha;
   private final RepositorioUsuario repositorioUsuario;
+  private static final int HORAS_MINIMAS_ENTRE_PARTIDOS = 3;
 
   @Autowired
   public ServicioPartidoImpl(
@@ -35,7 +33,6 @@ public class ServicioPartidoImpl implements ServicioPartido {
     if (datos.getCupo() == null || datos.getCupo() <= 0) {
       throw new RuntimeException("El cupo debe ser mayor a cero.");
     }
-
     if (datos.getFechaHora() == null) {
       throw new RuntimeException("Debe ingresar una fecha y hora.");
     }
@@ -51,8 +48,23 @@ public class ServicioPartidoImpl implements ServicioPartido {
     partido.setCupoMaximo(datos.getCupo());
     partido.setNivel(datos.getNivel());
     partido.setOrganizador(creador);
+    partido.setEsPrivado(datos.getEsPrivado());
+
+    if (Boolean.TRUE.equals(datos.getEsPrivado())) {
+      partido.setCodigoDeAcceso(UUID.randomUUID().toString().substring(0, 8));
+    }
 
     repositorioPartido.guardar(partido);
+  }
+
+  @Override
+  public List<Cancha> listarCanchas() {
+    return repositorioCancha.buscarTodas();
+  }
+
+  @Override
+  public List<String> listarLocalidades() {
+    return repositorioCancha.buscarLocalidades();
   }
 
   @Override
@@ -77,15 +89,11 @@ public class ServicioPartidoImpl implements ServicioPartido {
 
   //Utilice el Transactional para que no se me cierre la sesion al momento de ejecutar el metodo,
   //con esto puedo consultar correctamente el partido mandandole el id por parametro.
-  //Tambien inicio la lista de confirmados ya que esta mapeado con LAZY en la clase Partido.
+  //Utilizo el repositorioPartido que ya tiene un metodo que es buscarPorId.
   @Transactional
   @Override
   public Partido buscarPartidoPorId(Long id) {
-    Partido partido = repositorioPartido.buscarPorId(id);
-    if (partido != null && partido.getConfirmados() != null) {
-      org.hibernate.Hibernate.initialize(partido.getConfirmados());
-    }
-    return partido;
+    return repositorioPartido.buscarPorId(id);
   }
 
   //Primero utilice directamente el metodo buscarPartidoPorId en lugar de usar el repositorioPartido directamente
@@ -102,9 +110,11 @@ public class ServicioPartidoImpl implements ServicioPartido {
 
     validarEstadoDelPartido(partido);
     validarCuposYDisponibilidad(partido, usuarioLogueado);
+    validarHorarioParaInscripcion(partido, usuarioLogueado);
 
-    partido.getConfirmados().add(usuarioLogueado);
-    partido.setCantJugadores(partido.getConfirmados().size());
+    InscripcionPartido nuevaInscripcion = new InscripcionPartido(partido, usuarioLogueado);
+    partido.getInscripciones().add(nuevaInscripcion);
+    partido.setCantJugadores(partido.getInscripciones().size());
 
     repositorioPartido.modificar(partido);
   }
@@ -120,24 +130,79 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
   }
 
-  //Metodo privado que valida los cupos de la lista de confirmados, donde primero valido si la lista de confirmados es nula
-  //si es asi, entonces inicializo la lista de confirmados. Luego de eso valido si el usuarioLogueado esta dentro de la lista
+  //Metodo privado que valida los cupos de la lista de Inscripciones, donde primero valido si la lista es nula
+  //si es asi, entonces inicializo la lista de inscripciones. Luego de eso valido si el usuarioLogueado esta dentro de la lista
   //confirmados, si es asi significa que el usuario ya esta dentro de la sala de espera.
   //Por ultimo valido que el partido tenga un cupo maximo de jugadores, para luego validar si los usuarios anotados supera el
   //cupo maximo de jugadores
   private void validarCuposYDisponibilidad(Partido partido, Usuario usuarioLogueado) {
-    if (partido.getConfirmados() == null) {
-      partido.setConfirmados(new ArrayList<>());
+    if (partido.getInscripciones() == null) {
+      partido.setInscripciones(new ArrayList<>());
     }
 
-    if (partido.getConfirmados().contains(usuarioLogueado)) {
+    boolean inscripto = partido
+      .getInscripciones()
+      .stream()
+      .anyMatch(i -> i.getUsuario().equals(usuarioLogueado));
+
+    if (inscripto) {
       throw new RuntimeException("Ya estas anotado en la sala de espera de este partido.");
     }
 
     if (
-      partido.getCupoMaximo() != null && partido.getConfirmados().size() >= partido.getCupoMaximo()
+      partido.getCupoMaximo() != null &&
+      partido.getInscripciones().size() >= partido.getCupoMaximo()
     ) {
       throw new RuntimeException("Cupo maximo alcanzado.");
+    }
+  }
+
+  //Este metodo valida la diferencia horaria entre un partido que el usuario ya esta inscripto y el partido nuevo al cual
+  //se quiere inscribir, esto para manejar mejor la logica de negocio y que un usuario pueda ingresar a varios partidos en
+  //el mismo dia, solamente que tendra una diferencia horaria de al menos 3 horas para poder inscribirse.
+  //Utilice ChronoUnit.HOURS para poder comparar la fecha del partido donde ya esta inscripto y la fecha del nuevo partido.
+  //Luego hago una validacion donde utilizo el metodo abs de la clase Math para poder manejar los numeros positivos y negativos.
+  //Esto para poder compararlo con la CONSTANTE de HORAS_MINIMAS_ENTRE_PARTIDOS que es el minimo de horas que tiene
+  //que pasar para que un usuario pueda ingresar a otro partido.
+  private void validarDiferenciaHoraria(
+    LocalDateTime fechaYHoraExistente,
+    LocalDateTime fechaHoraNuevoPartido
+  ) {
+    if (fechaYHoraExistente == null) {
+      return;
+    }
+
+    long horasDeDiferencia = java.time.temporal.ChronoUnit.HOURS.between(
+      fechaYHoraExistente,
+      fechaHoraNuevoPartido
+    );
+
+    if (Math.abs(horasDeDiferencia) < HORAS_MINIMAS_ENTRE_PARTIDOS) {
+      throw new RuntimeException(
+        "No podes unirte, es necesario que haya al menos 3 horas de diferencia (" +
+        fechaYHoraExistente.format(
+          java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+        ) +
+        ")."
+      );
+    }
+  }
+
+  //Este metodo sirve para poder validar el horario para que el usuario pueda inscribirse, en este metodo
+  //buscamos directamente los partidos del usuario, donde mandaremos todos los datos al momento de utilizar
+  //validarDiferenciaHoraria para que haga la comparacion de las fechas.
+  private void validarHorarioParaInscripcion(Partido partidoNuevo, Usuario usuarioLogueado) {
+    List<Partido> partidosUsuario = repositorioPartido.buscarPartidosPorUsuario(
+      usuarioLogueado.getId()
+    );
+    LocalDateTime fechaHoraNuevoPartido = partidoNuevo.getFecha();
+
+    if (fechaHoraNuevoPartido == null) {
+      return;
+    }
+
+    for (Partido partidoExistente : partidosUsuario) {
+      validarDiferenciaHoraria(partidoExistente.getFecha(), fechaHoraNuevoPartido);
     }
   }
 
@@ -150,7 +215,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
     String filtrocupoMaximo,
     String filtroFecha,
     String filtroHora,
-    String FiltroDistancia
+    String filtroPartido,
+    String filtroLocalidad
   ) {
     return repositorioPartido.buscarPartidosPorFiltro(
       filtroNivel,
@@ -158,13 +224,15 @@ public class ServicioPartidoImpl implements ServicioPartido {
       filtrocupoMaximo,
       filtroFecha,
       filtroHora,
-      FiltroDistancia
+      filtroPartido,
+      filtroLocalidad
     );
   }
 
   @Override
   public List<String> obtenerFechasDisponibles() {
     List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
@@ -190,6 +258,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
+      FILTRO_TODOS,
       FILTRO_TODOS
     );
 
@@ -208,8 +277,10 @@ public class ServicioPartidoImpl implements ServicioPartido {
   }
 
   @Override
-  public List<Integer> obtenerDistanciasDisponibles() {
+  public List<String> obtenerProvinciasDisponibles() {
+    Set<String> provincias = new TreeSet<>();
     List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
@@ -217,19 +288,38 @@ public class ServicioPartidoImpl implements ServicioPartido {
       FILTRO_TODOS,
       FILTRO_TODOS
     );
-
-    Set<Integer> distanciasUnicas = new TreeSet<>();
-    for (Partido p : partidos) {
-      if (p.getDistancia() != null) {
-        distanciasUnicas.add(p.getDistancia());
+    for (Partido partido : partidos) {
+      if (partido.getCancha() != null && partido.getCancha().getProvincia() != null) {
+        provincias.add(partido.getCancha().getProvincia());
       }
     }
-    return new ArrayList<>(distanciasUnicas);
+    return new ArrayList<>(provincias);
+  }
+
+  @Override
+  public List<String> obtenerLocalidadesDisponibles() {
+    Set<String> localidades = new TreeSet<>();
+    List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
+    );
+    for (Partido partido : partidos) {
+      if (partido.getCancha() != null && partido.getCancha().getLocalidad() != null) {
+        localidades.add(partido.getCancha().getLocalidad());
+      }
+    }
+    return new ArrayList<>(localidades);
   }
 
   @Override
   public List<Integer> obtenerCuposDisponibles() {
     List<Partido> todosLosPartidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,

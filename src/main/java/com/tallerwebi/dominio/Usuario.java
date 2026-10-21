@@ -16,8 +16,14 @@ public class Usuario {
   private String zona;
   private String biografia;
   private String nickname;
+  private Integer dni;
 
   public Usuario() {}
+
+  public Usuario(String email, Boolean activo) {
+    this.email = email;
+    this.activo = activo;
+  }
 
   public Long getId() {
     return id;
@@ -85,5 +91,13 @@ public class Usuario {
 
   public void setNickname(String nickname) {
     this.nickname = nickname;
+  }
+
+  public Integer getDni() {
+    return dni;
+  }
+
+  public void setDni(Integer dni) {
+    this.dni = dni;
   }
 }
