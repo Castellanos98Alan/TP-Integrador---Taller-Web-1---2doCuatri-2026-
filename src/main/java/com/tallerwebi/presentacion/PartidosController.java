@@ -83,6 +83,12 @@ public class PartidosController {
     model.put("horaSeleccionada", filtroHora);
     model.put("distanciaSeleccionada", filtroDistancia);
 
+    // Datos Dinamico segun partidos
+    model.put("fechasDisponibles", servicioPartido.obtenerFechasDisponibles());
+    model.put("horasDisponibles", servicioPartido.obtenerHorasDisponibles());
+    model.put("distanciasDisponibles", servicioPartido.obtenerDistanciasDisponibles());
+    model.put("cuposDisponibles", servicioPartido.obtenerCuposDisponibles());
+
     return new ModelAndView("partidos", model);
   }
 

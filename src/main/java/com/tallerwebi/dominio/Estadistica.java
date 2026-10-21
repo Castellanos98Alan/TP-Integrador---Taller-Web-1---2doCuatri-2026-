@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 @Entity
 public class Estadistica {
 
+  public enum CondicionJugador {
+    LOCAL,
+    VISITANTE,
+  }
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
@@ -15,10 +20,13 @@ public class Estadistica {
   private Integer rojas;
   private Integer puntaje;
 
+  @Enumerated(EnumType.STRING)
+  private CondicionJugador condicion;
+
   @ManyToOne(fetch = FetchType.EAGER)
   private Partido partido;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne
   private Jugador jugador;
 
   public Estadistica() {}
@@ -103,5 +111,13 @@ public class Estadistica {
 
   public void setPartido(Partido partido) {
     this.partido = partido;
+  }
+
+  public CondicionJugador getCondicion() {
+    return condicion;
+  }
+
+  public void setCondicion(CondicionJugador condicion) {
+    this.condicion = condicion;
   }
 }

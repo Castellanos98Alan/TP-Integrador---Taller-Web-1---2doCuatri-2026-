@@ -32,9 +32,125 @@
             <a class="nav-link active" th:href="@{/perfil}">Mi Perfil</a>
         </div>
 
-        <a class="boton-crear" th:href="@{/crearPartido}">
-            ＋ Crear partido
-        </a>
+        <!-- CAMPANITA -->
+        <div class="dropdown me-3">
+
+            <button
+                    type="button"
+                    class="btn text-white position-relative"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+
+                <i class="fa-solid fa-bell"></i>
+
+                <span
+                        th:if="${solicitudesPendientes != null
+                        and !solicitudesPendientes.isEmpty()}"
+                        class="position-absolute top-0 start-100
+                       translate-middle badge rounded-pill bg-danger"
+                        th:text="${solicitudesPendientes.size()}">
+
+            0
+
+        </span>
+
+            </button>
+
+
+            <div
+                    class="dropdown-menu dropdown-menu-end p-3"
+                    style="width: 340px;">
+
+                <h6 class="fw-bold mb-3">
+                    Solicitudes de amistad
+                </h6>
+
+
+                <div
+                        th:if="${solicitudesPendientes == null
+                        or solicitudesPendientes.isEmpty()}"
+                        class="text-muted">
+
+                    No tenés solicitudes pendientes.
+
+                </div>
+
+
+                <div
+                        th:if="${solicitudesPendientes != null}"
+                        th:each="solicitud : ${solicitudesPendientes}"
+                        class="border-bottom py-2">
+
+                    <div>
+
+                        <strong
+                                th:text="${solicitud.emisor.nickname}">
+                            Usuario
+                        </strong>
+
+                        <span>
+                    quiere agregarte como amigo.
+                </span>
+
+                    </div>
+
+
+                    <div class="d-flex gap-2 mt-2">
+
+                        <form
+                                th:action="@{/amistad/aceptar}"
+                                method="post">
+
+                            <input
+                                    type="hidden"
+                                    name="idSolicitud"
+                                    th:value="${solicitud.id}">
+
+                            <button
+                                    type="submit"
+                                    class="btn btn-success btn-sm">
+
+                                Aceptar
+
+                            </button>
+
+                        </form>
+
+
+                        <form
+                                th:action="@{/amistad/rechazar}"
+                                method="post">
+
+                            <input
+                                    type="hidden"
+                                    name="idSolicitud"
+                                    th:value="${solicitud.id}">
+
+                            <button
+                                    type="submit"
+                                    class="btn btn-outline-danger btn-sm">
+
+                                Rechazar
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- CREAR PARTIDO -->
+    <a class="boton-crear" th:href="@{/crearPartido}">
+        + Crear partido
+    </a>
+
     </div>
 </nav>
 

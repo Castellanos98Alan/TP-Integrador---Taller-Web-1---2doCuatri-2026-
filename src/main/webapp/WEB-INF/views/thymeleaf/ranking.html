@@ -26,7 +26,10 @@
             color: #17332b;
         }
 
-        /* NAVBAR */
+
+        /* =========================
+           NAVBAR
+           ========================= */
 
         .navbar-ranking {
             background-color: #003c2e;
@@ -38,6 +41,10 @@
             font-size: 25px;
             font-weight: bold;
             text-decoration: none;
+        }
+
+        .marca:hover {
+            color: white;
         }
 
         .marca span {
@@ -63,8 +70,15 @@
             text-decoration: none;
         }
 
+        .boton-crear:hover {
+            color: #18352c;
+            background-color: #f4dc00;
+        }
 
-        /* HERO */
+
+        /* =========================
+           HERO
+           ========================= */
 
         .hero-ranking {
             min-height: 230px;
@@ -120,7 +134,9 @@
         }
 
 
-        /* CONTENIDO */
+        /* =========================
+           CONTENIDO
+           ========================= */
 
         .contenido-ranking {
             margin-top: -20px;
@@ -130,7 +146,9 @@
         }
 
 
-        /* TABS */
+        /* =========================
+           TABS
+           ========================= */
 
         .tabs-ranking {
             display: grid;
@@ -161,7 +179,9 @@
         }
 
 
-        /* FILTROS */
+        /* =========================
+           FILTROS
+           ========================= */
 
         .filtros {
             background-color: #f6f9f8;
@@ -173,7 +193,8 @@
             margin-bottom: 20px;
         }
 
-        .filtro label {
+        .filtro span {
+            display: block;
             font-size: 12px;
             font-weight: bold;
             margin-bottom: 5px;
@@ -188,7 +209,9 @@
         }
 
 
-        /* PODIO */
+        /* =========================
+           PODIO
+           ========================= */
 
         .podio {
             display: grid;
@@ -198,7 +221,7 @@
         }
 
         .podio-card {
-            min-height: 175px;
+            min-height: 205px;
             border-radius: 12px;
             background-color: #f7faf9;
             border: 1px solid #e3ebe8;
@@ -220,6 +243,18 @@
         .medalla {
             font-size: 32px;
             margin-bottom: 7px;
+        }
+
+        .primer-puesto {
+            color: #e8b900;
+        }
+
+        .segundo-puesto {
+            color: #929b9b;
+        }
+
+        .tercer-puesto {
+            color: #bd7b3c;
         }
 
         .avatar {
@@ -244,6 +279,18 @@
             font-size: 18px;
         }
 
+        .posicion-podio {
+            display: inline-block;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            padding: 4px 10px;
+            background-color: #e6f5ef;
+            color: #006747;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
         .puntos-podio {
             color: #00563e;
             font-size: 25px;
@@ -251,7 +298,9 @@
         }
 
 
-        /* TABLA */
+        /* =========================
+           TABLA
+           ========================= */
 
         .tabla-ranking {
             border: 1px solid #e0e9e5;
@@ -281,6 +330,7 @@
         .numero-posicion {
             font-weight: bold;
             color: #536762;
+            font-size: 17px;
         }
 
         .jugador-tabla {
@@ -308,8 +358,21 @@
             color: #004d38;
         }
 
+        .posicion-juego {
+            display: inline-block;
+            background-color: #eef7f3;
+            border: 1px solid #cfe8dd;
+            color: #006747;
+            border-radius: 15px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
 
-        /* PANEL DERECHO */
+
+        /* =========================
+           PANEL DERECHO
+           ========================= */
 
         .panel-lateral {
             background-color: white;
@@ -336,10 +399,13 @@
             font-size: 30px;
             font-weight: bold;
             color: #ffe600;
+            margin-right: 5px;
         }
 
 
-        /* RANGOS */
+        /* =========================
+           RANGOS
+           ========================= */
 
         .rangos {
             border: 1px solid #e1e9e5;
@@ -359,6 +425,10 @@
             padding: 7px 0;
             border-bottom: 1px solid #edf1ef;
             font-size: 13px;
+        }
+
+        .rango:last-child {
+            border-bottom: none;
         }
 
         .letra-rango {
@@ -395,13 +465,19 @@
         }
 
 
-        /* VACÍO */
+        /* =========================
+           VACÍO
+           ========================= */
 
         .ranking-vacio {
             padding: 50px;
             text-align: center;
         }
 
+
+        /* =========================
+           RESPONSIVE
+           ========================= */
 
         @media(max-width: 900px) {
 
@@ -420,6 +496,23 @@
 
         }
 
+        @media(max-width: 600px) {
+
+            .tabs-ranking,
+            .filtros {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-ranking {
+                padding: 30px 20px;
+            }
+
+            .tabla-ranking {
+                overflow-x: auto;
+            }
+
+        }
+
     </style>
 </head>
 
@@ -427,7 +520,9 @@
 <body>
 
 
-<!-- NAVBAR -->
+<!-- =========================
+     NAVBAR
+     ========================= -->
 
 <nav class="navbar navbar-expand-lg navbar-ranking">
 
@@ -462,10 +557,124 @@
 
         </div>
 
-        <a class="boton-crear"
-           th:href="@{/crearPartido}">
-            ＋ Crear partido
-        </a>
+        <!-- CAMPANITA -->
+        <div class="dropdown me-3">
+
+            <button
+                    type="button"
+                    class="btn text-white position-relative"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+
+                <i class="fa-solid fa-bell"></i>
+
+                <span
+                        th:if="${solicitudesPendientes != null
+                        and !solicitudesPendientes.isEmpty()}"
+                        class="position-absolute top-0 start-100
+                       translate-middle badge rounded-pill bg-danger"
+                        th:text="${solicitudesPendientes.size()}">
+
+            0
+
+        </span>
+
+            </button>
+
+
+            <div
+                    class="dropdown-menu dropdown-menu-end p-3"
+                    style="width: 340px;">
+
+                <h6 class="fw-bold mb-3">
+                    Solicitudes de amistad
+                </h6>
+
+
+                <div
+                        th:if="${solicitudesPendientes == null
+                        or solicitudesPendientes.isEmpty()}"
+                        class="text-muted">
+
+                    No tenés solicitudes pendientes.
+
+                </div>
+
+
+                <div
+                        th:if="${solicitudesPendientes != null}"
+                        th:each="solicitud : ${solicitudesPendientes}"
+                        class="border-bottom py-2">
+
+                    <div>
+
+                        <strong
+                                th:text="${solicitud.emisor.nickname}">
+                            Usuario
+                        </strong>
+
+                        <span>
+                    quiere agregarte como amigo.
+                </span>
+
+                    </div>
+
+
+                    <div class="d-flex gap-2 mt-2">
+
+                        <form
+                                th:action="@{/amistad/aceptar}"
+                                method="post">
+
+                            <input
+                                    type="hidden"
+                                    name="idSolicitud"
+                                    th:value="${solicitud.id}">
+
+                            <button
+                                    type="submit"
+                                    class="btn btn-success btn-sm">
+
+                                Aceptar
+
+                            </button>
+
+                        </form>
+
+
+                        <form
+                                th:action="@{/amistad/rechazar}"
+                                method="post">
+
+                            <input
+                                    type="hidden"
+                                    name="idSolicitud"
+                                    th:value="${solicitud.id}">
+
+                            <button
+                                    type="submit"
+                                    class="btn btn-outline-danger btn-sm">
+
+                                Rechazar
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- CREAR PARTIDO -->
+    <a class="boton-crear" th:href="@{/crearPartido}">
+        + Crear partido
+    </a>
 
     </div>
 
@@ -473,7 +682,9 @@
 
 
 
-<!-- HERO -->
+<!-- =========================
+     HERO
+     ========================= -->
 
 <section class="hero-ranking">
 
@@ -497,33 +708,41 @@
     <div class="datos-hero">
 
         <div class="dato-hero">
-            <i class="fa-solid fa-users"></i>
+
+            <i class="fa-solid fa-users icono-hero"></i>
 
             <div>
                 <strong>Comunidad</strong>
                 <br>
                 <small>Jugadores de ArmoLaCancha</small>
             </div>
+
         </div>
 
+
         <div class="dato-hero">
-            <i class="fa-solid fa-trophy"></i>
+
+            <i class="fa-solid fa-trophy icono-hero"></i>
 
             <div>
                 <strong>Ranking general</strong>
                 <br>
                 <small>Ordenado por puntos</small>
             </div>
+
         </div>
 
+
         <div class="dato-hero">
-            <i class="fa-solid fa-futbol"></i>
+
+            <i class="fa-solid fa-futbol icono-hero"></i>
 
             <div>
                 <strong>Fútbol amateur</strong>
                 <br>
                 <small>Competí y mejorá</small>
             </div>
+
         </div>
 
     </div>
@@ -532,177 +751,240 @@
 
 
 
+<!-- =========================
+     CONTENIDO
+     ========================= -->
+
 <div class="container-fluid contenido-ranking">
 
     <div class="row">
 
-        <!-- CONTENIDO PRINCIPAL -->
+
+        <!-- =========================
+             CONTENIDO PRINCIPAL
+             ========================= -->
 
         <div class="col-lg-8">
 
 
-            <!-- TABS -->
+            <!-- =========================
+                 TABS
+                 ========================= -->
 
             <div class="tabs-ranking">
 
                 <div class="tab-ranking activo">
-                    <i class="fa-solid fa-trophy"></i> General
+
+                    <div class="tab-titulo">
+                        <i class="fa-solid fa-trophy"></i>
+                        General
+                    </div>
 
                     <div class="tab-subtitulo">
                         Todos los jugadores
                     </div>
+
                 </div>
 
 
                 <div class="tab-ranking">
-                    <i class="fa-solid fa-calendar-days"></i> Este mes
+
+                    <div class="tab-titulo">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        Este mes
+                    </div>
 
                     <div class="tab-subtitulo">
                         Próximamente
                     </div>
+
                 </div>
 
 
                 <div class="tab-ranking">
-                    <i class="fa-solid fa-location-dot"></i> Mi zona
+
+                    <div class="tab-titulo">
+                        <i class="fa-solid fa-location-dot"></i>
+                        Mi zona
+                    </div>
 
                     <div class="tab-subtitulo">
                         Próximamente
                     </div>
+
                 </div>
 
 
                 <div class="tab-ranking">
-                    <i class="fa-solid fa-user-group"></i> Amigos
+
+                    <div class="tab-titulo">
+                        <i class="fa-solid fa-user-group"></i>
+                        Amigos
+                    </div>
 
                     <div class="tab-subtitulo">
                         Próximamente
                     </div>
+
                 </div>
 
             </div>
 
 
 
-            <!-- FILTROS VISUALES -->
+            <!-- =========================
+                 FILTROS
+                 ========================= -->
 
             <form th:action="@{/ranking}" method="GET">
 
-            <div class="filtros">
+                <div class="filtros">
 
-                <div class="filtro">
 
-                    <span>Nivel</span>
+                    <!-- NIVEL -->
 
-                    <select name="nivel" onchange="this.form.submit()">
+                    <div class="filtro">
 
-                        <option value=""
-                                th:selected="${nivelSeleccionado == null or nivelSeleccionado == ''}">
-                            Todos los niveles
-                        </option>
+                        <span>Nivel</span>
 
-                        <option value="SS"
-                                th:selected="${nivelSeleccionado == 'SS'}">
-                            SS
-                        </option>
+                        <select name="nivel"
+                                onchange="this.form.submit()">
 
-                        <option value="S"
-                                th:selected="${nivelSeleccionado == 'S'}">
-                            S
-                        </option>
+                            <option value=""
+                                    th:selected="${nivelSeleccionado == null or nivelSeleccionado == ''}">
+                                Todos los niveles
+                            </option>
 
-                        <option value="A"
-                                th:selected="${nivelSeleccionado == 'A'}">
-                            A
-                        </option>
+                            <option value="SS"
+                                    th:selected="${nivelSeleccionado == 'SS'}">
+                                SS
+                            </option>
 
-                        <option value="B"
-                                th:selected="${nivelSeleccionado == 'B'}">
-                            B
-                        </option>
+                            <option value="S"
+                                    th:selected="${nivelSeleccionado == 'S'}">
+                                S
+                            </option>
 
-                        <option value="C"
-                                th:selected="${nivelSeleccionado == 'C'}">
-                            C
-                        </option>
+                            <option value="A"
+                                    th:selected="${nivelSeleccionado == 'A'}">
+                                A
+                            </option>
 
-                        <option value="D"
-                                th:selected="${nivelSeleccionado == 'D'}">
-                            D
-                        </option>
+                            <option value="B"
+                                    th:selected="${nivelSeleccionado == 'B'}">
+                                B
+                            </option>
 
-                    </select>
+                            <option value="C"
+                                    th:selected="${nivelSeleccionado == 'C'}">
+                                C
+                            </option>
+
+                            <option value="D"
+                                    th:selected="${nivelSeleccionado == 'D'}">
+                                D
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- POSICIÓN -->
+
+                    <div class="filtro">
+
+                        <span>Posición</span>
+
+                        <select name="posicion"
+                                onchange="this.form.submit()">
+
+                            <option value=""
+                                    th:selected="${posicionSeleccionada == null or posicionSeleccionada == ''}">
+                                Todas las posiciones
+                            </option>
+
+                            <option value="Arquero"
+                                    th:selected="${posicionSeleccionada == 'Arquero'}">
+                                Arquero
+                            </option>
+
+                            <option value="Defensor"
+                                    th:selected="${posicionSeleccionada == 'Defensor'}">
+                                Defensor
+                            </option>
+
+                            <option value="Mediocampista"
+                                    th:selected="${posicionSeleccionada == 'Mediocampista'}">
+                                Mediocampista
+                            </option>
+
+                            <option value="Delantero"
+                                    th:selected="${posicionSeleccionada == 'Delantero'}">
+                                Delantero
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- RANGO -->
+
+                    <div class="filtro">
+
+                        <span>Rango</span>
+
+                        <select disabled>
+
+                            <option>
+                                Todos los rangos
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- VISTA -->
+
+                    <div class="filtro">
+
+                        <span>Vista</span>
+
+                        <select disabled>
+
+                            <option>
+                                General
+                            </option>
+
+                            <option>
+                                Amigos
+                            </option>
+
+                        </select>
+
+                    </div>
 
                 </div>
 
-
-                <div class="filtro">
-                    <span>Posición</span>
-
-                    <select name="posicion" onchange="this.form.submit()">
-
-                        <option value=""
-                                th:selected="${posicionSeleccionada == null or posicionSeleccionada == ''}">
-                            Todas las posiciones
-                        </option>
-
-                        <option value="Arquero"
-                                th:selected="${posicionSeleccionada == 'Arquero'}">
-                            Arquero
-                        </option>
-
-                        <option value="Defensor"
-                                th:selected="${posicionSeleccionada == 'Defensor'}">
-                            Defensor
-                        </option>
-
-                        <option value="Mediocampista"
-                                th:selected="${posicionSeleccionada == 'Mediocampista'}">
-                            Mediocampista
-                        </option>
-
-                        <option value="Delantero"
-                                th:selected="${posicionSeleccionada == 'Delantero'}">
-                            Delantero
-                        </option>
-
-                    </select>
-                </div>
-
-
-                <div class="filtro">
-
-                    <span>Rango</span>
-
-                    <select disabled>
-                        <option>Todos los rangos</option>
-                    </select>
-
-                </div>
-
-
-                <div class="filtro">
-
-                    <span>Vista</span>
-
-                    <select onchange="this.form.submit()">
-                        <option value="General">General</option>
-                        <option value="Amigos">Amigos</option>
-                    </select>
-
-                </div>
-
-            </div>
             </form>
 
 
 
-            <!-- SI HAY JUGADORES -->
+            <!-- =========================
+                 SI HAY JUGADORES
+                 ========================= -->
 
             <div th:if="${ranking != null and !ranking.isEmpty()}">
 
 
-                <!-- PODIO -->
+                <!-- =========================
+                     PODIO
+                     ========================= -->
 
                 <div class="podio">
 
@@ -713,17 +995,34 @@
                          th:if="${ranking.size() > 1}">
 
                         <div class="medalla segundo-puesto">
+
                             <i class="fa-solid fa-medal"></i>
+
                         </div>
+
 
                         <div class="avatar">
                             ⚽
                         </div>
 
+
                         <div class="nombre-podio"
                              th:text="${ranking[1].nombre}">
+
                             Jugador
+
                         </div>
+
+
+                        <!-- POSICIÓN DEL JUGADOR -->
+
+                        <div class="posicion-podio"
+                             th:text="${ranking[1].posicion1 != null and ranking[1].posicion1 != '' ? ranking[1].posicion1 : 'Sin posición'}">
+
+                            Posición
+
+                        </div>
+
 
                         <div class="puntos-podio">
 
@@ -745,17 +1044,34 @@
                          th:if="${ranking.size() > 0}">
 
                         <div class="medalla primer-puesto">
+
                             <i class="fa-solid fa-crown"></i>
+
                         </div>
+
 
                         <div class="avatar">
                             ⚽
                         </div>
 
+
                         <div class="nombre-podio"
                              th:text="${ranking[0].nombre}">
+
                             Jugador
+
                         </div>
+
+
+                        <!-- POSICIÓN DEL JUGADOR -->
+
+                        <div class="posicion-podio"
+                             th:text="${ranking[0].posicion1 != null and ranking[0].posicion1 != '' ? ranking[0].posicion1 : 'Sin posición'}">
+
+                            Posición
+
+                        </div>
+
 
                         <div class="puntos-podio">
 
@@ -777,17 +1093,34 @@
                          th:if="${ranking.size() > 2}">
 
                         <div class="medalla tercer-puesto">
+
                             <i class="fa-solid fa-medal"></i>
+
                         </div>
+
 
                         <div class="avatar">
                             ⚽
                         </div>
 
+
                         <div class="nombre-podio"
                              th:text="${ranking[2].nombre}">
+
                             Jugador
+
                         </div>
+
+
+                        <!-- POSICIÓN DEL JUGADOR -->
+
+                        <div class="posicion-podio"
+                             th:text="${ranking[2].posicion1 != null and ranking[2].posicion1 != '' ? ranking[2].posicion1 : 'Sin posición'}">
+
+                            Posición
+
+                        </div>
+
 
                         <div class="puntos-podio">
 
@@ -805,7 +1138,9 @@
 
 
 
-                <!-- TABLA -->
+                <!-- =========================
+                     TABLA DEL RANKING
+                     ========================= -->
 
                 <div class="tabla-ranking">
 
@@ -815,13 +1150,31 @@
 
                         <tr>
 
+                            <!-- POSICIÓN EN EL RANKING -->
+
                             <th>#</th>
 
-                            <th>Jugador</th>
 
-                            <th>Puntos ↓</th>
+                            <th>
+                                Jugador
+                            </th>
 
-                            <th>Rango</th>
+
+                            <!-- POSICIÓN DE FÚTBOL -->
+
+                            <th>
+                                Posición
+                            </th>
+
+
+                            <th>
+                                Puntos ↓
+                            </th>
+
+
+                            <th>
+                                Rango
+                            </th>
 
                         </tr>
 
@@ -830,13 +1183,22 @@
 
                         <tbody>
 
+
                         <tr th:each="jugador, estado : ${ranking}">
+
+
+                            <!-- PUESTO EN EL RANKING -->
 
                             <td class="numero-posicion"
                                 th:text="${estado.index + 1}">
+
                                 1
+
                             </td>
 
+
+
+                            <!-- JUGADOR -->
 
                             <td>
 
@@ -855,47 +1217,91 @@
                             </td>
 
 
-                            <td class="puntos-tabla"
-                                th:text="${jugador.puntos}">
-                                0
-                            </td>
 
+                            <!-- POSICIÓN DE JUEGO -->
 
                             <td>
 
-                                <span class="letra-rango rango-ss"
-                                      th:if="${jugador.puntos >= 110}">
-                                    SS
-                                </span>
+                                <span class="posicion-juego"
+                                      th:text="${jugador.posicion1 != null and jugador.posicion1 != '' ? jugador.posicion1 : 'Sin posición'}">
 
-                                <span class="letra-rango rango-s"
-                                      th:if="${jugador.puntos >= 80 and jugador.puntos < 110}">
-                                    S
-                                </span>
+                                    Sin posición
 
-                                <span class="letra-rango rango-a"
-                                      th:if="${jugador.puntos >= 50 and jugador.puntos < 80}">
-                                    A
-                                </span>
-
-                                <span class="letra-rango rango-b"
-                                      th:if="${jugador.puntos >= 30 and jugador.puntos < 50}">
-                                    B
-                                </span>
-
-                                <span class="letra-rango rango-c"
-                                      th:if="${jugador.puntos >= 10 and jugador.puntos < 30}">
-                                    C
-                                </span>
-
-                                <span class="letra-rango rango-d"
-                                      th:if="${jugador.puntos < 10}">
-                                    D
                                 </span>
 
                             </td>
 
+
+
+                            <!-- PUNTOS -->
+
+                            <td class="puntos-tabla"
+                                th:text="${jugador.puntos}">
+
+                                0
+
+                            </td>
+
+
+
+                            <!-- RANGO -->
+
+                            <td>
+
+
+                                <span class="letra-rango rango-ss"
+                                      th:if="${jugador.puntos >= 110}">
+
+                                    SS
+
+                                </span>
+
+
+                                <span class="letra-rango rango-s"
+                                      th:if="${jugador.puntos >= 80 and jugador.puntos < 110}">
+
+                                    S
+
+                                </span>
+
+
+                                <span class="letra-rango rango-a"
+                                      th:if="${jugador.puntos >= 50 and jugador.puntos < 80}">
+
+                                    A
+
+                                </span>
+
+
+                                <span class="letra-rango rango-b"
+                                      th:if="${jugador.puntos >= 30 and jugador.puntos < 50}">
+
+                                    B
+
+                                </span>
+
+
+                                <span class="letra-rango rango-c"
+                                      th:if="${jugador.puntos >= 10 and jugador.puntos < 30}">
+
+                                    C
+
+                                </span>
+
+
+                                <span class="letra-rango rango-d"
+                                      th:if="${jugador.puntos < 10}">
+
+                                    D
+
+                                </span>
+
+
+                            </td>
+
+
                         </tr>
+
 
                         </tbody>
 
@@ -907,12 +1313,16 @@
 
 
 
-            <!-- SIN JUGADORES -->
+            <!-- =========================
+                 SIN JUGADORES
+                 ========================= -->
 
             <div class="ranking-vacio"
                  th:if="${ranking == null or ranking.isEmpty()}">
 
-                <h3>⚽ Todavía no hay jugadores en el ranking</h3>
+                <h3>
+                    ⚽ Todavía no hay jugadores en el ranking
+                </h3>
 
                 <p>
                     Cuando haya jugadores registrados aparecerán acá.
@@ -924,40 +1334,71 @@
 
 
 
-        <!-- PANEL DERECHO -->
+        <!-- =========================
+             PANEL DERECHO
+             ========================= -->
 
         <div class="col-lg-4 panel-lateral">
 
 
+            <!-- RANKING GENERAL -->
+
             <div class="tarjeta-posicion">
 
                 <h5>
+
                     <i class="fa-solid fa-trophy"></i>
+
                     Ranking general
+
                 </h5>
 
+
                 <p>
+
                     El jugador con mayor cantidad de puntos ocupa
                     el primer puesto.
+
                 </p>
 
+
                 <div th:if="${ranking != null and !ranking.isEmpty()}">
+
 
                     <span class="posicion-destacada">
                         #1
                     </span>
 
+
                     <strong th:text="${ranking[0].nombre}">
                         Jugador
                     </strong>
 
+
                     <br>
 
-                    <span th:text="${ranking[0].puntos}">
-                        0
+
+                    <!-- POSICIÓN DEL PRIMERO -->
+
+                    <span th:text="${ranking[0].posicion1 != null and ranking[0].posicion1 != '' ? ranking[0].posicion1 : 'Sin posición'}">
+
+                        Posición
+
                     </span>
 
-                    puntos
+
+                    <br>
+
+
+                    <strong>
+
+                        <span th:text="${ranking[0].puntos}">
+                            0
+                        </span>
+
+                        puntos
+
+                    </strong>
 
                 </div>
 
@@ -965,15 +1406,23 @@
 
 
 
-            <!-- RANGOS -->
+            <!-- =========================
+                 RANGOS
+                 ========================= -->
 
             <div class="rangos">
 
                 <h5>
+
                     <i class="fa-solid fa-ranking-star"></i>
+
                     Rangos de puntos
+
                 </h5>
 
+
+
+                <!-- D -->
 
                 <div class="rango">
 
@@ -992,6 +1441,9 @@
                 </div>
 
 
+
+                <!-- C -->
+
                 <div class="rango">
 
                     <span class="letra-rango rango-c">
@@ -1008,6 +1460,9 @@
 
                 </div>
 
+
+
+                <!-- B -->
 
                 <div class="rango">
 
@@ -1026,6 +1481,9 @@
                 </div>
 
 
+
+                <!-- A -->
+
                 <div class="rango">
 
                     <span class="letra-rango rango-a">
@@ -1042,6 +1500,9 @@
 
                 </div>
 
+
+
+                <!-- S -->
 
                 <div class="rango">
 
@@ -1060,6 +1521,9 @@
                 </div>
 
 
+
+                <!-- SS -->
+
                 <div class="rango">
 
                     <span class="letra-rango rango-ss">
@@ -1075,6 +1539,7 @@
                     </span>
 
                 </div>
+
 
             </div>
 

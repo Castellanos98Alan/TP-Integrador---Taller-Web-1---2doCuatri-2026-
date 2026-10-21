@@ -17,3 +17,67 @@ h2{
 .navbar-brand{
     margin:0 2rem;
 }
+
+.navbar-principal {
+    background-color: #004d3b;
+    min-height: 74px;
+}
+
+.marca-header {
+    color: white;
+    font-size: 22px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.marca-header:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.link-header {
+    color: white !important;
+    font-weight: 500;
+}
+
+.link-header:hover {
+    color: #7ef0be !important;
+}
+
+.boton-notificacion {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-weight: 600;
+}
+
+.boton-notificacion:hover {
+    color: #7ef0be;
+}
+
+.menu-notificaciones {
+    width: 340px;
+}
+
+.solicitud-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.solicitud-item:last-child {
+    border-bottom: none;
+}
+
+.boton-crear-partido {
+    background-color: #ffe600;
+    color: #111;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 10px 18px;
+    border: none;
+}
+
+.boton-crear-partido:hover {
+    background-color: #f2d900;
+    color: #111;
+}

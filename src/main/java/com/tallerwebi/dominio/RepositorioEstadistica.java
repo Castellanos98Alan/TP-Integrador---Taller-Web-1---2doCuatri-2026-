@@ -10,4 +10,9 @@ public interface RepositorioEstadistica {
   public List<Estadistica> buscarTodasLasEstadisticasPorJugador(Jugador jugador);
 
   public List<Estadistica> buscarTodasLasEstadisticasPorPartido(Partido partido);
+
+  List<Estadistica> buscarPorJugadorYCondicion(
+    Jugador jugador,
+    Estadistica.CondicionJugador condicion
+  );
 }
