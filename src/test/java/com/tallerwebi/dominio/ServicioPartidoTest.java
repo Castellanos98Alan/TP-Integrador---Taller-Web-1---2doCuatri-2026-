@@ -4,12 +4,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioPartido;
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -146,6 +148,82 @@ public class ServicioPartidoTest {
         FILTRO_TODOS,
         FILTRO_TODOS
       );
+  }
+
+  @Test
+  public void queSePuedanObtenerProvinciasYLocalidadesDisponiblesSinRepetir() {
+    Partido partido1 = new Partido();
+    Cancha cancha1 = new Cancha();
+    cancha1.setProvincia("Buenos Aires");
+    cancha1.setLocalidad("La Matanza");
+    partido1.setCancha(cancha1);
+
+    Partido partido2 = new Partido();
+    Cancha cancha2 = new Cancha();
+    cancha2.setProvincia("Buenos Aires");
+    cancha2.setLocalidad("Moron");
+    partido2.setCancha(cancha2);
+
+    List<Partido> partidosSimulados = Arrays.asList(partido1, partido2);
+
+    when(
+      repositorioPartidoMock.buscarPartidosPorFiltro(
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString()
+      )
+    )
+      .thenReturn(partidosSimulados);
+    // Ejecución
+    List<String> provincias = servicioPartido.obtenerProvinciasDisponibles();
+    List<String> localidades = servicioPartido.obtenerLocalidadesDisponibles();
+
+    // Validación
+    assertThat(provincias.size(), equalTo(1)); // "Buenos Aires" no debería duplicarse
+    assertThat(provincias.contains("Buenos Aires"), equalTo(true));
+
+    assertThat(localidades.size(), equalTo(2)); // "La Matanza" y "Moron"
+    assertThat(localidades.contains("La Matanza"), equalTo(true));
+    assertThat(localidades.contains("Moron"), equalTo(true));
+  }
+
+  @Test
+  public void queNoFalleAlObtenerProvinciasYLocalidadesSiLaCanchaOAtributosSonNulos() {
+    Partido partidoSinCancha = new Partido();
+    partidoSinCancha.setCancha(null);
+
+    Partido partidoSinUbicacion = new Partido();
+    Cancha canchaVacia = new Cancha();
+    canchaVacia.setProvincia(null);
+    canchaVacia.setLocalidad(null);
+    partidoSinUbicacion.setCancha(canchaVacia);
+
+    List<Partido> partidosIncompletos = Arrays.asList(partidoSinCancha, partidoSinUbicacion);
+
+    when(
+      repositorioPartidoMock.buscarPartidosPorFiltro(
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString()
+      )
+    )
+      .thenReturn(partidosIncompletos);
+
+    // Ejecución
+    List<String> provincias = servicioPartido.obtenerProvinciasDisponibles();
+    List<String> localidades = servicioPartido.obtenerLocalidadesDisponibles();
+
+    // Validación
+    assertThat(provincias.isEmpty(), equalTo(true));
+    assertThat(localidades.isEmpty(), equalTo(true));
   }
 
   @Test
