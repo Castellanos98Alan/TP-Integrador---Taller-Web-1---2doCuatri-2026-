@@ -14,6 +14,219 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <link rel="stylesheet" th:href="@{/css/perfil.css}">
+
+    <!-- Estilos de la foto y de la ventana de ajuste (incrustados para no depender de que perfil.css esté actualizado) -->
+    <style>
+    .foto-card {
+        text-align: center;
+    }
+
+    .foto-card h5 {
+        text-align: left;
+    }
+
+    .foto-preview {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        margin: 8px auto 16px;
+        overflow: hidden;
+        background-color: #006747;
+        border: 4px solid #50e3a4;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+    }
+
+    .foto-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .input-archivo {
+        display: none;
+    }
+
+    .btn-foto {
+        display: inline-block;
+        background-color: #ffe600;
+        color: #18352c;
+        font-weight: bold;
+        font-size: 14px;
+        border-radius: 8px;
+        padding: 10px 18px;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-foto:hover {
+        background-color: #f2d900;
+        transform: translateY(-1px);
+    }
+
+    .foto-card small {
+        display: block;
+        margin-top: 12px;
+    }
+
+
+    /* ----- Ventana para ajustar la foto ----- */
+
+    .modal-foto {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        color: #17332b;
+    }
+
+    .modal-foto .modal-header {
+        padding: 16px 22px;
+        border: none;
+        background-color: #003c2e;
+        color: white;
+    }
+
+    .modal-foto .modal-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .modal-foto .modal-title i {
+        margin-right: 6px;
+        color: #50e3a4;
+    }
+
+    .modal-foto .modal-body {
+        padding: 24px;
+        background-color: #f6f9f8;
+        text-align: center;
+    }
+
+    .modal-foto .modal-footer {
+        padding: 14px 22px;
+        gap: 10px;
+        border-top: 1px solid #dde6e2;
+        background-color: white;
+    }
+
+    .modal-foto .modal-footer .boton-crear {
+        width: auto;
+        margin: 0;
+    }
+
+    button.btn-cancelar {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .ajuste-marco {
+        width: 240px;
+        height: 240px;
+        max-width: 100%;
+        margin: 0 auto 10px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #006747;
+        border: 5px solid #50e3a4;
+        box-shadow: 0 8px 22px rgba(0, 60, 46, 0.25);
+        cursor: grab;
+        touch-action: none;
+        user-select: none;
+    }
+
+    .ajuste-marco.arrastrando {
+        cursor: grabbing;
+    }
+
+    .ajuste-marco img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        pointer-events: none;
+        -webkit-user-drag: none;
+    }
+
+    .ajuste-hint {
+        margin: 0 0 20px;
+        color: #536762;
+        font-size: 12px;
+    }
+
+    .ajuste-hint i {
+        margin-right: 4px;
+        color: #006747;
+    }
+
+    .ajuste-sliders {
+        display: grid;
+        gap: 14px;
+        text-align: left;
+    }
+
+    .ajuste-slider label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .ajuste-slider label i {
+        margin-right: 4px;
+        color: #006747;
+    }
+
+    .ajuste-slider input[type="range"] {
+        width: 100%;
+        accent-color: #006747;
+        cursor: pointer;
+    }
+
+    .ajuste-slider.sin-margen {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
+    .ajuste-mini {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 20px;
+        padding: 12px 14px;
+        border: 1px solid #e1e9e5;
+        border-radius: 12px;
+        background-color: white;
+        color: #536762;
+        font-size: 12px;
+        text-align: left;
+    }
+
+    .ajuste-mini-foto {
+        width: 56px;
+        height: 56px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #006747;
+        border: 3px solid #50e3a4;
+    }
+
+    .ajuste-mini-foto img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .form-footer .acciones {
+        margin-left: auto;
+    }
+    </style>
 </head>
 
 <body>
@@ -163,6 +376,7 @@
 <div class="container-fluid contenido-ranking">
     <div class="row">
 
+        <!-- ================= DATOS PERSONALES ================= -->
         <div class="col-lg-8">
             <form id="formPerfil"
                   class="form-panel"
@@ -178,134 +392,400 @@
                     Actualizá los datos de tu perfil deportivo.
                 </p>
 
-                <div class="campo campo-completo">
-                    <label for="nickname">Nickname</label>
-                    <input type="text"
-                           id="nickname"
-                           name="nickname"
-                           th:value="${nickname}"
-                           placeholder="Ej: Tomi R.">
+                <div class="form-grid">
 
-                    <small class="ayuda">
-                        Este será el nombre que verán los demás jugadores.
-                        Si lo dejás vacío, mostraremos tu nombre.
-                    </small>
-                </div>
+                    <div class="campo campo-completo">
+                        <label for="nickname">Nickname</label>
+                        <input type="text"
+                               id="nickname"
+                               name="nickname"
+                               th:value="${nickname}"
+                               placeholder="Ej: Tomi R.">
 
-                <div class="campo">
-                    <label for="posicion1">Posición principal</label>
-                    <select id="posicion1" name="posicion1">
-                        <option value=""
-                                th:selected="${posicion1 == null or posicion1 == ''}">
-                            Seleccioná tu posición
-                        </option>
-                        <option value="Arquero"
-                                th:selected="${posicion1 == 'Arquero'}">Arquero</option>
-                        <option value="Defensor"
-                                th:selected="${posicion1 == 'Defensor'}">Defensor</option>
-                        <option value="Mediocampista"
-                                th:selected="${posicion1 == 'Mediocampista'}">Mediocampista</option>
-                        <option value="Delantero"
-                                th:selected="${posicion1 == 'Delantero'}">Delantero</option>
-                        <option value="Polifuncional"
-                                th:selected="${posicion1 == 'Polifuncional'}">Polifuncional</option>
-                    </select>
-                </div>
+                        <small class="ayuda">
+                            Este será el nombre que verán los demás jugadores.
+                            Si lo dejás vacío, mostraremos tu nombre.
+                        </small>
+                    </div>
 
-                <div class="campo">
-                    <label for="posicion2">Posición secundaria</label>
-                    <select id="posicion2" name="posicion2">
-                        <option value=""
-                                th:selected="${posicion2 == null or posicion2 == ''}">
-                            Sin posición secundaria
-                        </option>
-                        <option value="Arquero"
-                                th:selected="${posicion2 == 'Arquero'}">Arquero</option>
-                        <option value="Defensor"
-                                th:selected="${posicion2 == 'Defensor'}">Defensor</option>
-                        <option value="Mediocampista"
-                                th:selected="${posicion2 == 'Mediocampista'}">Mediocampista</option>
-                        <option value="Delantero"
-                                th:selected="${posicion2 == 'Delantero'}">Delantero</option>
-                        <option value="Polifuncional"
-                                th:selected="${posicion2 == 'Polifuncional'}">Polifuncional</option>
-                    </select>
-                </div>
+                    <div class="campo">
+                        <label for="posicion1">Posición principal</label>
+                        <select id="posicion1" name="posicion1">
+                            <option value=""
+                                    th:selected="${posicion1 == null or posicion1 == ''}">
+                                Seleccioná tu posición
+                            </option>
+                            <option value="Arquero"
+                                    th:selected="${posicion1 == 'Arquero'}">Arquero</option>
+                            <option value="Defensor"
+                                    th:selected="${posicion1 == 'Defensor'}">Defensor</option>
+                            <option value="Mediocampista"
+                                    th:selected="${posicion1 == 'Mediocampista'}">Mediocampista</option>
+                            <option value="Delantero"
+                                    th:selected="${posicion1 == 'Delantero'}">Delantero</option>
+                            <option value="Polifuncional"
+                                    th:selected="${posicion1 == 'Polifuncional'}">Polifuncional</option>
+                        </select>
+                    </div>
 
-                <div class="campo">
-                    <label for="zona">Zona</label>
-                    <input type="text"
-                           id="zona"
-                           name="zona"
-                           th:value="${zona}"
-                           placeholder="Ej: Laferrere">
-                </div>
+                    <div class="campo">
+                        <label for="posicion2">Posición secundaria</label>
+                        <select id="posicion2" name="posicion2">
+                            <option value=""
+                                    th:selected="${posicion2 == null or posicion2 == ''}">
+                                Sin posición secundaria
+                            </option>
+                            <option value="Arquero"
+                                    th:selected="${posicion2 == 'Arquero'}">Arquero</option>
+                            <option value="Defensor"
+                                    th:selected="${posicion2 == 'Defensor'}">Defensor</option>
+                            <option value="Mediocampista"
+                                    th:selected="${posicion2 == 'Mediocampista'}">Mediocampista</option>
+                            <option value="Delantero"
+                                    th:selected="${posicion2 == 'Delantero'}">Delantero</option>
+                            <option value="Polifuncional"
+                                    th:selected="${posicion2 == 'Polifuncional'}">Polifuncional</option>
+                        </select>
+                    </div>
 
-                <div class="campo campo-completo">
-                    <label for="biografia">Sobre mí</label>
-                    <textarea id="biografia"
-                              name="biografia"
-                              rows="5"
-                              th:text="${biografia}"
-                              placeholder="Contanos sobre vos, tu experiencia o qué tipo de equipo buscás..."></textarea>
+                    <div class="campo campo-completo">
+                        <label for="zona">Zona</label>
+                        <input type="text"
+                               id="zona"
+                               name="zona"
+                               th:value="${zona}"
+                               placeholder="Ej: Laferrere">
+                    </div>
 
-                    <small class="ayuda">
-                        Compartí algo que te gustaría que sepan
-                        los demás jugadores.
-                    </small>
+                    <div class="campo campo-completo">
+                        <label for="biografia">Sobre mí</label>
+                        <textarea id="biografia"
+                                  name="biografia"
+                                  rows="5"
+                                  th:text="${biografia}"
+                                  placeholder="Contanos sobre vos, tu experiencia o qué tipo de equipo buscás..."></textarea>
+
+                        <small class="ayuda">
+                            Compartí algo que te gustaría que sepan
+                            los demás jugadores.
+                        </small>
+                    </div>
+
                 </div>
 
                 <div class="form-footer">
-                    <p><span>*</span> Campos obligatorios</p>
-
                     <div class="acciones">
                         <a th:href="@{/perfil}" class="btn-cancelar">
                             Cancelar
                         </a>
 
                         <button type="submit" class="boton-crear">
-                            Guardar cambios →
+                            Guardar cambios &rarr;
                         </button>
                     </div>
                 </div>
             </form>
         </div>
 
-        <div class="col-lg-4 panel-lateral">
+        <!-- ================= FOTO DE PERFIL ================= -->
+        <form id="formFoto"
+              class="col-lg-4 panel-lateral"
+              th:action="@{/guardar-foto}"
+              method="post">
+
             <div class="tarjeta-posicion foto-card">
                 <h5>
                     <i class="fa-solid fa-camera"></i>
-                    <label for="fotoArchivo" style="margin:0;">Foto de perfil</label>
+                    Foto de perfil
                 </h5>
 
-                <div class="foto-preview">⚽</div>
-
-                <p>Elegí una imagen para personalizar tu perfil.</p>
+                <div class="foto-preview"
+                     th:with="tieneFoto=${foto != null and !foto.isEmpty()}">
+                    <img th:if="${tieneFoto}"
+                         th:src="@{|/${foto}|}"
+                         th:style="'object-position:' + ${fotoPosicionX ?: 50} + '% ' + ${fotoPosicionY ?: 50} + '%;'"
+                         alt="Foto de perfil actual">
+                    <span th:unless="${tieneFoto}">&#9917;</span>
+                </div>
 
                 <label for="fotoArchivo" class="btn-foto">
-                    ＋ Seleccionar imagen
+                    <i class="fa-solid fa-image"></i>
+                    Seleccionar imagen
                 </label>
 
                 <input type="file"
                        id="fotoArchivo"
-                       form="formPerfil"
-                       accept="image/*"
+                       accept="image/jpeg,image/png,image/webp"
                        class="input-archivo">
 
-                <small>JPG o PNG. Funcionalidad próximamente.</small>
+                <input type="hidden" id="fotoBase64" name="fotoBase64">
+
+                <small>JPG, PNG o WEBP. Después de elegirla vas a poder acomodarla.</small>
             </div>
-        </div>
+
+            <!-- Ventana para encuadrar la foto (se abre al elegir una imagen) -->
+            <div class="modal fade"
+                 id="modalFoto"
+                 tabindex="-1"
+                 aria-labelledby="modalFotoTitulo"
+                 aria-hidden="true"
+                 data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content modal-foto">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalFotoTitulo">
+                                <i class="fa-solid fa-crop-simple"></i>
+                                Ajustá tu foto
+                            </h5>
+                            <button type="button"
+                                    class="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Cerrar"></button>
+                        </div>
+
+                        <div class="modal-body">
+
+                            <div class="ajuste-marco" id="ajusteMarco">
+                                <img id="fotoPreview" alt="Vista previa de la foto">
+                            </div>
+                            <p class="ajuste-hint">
+                                <i class="fa-solid fa-hand"></i>
+                                Arrastrá la imagen para encuadrarla
+                            </p>
+
+                            <div class="ajuste-sliders">
+                                <div class="ajuste-slider" id="sliderX">
+                                    <label for="fotoPosicionX">
+                                        <span><i class="fa-solid fa-left-right"></i> Horizontal</span>
+                                    </label>
+                                    <input type="range"
+                                           id="fotoPosicionX"
+                                           name="fotoPosicionX"
+                                           min="0"
+                                           max="100"
+                                           value="50">
+                                </div>
+
+                                <div class="ajuste-slider" id="sliderY">
+                                    <label for="fotoPosicionY">
+                                        <span><i class="fa-solid fa-up-down"></i> Vertical</span>
+                                    </label>
+                                    <input type="range"
+                                           id="fotoPosicionY"
+                                           name="fotoPosicionY"
+                                           min="0"
+                                           max="100"
+                                           value="50">
+                                </div>
+                            </div>
+
+                            <div class="ajuste-mini">
+                                <div class="ajuste-mini-foto">
+                                    <img id="fotoMini" alt="">
+                                </div>
+                                <span>Así se va a ver en tu perfil y en el ranking.</span>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn-cancelar"
+                                    data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+
+                            <button type="submit" class="boton-crear">
+                                Guardar foto
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </form>
 
     </div>
 </div>
 
 <footer class="footer">
     <p class="mb-0">
-        ArmoLaCancha <span>•</span> Conectando jugadores, creando equipos.
+        ArmoLaCancha <span>&bull;</span> Conectando jugadores, creando equipos.
     </p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    (function () {
+        const formFoto = document.getElementById("formFoto");
+        const archivo = document.getElementById("fotoArchivo");
+        const modalEl = document.getElementById("modalFoto");
+        const modal = new bootstrap.Modal(modalEl);
+
+        const marco = document.getElementById("ajusteMarco");
+        const imagen = document.getElementById("fotoPreview");
+        const mini = document.getElementById("fotoMini");
+
+        const rangoX = document.getElementById("fotoPosicionX");
+        const rangoY = document.getElementById("fotoPosicionY");
+        const sliderX = document.getElementById("sliderX");
+        const sliderY = document.getElementById("sliderY");
+
+        let urlTemporal = null;
+        let guardando = false;
+        let margenX = 0;
+        let margenY = 0;
+        let arrastre = null;
+
+        function limitar(valor) {
+            return Math.max(0, Math.min(100, Math.round(valor)));
+        }
+
+        function aplicarEncuadre() {
+            const posicion = rangoX.value + "% " + rangoY.value + "%";
+            imagen.style.objectPosition = posicion;
+            mini.style.objectPosition = posicion;
+        }
+
+        // Cuánto "sobra" de la imagen en cada eje dentro del círculo.
+        // Si no sobra nada en un eje, ese control no tiene efecto.
+        function calcularMargenes() {
+            const lado = marco.clientWidth;
+            const w = imagen.naturalWidth;
+            const h = imagen.naturalHeight;
+            if (!lado || !w || !h) return;
+
+            const escala = Math.max(lado / w, lado / h);
+            margenX = Math.max(0, w * escala - lado);
+            margenY = Math.max(0, h * escala - lado);
+
+            sliderX.classList.toggle("sin-margen", margenX < 1);
+            sliderY.classList.toggle("sin-margen", margenY < 1);
+        }
+
+        function liberarImagen() {
+            if (urlTemporal) {
+                URL.revokeObjectURL(urlTemporal);
+                urlTemporal = null;
+            }
+        }
+
+        // 1) Se elige un archivo -> se carga y recién ahí se abre el ajuste
+        archivo.addEventListener("change", function () {
+            if (archivo.files.length === 0) return;
+
+            liberarImagen();
+            urlTemporal = URL.createObjectURL(archivo.files[0]);
+
+            imagen.onload = function () {
+                rangoX.value = 50;
+                rangoY.value = 50;
+                aplicarEncuadre();
+                modal.show();
+            };
+
+            imagen.src = urlTemporal;
+            mini.src = urlTemporal;
+        });
+
+        modalEl.addEventListener("shown.bs.modal", calcularMargenes);
+        window.addEventListener("resize", calcularMargenes);
+
+        // 2) Ajuste con sliders
+        rangoX.addEventListener("input", aplicarEncuadre);
+        rangoY.addEventListener("input", aplicarEncuadre);
+
+        // 3) Ajuste arrastrando la imagen
+        marco.addEventListener("pointerdown", function (e) {
+            arrastre = {
+                x: e.clientX,
+                y: e.clientY,
+                valorX: Number(rangoX.value),
+                valorY: Number(rangoY.value)
+            };
+            marco.setPointerCapture(e.pointerId);
+            marco.classList.add("arrastrando");
+        });
+
+        marco.addEventListener("pointermove", function (e) {
+            if (!arrastre) return;
+
+            if (margenX >= 1) {
+                rangoX.value = limitar(arrastre.valorX - ((e.clientX - arrastre.x) / margenX) * 100);
+            }
+            if (margenY >= 1) {
+                rangoY.value = limitar(arrastre.valorY - ((e.clientY - arrastre.y) / margenY) * 100);
+            }
+            aplicarEncuadre();
+        });
+
+        function soltar() {
+            arrastre = null;
+            marco.classList.remove("arrastrando");
+        }
+
+        marco.addEventListener("pointerup", soltar);
+        marco.addEventListener("pointercancel", soltar);
+
+        // 4) Al guardar: se achica la imagen y se envía como Base64 (sin multipart)
+        formFoto.addEventListener("submit", function (e) {
+            if (archivo.files.length === 0) {
+                guardando = true;   // no hay imagen nueva, solo viaja el encuadre
+                return;
+            }
+
+            e.preventDefault();
+
+            const LIMITE = 150000;  // caracteres Base64 (el servidor corta los formularios cerca de 200000)
+            let ancho = imagen.naturalWidth;
+            let alto = imagen.naturalHeight;
+            const maximo = 600;
+
+            if (Math.max(ancho, alto) > maximo) {
+                const factor = maximo / Math.max(ancho, alto);
+                ancho = Math.round(ancho * factor);
+                alto = Math.round(alto * factor);
+            }
+
+            let datos = "";
+            do {
+                const canvas = document.createElement("canvas");
+                canvas.width = ancho;
+                canvas.height = alto;
+
+                const ctx = canvas.getContext("2d");
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, ancho, alto);
+                ctx.drawImage(imagen, 0, 0, ancho, alto);
+
+                datos = canvas.toDataURL("image/jpeg", 0.8);
+
+                if (datos.length > LIMITE) {
+                    ancho = Math.round(ancho * 0.8);
+                    alto = Math.round(alto * 0.8);
+                }
+            } while (datos.length > LIMITE && ancho > 150);
+
+            if (datos.length > LIMITE) {
+                alert("No pudimos preparar esa imagen. Probá con otra más liviana.");
+                return;
+            }
+
+            document.getElementById("fotoBase64").value = datos;
+            guardando = true;
+            formFoto.submit();
+        });
+
+        modalEl.addEventListener("hidden.bs.modal", function () {
+            if (!guardando) {
+                archivo.value = "";
+                liberarImagen();
+            }
+        });
+    })();
+</script>
 
 </body>
 </html>

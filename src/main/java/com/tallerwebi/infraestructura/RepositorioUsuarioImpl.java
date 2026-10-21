@@ -44,6 +44,15 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
   }
 
   @Override
+  public Usuario buscarPorDni(Integer dni) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery("from Usuario where dni = :dni", Usuario.class)
+      .setParameter("dni", dni)
+      .uniqueResult();
+  }
+
+  @Override
   public void modificar(Usuario usuario) {
     Usuario existente = sessionFactory
       .getCurrentSession()
