@@ -49,7 +49,7 @@ VALUES (
            'Mediocampista',
            60,
            'A',
-           (SELECT id FROM Usuario WHERE email = 'test@unlam.edu.ar'),
+           (SELECT id FROM Usuario WHERE email = 'test@unlam.edu.ar' LIMIT 1),
            3,
            2,
            1
@@ -77,8 +77,9 @@ VALUES (
                WHERE usuario_id = (
                    SELECT id
                    FROM Usuario
-                   WHERE email = 'test@unlam.edu.ar'
+                   WHERE email = 'test@unlam.edu.ar' LIMIT 1
                )
+        LIMIT 1
            ),
            NULL
        );
