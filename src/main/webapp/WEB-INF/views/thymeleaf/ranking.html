@@ -527,147 +527,129 @@
 <nav class="navbar navbar-expand-lg navbar-ranking">
 
     <div class="container-fluid">
-
         <a class="marca" th:href="@{/home}">
-            <i class="fa-solid fa-futbol"></i>
-            ArmoLaCancha
+            <i class="fa-solid fa-futbol"></i> ArmoLaCancha
         </a>
-
         <div class="navbar-nav ms-auto me-auto">
-
-            <a class="nav-link"
-               th:href="@{/home}">
-                Inicio
-            </a>
-
-            <a class="nav-link"
-               th:href="@{/partidos}">
-                Partidos
-            </a>
-
-            <a class="nav-link active"
-               th:href="@{/ranking}">
-                Ranking
-            </a>
-
-            <a class="nav-link"
-               th:href="@{/perfil}">
-                Mi Perfil
-            </a>
-
+            <a class="nav-link" th:href="@{/home}">Inicio</a>
+            <!-- Pestaña activa -->
+            <a class="nav-link" th:href="@{/partidos}">Partidos</a>
+            <a class="nav-link active" th:href="@{/ranking}">Ranking</a>
+            <a class="nav-link" th:href="@{/perfil}">Mi Perfil</a>
         </div>
+        <div class="d-flex align-items-center">
 
-        <!-- CAMPANITA -->
-        <div class="dropdown me-3">
+            <!-- CAMPANITA -->
+            <div class="dropdown me-3">
 
-            <button
-                    type="button"
-                    class="btn text-white position-relative"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">
+                <button
+                        type="button"
+                        class="btn text-white position-relative"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
 
-                <i class="fa-solid fa-bell"></i>
+                    <i class="fa-solid fa-bell"></i>
 
-                <span
-                        th:if="${solicitudesPendientes != null
+                    <span
+                            th:if="${solicitudesPendientes != null
                         and !solicitudesPendientes.isEmpty()}"
-                        class="position-absolute top-0 start-100
+                            class="position-absolute top-0 start-100
                        translate-middle badge rounded-pill bg-danger"
-                        th:text="${solicitudesPendientes.size()}">
+                            th:text="${solicitudesPendientes.size()}">
 
             0
 
         </span>
 
-            </button>
-
-
-            <div
-                    class="dropdown-menu dropdown-menu-end p-3"
-                    style="width: 340px;">
-
-                <h6 class="fw-bold mb-3">
-                    Solicitudes de amistad
-                </h6>
+                </button>
 
 
                 <div
-                        th:if="${solicitudesPendientes == null
+                        class="dropdown-menu dropdown-menu-end p-3"
+                        style="width: 340px;">
+
+                    <h6 class="fw-bold mb-3">
+                        Solicitudes de amistad
+                    </h6>
+
+
+                    <div
+                            th:if="${solicitudesPendientes == null
                         or solicitudesPendientes.isEmpty()}"
-                        class="text-muted">
+                            class="text-muted">
 
-                    No tenés solicitudes pendientes.
-
-                </div>
-
-
-                <div
-                        th:if="${solicitudesPendientes != null}"
-                        th:each="solicitud : ${solicitudesPendientes}"
-                        class="border-bottom py-2">
-
-                    <div>
-
-                        <strong
-                                th:text="${solicitud.emisor.nickname}">
-                            Usuario
-                        </strong>
-
-                        <span>
-                    quiere agregarte como amigo.
-                </span>
+                        No tenés solicitudes pendientes.
 
                     </div>
 
 
-                    <div class="d-flex gap-2 mt-2">
+                    <div
+                            th:if="${solicitudesPendientes != null}"
+                            th:each="solicitud : ${solicitudesPendientes}"
+                            class="border-bottom py-2">
 
-                        <form
-                                th:action="@{/amistad/aceptar}"
-                                method="post">
+                        <div>
 
-                            <input
-                                    type="hidden"
-                                    name="idSolicitud"
-                                    th:value="${solicitud.id}">
+                            <strong
+                                    th:text="${solicitud.emisor.nickname}">
+                                Usuario
+                            </strong>
 
-                            <button
-                                    type="submit"
-                                    class="btn btn-success btn-sm">
+                            <span>
+                    quiere agregarte como amigo.
+                </span>
 
-                                Aceptar
-
-                            </button>
-
-                        </form>
+                        </div>
 
 
-                        <form
-                                th:action="@{/amistad/rechazar}"
-                                method="post">
+                        <div class="d-flex gap-2 mt-2">
 
-                            <input
-                                    type="hidden"
-                                    name="idSolicitud"
-                                    th:value="${solicitud.id}">
+                            <form
+                                    th:action="@{/amistad/aceptar}"
+                                    method="post">
 
-                            <button
-                                    type="submit"
-                                    class="btn btn-outline-danger btn-sm">
+                                <input
+                                        type="hidden"
+                                        name="idSolicitud"
+                                        th:value="${solicitud.id}">
 
-                                Rechazar
+                                <button
+                                        type="submit"
+                                        class="btn btn-success btn-sm">
 
-                            </button>
+                                    Aceptar
 
-                        </form>
+                                </button>
+
+                            </form>
+
+
+                            <form
+                                    th:action="@{/amistad/rechazar}"
+                                    method="post">
+
+                                <input
+                                        type="hidden"
+                                        name="idSolicitud"
+                                        th:value="${solicitud.id}">
+
+                                <button
+                                        type="submit"
+                                        class="btn btn-outline-danger btn-sm">
+
+                                    Rechazar
+
+                                </button>
+
+                            </form>
+
+                        </div>
 
                     </div>
 
                 </div>
 
             </div>
-
-        </div>
     </div>
 
 
