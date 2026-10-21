@@ -150,7 +150,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
     String filtrocupoMaximo,
     String filtroFecha,
     String filtroHora,
-    String FiltroDistancia
+    String filtroPartido,
+    String filtroLocalidad
   ) {
     return repositorioPartido.buscarPartidosPorFiltro(
       filtroNivel,
@@ -158,13 +159,15 @@ public class ServicioPartidoImpl implements ServicioPartido {
       filtrocupoMaximo,
       filtroFecha,
       filtroHora,
-      FiltroDistancia
+      filtroPartido,
+      filtroLocalidad
     );
   }
 
   @Override
   public List<String> obtenerFechasDisponibles() {
     List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
@@ -190,6 +193,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
+      FILTRO_TODOS,
       FILTRO_TODOS
     );
 
@@ -208,8 +212,10 @@ public class ServicioPartidoImpl implements ServicioPartido {
   }
 
   @Override
-  public List<Integer> obtenerDistanciasDisponibles() {
+  public List<String> obtenerProvinciasDisponibles() {
+    Set<String> provincias = new TreeSet<>();
     List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
@@ -217,19 +223,38 @@ public class ServicioPartidoImpl implements ServicioPartido {
       FILTRO_TODOS,
       FILTRO_TODOS
     );
-
-    Set<Integer> distanciasUnicas = new TreeSet<>();
-    for (Partido p : partidos) {
-      if (p.getDistancia() != null) {
-        distanciasUnicas.add(p.getDistancia());
+    for (Partido partido : partidos) {
+      if (partido.getCancha() != null && partido.getCancha().getProvincia() != null) {
+        provincias.add(partido.getCancha().getProvincia());
       }
     }
-    return new ArrayList<>(distanciasUnicas);
+    return new ArrayList<>(provincias);
+  }
+
+  @Override
+  public List<String> obtenerLocalidadesDisponibles() {
+    Set<String> localidades = new TreeSet<>();
+    List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
+    );
+    for (Partido partido : partidos) {
+      if (partido.getCancha() != null && partido.getCancha().getLocalidad() != null) {
+        localidades.add(partido.getCancha().getLocalidad());
+      }
+    }
+    return new ArrayList<>(localidades);
   }
 
   @Override
   public List<Integer> obtenerCuposDisponibles() {
     List<Partido> todosLosPartidos = repositorioPartido.buscarPartidosPorFiltro(
+      FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
