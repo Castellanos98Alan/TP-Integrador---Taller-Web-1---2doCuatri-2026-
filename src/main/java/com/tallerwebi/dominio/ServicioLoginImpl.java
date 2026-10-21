@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service("servicioLogin")
 @Transactional
-public class gServicioLoginImpl implements ServicioLogin {
+public class ServicioLoginImpl implements ServicioLogin {
 
   private RepositorioUsuario repositorioUsuario;
   private RepositorioJugador repositorioJugador;
@@ -42,7 +42,7 @@ public class gServicioLoginImpl implements ServicioLogin {
     validarUsuarioNuevo(usuario);
     repositorioUsuario.guardar(usuario);
 
-    Jugador jugador = new Jugador(nombreJugador, posicion1, posicion2, "Principiante");
+    Jugador jugador = new Jugador(nombreJugador, posicion1, posicion2, "D");
 
     jugador.setUsuario(usuario);
     repositorioJugador.guardar(jugador);
