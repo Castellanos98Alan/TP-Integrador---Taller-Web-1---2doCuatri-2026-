@@ -2,12 +2,18 @@ INSERT INTO Usuario(id, email, password, rol, activo)
 VALUES(null, 'test@unlam.edu.ar', 'test', 'ADMIN', true);
 
 
-INSERT INTO Cancha(id, nombre, provincia, localidad)
-VALUES(null, 'Cancha Los Leones', 'BUENOS AIRES', 'LA MATANZA');
-INSERT INTO Cancha(id, nombre, provincia, localidad)
-VALUES(null, 'Cancha 5','BUENOS AIRES', 'LA MATANZA');
-INSERT INTO Cancha(id, nombre, provincia, localidad)
-VALUES(null, 'Cancha El Potrero','BUENOS AIRES', 'LA MATANZA');
+INSERT INTO Cancha(id, nombre, localidad)
+VALUES(null, 'Cancha Los Leones', 'San Justo');
+INSERT INTO Cancha(id, nombre, localidad)
+VALUES(null, 'Cancha 5', 'San Justo');
+INSERT INTO Cancha(id, nombre, localidad)
+VALUES(null, 'Cancha El Potrero', 'Laferrere');
+INSERT INTO Cancha(id, nombre, localidad)
+VALUES(null, 'Cancha Los Pibes', 'Laferrere');
+INSERT INTO Cancha(id, nombre, localidad)
+VALUES(null, 'Cancha La Quinta', 'Ramos Mejia');
+INSERT INTO Cancha(id, nombre, localidad)
+VALUES(null, 'Cancha El Fortin', 'Ramos Mejia');
 
 INSERT INTO Jugador(nombre, posicion1, posicion2, puntos, nivel)
 VALUES('Alan', 'Delantero', 'Arquero', 40, "B");
