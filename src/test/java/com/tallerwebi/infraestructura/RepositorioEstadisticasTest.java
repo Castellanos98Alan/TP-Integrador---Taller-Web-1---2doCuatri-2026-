@@ -423,6 +423,33 @@ public class RepositorioEstadisticasTest {
     assertThat(jugadoresFiltrados.size(), equalTo(1));
   }
 
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaGuardarUnaEstadisticaDeJugadorLocal() {
+    // Given
+    Jugador jugador = givenDadoQueTengoUnJugador("Pedro", "Delantero", "Mediocampista", "B");
+
+    Partido partido = givenDadoQueTengoUnPartido("B", false, LocalDateTime.of(2026, 10, 20, 20, 0));
+
+    Estadistica estadistica = givenDadoQueTengoSusEstadisticas(2, 1, 0, 0, 8, jugador, partido);
+
+    estadistica.setCondicion(Estadistica.CondicionJugador.LOCAL);
+
+    // When
+
+    List<Estadistica> estadisticasEncontradas =
+      repositorioEstadistica.buscarTodasLasEstadisticasPorJugador(jugador);
+
+    // Then
+    assertThat(estadisticasEncontradas.size(), equalTo(1));
+
+    assertThat(
+      estadisticasEncontradas.getFirst().getCondicion(),
+      equalTo(Estadistica.CondicionJugador.LOCAL)
+    );
+  }
+
   private Estadistica givenDadoQueTengoSusEstadisticas(
     Integer goles,
     Integer asistencias,

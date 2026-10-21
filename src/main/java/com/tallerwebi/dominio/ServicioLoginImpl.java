@@ -69,4 +69,9 @@ public class ServicioLoginImpl implements ServicioLogin {
   public void modificar(Usuario usuario) {
     repositorioUsuario.modificar(usuario);
   }
+
+  @Override
+  public Usuario buscarUsuarioPorId(Long idUsuario) {
+    return repositorioUsuario.buscarPorId(idUsuario);
+  }
 }

@@ -10,20 +10,18 @@ public class Resultado {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  private Integer golesPrimerEquipo;
-  private Integer golesSegundoEquipo;
-
-  @OneToOne(fetch = FetchType.EAGER)
-  private Equipo ganador;
-
-  @OneToOne(fetch = FetchType.EAGER)
-  private Equipo perdedor;
-
-  //agregar caso de empate
+  private Integer golesLocal;
+  private Integer golesVisitante;
 
   private LocalDateTime fechaRegistro;
 
   public Resultado() {}
+
+  public Resultado(Integer golesLocal, Integer golesVisitante) {
+    this.golesLocal = golesLocal;
+    this.golesVisitante = golesVisitante;
+    this.fechaRegistro = LocalDateTime.now();
+  }
 
   public Integer getId() {
     return id;
@@ -33,36 +31,20 @@ public class Resultado {
     this.id = id;
   }
 
-  public Integer getGolesPrimerEquipo() {
-    return golesPrimerEquipo;
+  public Integer getGolesLocal() {
+    return golesLocal;
   }
 
-  public void setGolesPrimerEquipo(Integer golesPrimerEquipo) {
-    this.golesPrimerEquipo = golesPrimerEquipo;
+  public void setGolesLocal(Integer golesPrimerEquipo) {
+    this.golesLocal = golesPrimerEquipo;
   }
 
-  public Integer getGolesSegundoEquipo() {
-    return golesSegundoEquipo;
+  public Integer getGolesVisitante() {
+    return golesVisitante;
   }
 
-  public void setGolesSegundoEquipo(Integer golesSegundoEquipo) {
-    this.golesSegundoEquipo = golesSegundoEquipo;
-  }
-
-  public Equipo getGanador() {
-    return ganador;
-  }
-
-  public void setGanador(Equipo ganador) {
-    this.ganador = ganador;
-  }
-
-  public Equipo getPerdedor() {
-    return perdedor;
-  }
-
-  public void setPerdedor(Equipo perdedor) {
-    this.perdedor = perdedor;
+  public void setGolesVisitante(Integer golesSegundoEquipo) {
+    this.golesVisitante = golesSegundoEquipo;
   }
 
   public LocalDateTime getFechaRegistro() {

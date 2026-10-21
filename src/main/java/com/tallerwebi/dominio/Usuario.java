@@ -20,6 +20,11 @@ public class Usuario {
 
   public Usuario() {}
 
+  public Usuario(String email, Boolean activo) {
+    this.email = email;
+    this.activo = activo;
+  }
+
   public Long getId() {
     return id;
   }
