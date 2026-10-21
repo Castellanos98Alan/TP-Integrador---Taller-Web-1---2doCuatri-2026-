@@ -42,7 +42,7 @@ VALUES (
            'Delantero',
            'Mediocampista',
            60,
-           'B',
+           'A',
            (SELECT id FROM Usuario WHERE email = 'test@unlam.edu.ar'),
            3,
            2,

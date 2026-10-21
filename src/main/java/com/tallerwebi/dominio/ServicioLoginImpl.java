@@ -42,7 +42,7 @@ public class ServicioLoginImpl implements ServicioLogin {
     validarUsuarioNuevo(usuario);
     repositorioUsuario.guardar(usuario);
 
-    Jugador jugador = new Jugador(nombreJugador, posicion1, posicion2, "Principiante");
+    Jugador jugador = new Jugador(nombreJugador, posicion1, posicion2, "D");
 
     jugador.setUsuario(usuario);
     repositorioJugador.guardar(jugador);
