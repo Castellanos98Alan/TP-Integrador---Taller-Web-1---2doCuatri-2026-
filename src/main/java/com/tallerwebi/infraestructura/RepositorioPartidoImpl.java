@@ -1,10 +1,14 @@
 package com.tallerwebi.infraestructura;
 
+import com.tallerwebi.dominio.InscripcionPartido;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.RepositorioPartido;
 import com.tallerwebi.dominio.Usuario;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -15,6 +19,9 @@ import org.springframework.stereotype.Repository;
 public class RepositorioPartidoImpl implements RepositorioPartido {
 
   private SessionFactory sessionFactory;
+
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Autowired
   public RepositorioPartidoImpl(SessionFactory sessionFactory) {
@@ -47,7 +54,8 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
     String filtroCupoMaximo,
     String filtroFecha,
     String filtroHora,
-    String filtroDistancia
+    String filtroProvincia,
+    String filtroLocalidad
   ) {
     String hql = armarConsultaHql(
       filtroNivel,
@@ -55,7 +63,8 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       filtroCupoMaximo,
       filtroFecha,
       filtroHora,
-      filtroDistancia
+      filtroProvincia,
+      filtroLocalidad
     );
 
     Query<Partido> query = sessionFactory
@@ -68,7 +77,8 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       filtroCupoMaximo,
       filtroFecha,
       filtroHora,
-      filtroDistancia
+      filtroProvincia,
+      filtroLocalidad
     );
 
     return query.getResultList();
@@ -84,13 +94,30 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
     sessionFactory.getCurrentSession().merge(partido);
   }
 
+  //Este metodo lo que hace es comunicarse con la base de datos para poder ver los partidos
+  //que tiene un usuario en especifico. Utilice una query para poder consultarle a la tabla intermedia
+  //InscripcionPartido filtrandolo por el ID de usuario. Esto lo que devuelve es la lista de partidos
+  //asociado a las inscripciones del usuario.
+  @Override
+  public List<Partido> buscarPartidosPorUsuario(Long idUsuario) {
+    if (idUsuario == null) {
+      return new ArrayList<>();
+    }
+    String query = "SELECT i.partido FROM InscripcionPartido i WHERE i.usuario.id = :idUsuario";
+    return entityManager
+      .createQuery(query, Partido.class)
+      .setParameter("idUsuario", idUsuario)
+      .getResultList();
+  }
+
   private void inyectarParametrosFiltro(
     Query<Partido> query,
     String filtroNivel,
     String filtroCupoMaximo,
     String filtroFecha,
     String filtroHora,
-    String filtroDistancia
+    String filtroProvincia,
+    String filtroLocalidad
   ) {
     if (!FILTRO_TODOS.equals(filtroNivel)) {
       query.setParameter("nivel", filtroNivel);
@@ -100,8 +127,11 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       query.setParameter("cupoMaximo", Integer.parseInt(filtroCupoMaximo));
     }
 
-    if (!FILTRO_TODOS.equals(filtroDistancia)) {
-      query.setParameter("distancia", Integer.parseInt(filtroDistancia));
+    if (!FILTRO_TODOS.equals(filtroProvincia)) {
+      query.setParameter("provincia", filtroProvincia);
+    }
+    if (!FILTRO_TODOS.equals(filtroLocalidad)) {
+      query.setParameter("localidad", filtroLocalidad);
     }
 
     if (!FILTRO_TODOS.equals(filtroFecha)) {
@@ -124,7 +154,8 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
     String filtroCupoMaximo,
     String filtroFecha,
     String filtroHora,
-    String filtroDistancia
+    String filtroProvincia,
+    String filtroLocalidad
   ) {
     StringBuilder hql = new StringBuilder("from Partido p where 1=1 ");
     if (!FILTRO_TODOS.equals(filtroNivel)) {
@@ -140,8 +171,11 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       hql.append("and p.cupoMaximo = :cupoMaximo ");
     }
 
-    if (!FILTRO_TODOS.equals(filtroDistancia)) {
-      hql.append("and p.distancia = :distancia ");
+    if (!FILTRO_TODOS.equals(filtroProvincia)) {
+      hql.append("and p.cancha.provincia = :provincia ");
+    }
+    if (!FILTRO_TODOS.equals(filtroLocalidad)) {
+      hql.append("and p.cancha.localidad = :localidad ");
     }
 
     if (!FILTRO_TODOS.equals(filtroFecha)) {

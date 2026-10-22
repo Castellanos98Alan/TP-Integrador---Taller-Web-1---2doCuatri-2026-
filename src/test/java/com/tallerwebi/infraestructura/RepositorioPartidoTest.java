@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.tallerwebi.dominio.Cancha;
 import com.tallerwebi.dominio.Partido;
@@ -94,6 +95,7 @@ public class RepositorioPartidoTest {
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
+      FILTRO_TODOS,
       FILTRO_TODOS
     );
 
@@ -148,38 +150,100 @@ public class RepositorioPartidoTest {
     return usuario;
   }
 
-  public void deberiaFiltrarPartidosPorNivelYDistancia() {
-    // 1. Preparación
-    Cancha cancha = new Cancha();
-    cancha.setNombre("Cancha de prueba");
-    sessionFactory.getCurrentSession().persist(cancha);
+  @Transactional
+  @Rollback
+  @Test
+  public void deberiaFiltrarPartidosPorNivelYProvincia() {
+    // 1. Arrange (Preparación)
+    // Cancha en la provincia objetivo
+    Cancha canchaBuenosAires = new Cancha();
+    canchaBuenosAires.setNombre("Cancha BA");
+    canchaBuenosAires.setProvincia("BUENOS AIRES");
+    sessionFactory.getCurrentSession().persist(canchaBuenosAires);
 
-    Partido partidoCercaPrincipiante = new Partido();
-    partidoCercaPrincipiante.setNivel("PRINCIPIANTE");
-    partidoCercaPrincipiante.setDistanciaKm(5);
-    partidoCercaPrincipiante.setCancha(cancha);
+    Cancha canchaCordoba = new Cancha();
+    canchaCordoba.setNombre("Cancha Cordoba");
+    canchaCordoba.setProvincia("CORDOBA");
+    sessionFactory.getCurrentSession().persist(canchaCordoba);
 
-    Partido partidoLejosAvanzado = new Partido();
-    partidoLejosAvanzado.setNivel("AVANZADO");
-    partidoLejosAvanzado.setDistanciaKm(15);
-    partidoLejosAvanzado.setCancha(cancha);
+    Partido partidoCoincide = new Partido();
+    partidoCoincide.setNivel("PRINCIPIANTE");
+    partidoCoincide.setCancha(canchaBuenosAires);
+    repositorioPartido.guardar(partidoCoincide);
 
-    repositorioPartido.guardar(partidoCercaPrincipiante);
-    repositorioPartido.guardar(partidoLejosAvanzado);
+    Partido partidoOtraProvincia = new Partido();
+    partidoOtraProvincia.setNivel("PRINCIPIANTE");
+    partidoOtraProvincia.setCancha(canchaCordoba);
+    repositorioPartido.guardar(partidoOtraProvincia);
 
-    // 2. Ejecución
+    Partido partidoOtroNivel = new Partido();
+    partidoOtroNivel.setNivel("AVANZADO");
+    partidoOtroNivel.setCancha(canchaBuenosAires);
+    repositorioPartido.guardar(partidoOtroNivel);
+
+    // 2. Act (Ejecución)
     List<Partido> resultado = whenObtenerPartidosPorFiltro(
       "PRINCIPIANTE",
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
-      "5"
+      "BUENOS AIRES",
+      FILTRO_TODOS
     );
 
-    // 3. Validación
+    // 3. Assert (Validación)
     assertThat(resultado.size(), equalTo(1));
     assertThat(resultado.get(0).getNivel(), equalTo("PRINCIPIANTE"));
+    assertThat(resultado.get(0).getCancha().getProvincia(), equalTo("BUENOS AIRES"));
+  }
+
+  @Transactional
+  @Rollback
+  @Test
+  public void deberiaFiltrarPartidosPorNivelYLocalidad() {
+    // 1. Arrange (Preparación)
+    // Cancha en la provincia objetivo
+    Cancha canchaLaMatanza = new Cancha();
+    canchaLaMatanza.setNombre("Cancha BA");
+    canchaLaMatanza.setLocalidad("LA MATANZA");
+    sessionFactory.getCurrentSession().persist(canchaLaMatanza);
+
+    Cancha canchaCordoba = new Cancha();
+    canchaCordoba.setNombre("Cancha Cordoba");
+    canchaCordoba.setProvincia("CORDOBA");
+    sessionFactory.getCurrentSession().persist(canchaCordoba);
+
+    Partido partidoCoincide = new Partido();
+    partidoCoincide.setNivel("PRINCIPIANTE");
+    partidoCoincide.setCancha(canchaLaMatanza);
+    repositorioPartido.guardar(partidoCoincide);
+
+    Partido partidoOtraProvincia = new Partido();
+    partidoOtraProvincia.setNivel("PRINCIPIANTE");
+    partidoOtraProvincia.setCancha(canchaCordoba);
+    repositorioPartido.guardar(partidoOtraProvincia);
+
+    Partido partidoOtroNivel = new Partido();
+    partidoOtroNivel.setNivel("AVANZADO");
+    partidoOtroNivel.setCancha(canchaLaMatanza);
+    repositorioPartido.guardar(partidoOtroNivel);
+
+    // 2. Act (Ejecución)
+    List<Partido> resultado = whenObtenerPartidosPorFiltro(
+      "PRINCIPIANTE",
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      "LA MATANZA"
+    );
+
+    // 3. Assert (Validación)
+    assertThat(resultado.size(), equalTo(1));
+    assertThat(resultado.get(0).getNivel(), equalTo("PRINCIPIANTE"));
+    assertThat(resultado.get(0).getCancha().getLocalidad(), equalTo("LA MATANZA"));
   }
 
   @Test
@@ -209,6 +273,7 @@ public class RepositorioPartidoTest {
       FILTRO_TODOS,
       "PRIVADO",
       "10",
+      FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS
@@ -250,6 +315,7 @@ public class RepositorioPartidoTest {
       FILTRO_TODOS,
       "2026-10-02",
       "14:30",
+      FILTRO_TODOS,
       FILTRO_TODOS
     );
 
@@ -264,7 +330,8 @@ public class RepositorioPartidoTest {
     String filtroTodo03,
     String filtroTodo04,
     String filtroTodo05,
-    String filtroTodo06
+    String filtroTodo06,
+    String filtroTodo07
   ) {
     return repositorioPartido.buscarPartidosPorFiltro(
       filtroTodo01,
@@ -272,7 +339,8 @@ public class RepositorioPartidoTest {
       filtroTodo03,
       filtroTodo04,
       filtroTodo05,
-      filtroTodo06
+      filtroTodo06,
+      filtroTodo07
     );
   }
 }

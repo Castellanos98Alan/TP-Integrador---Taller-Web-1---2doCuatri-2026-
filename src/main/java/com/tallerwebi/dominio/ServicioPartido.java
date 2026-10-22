@@ -8,7 +8,10 @@ public interface ServicioPartido {
   void crearPartido(DatosCrearPartido datos, Usuario creador);
   void cancelarPartido(Long partidoId, Usuario usuarioLogueado);
   void unirseAPartido(Long partidoId, Usuario usuarioLogueado);
+
   Partido buscarPartidoPorId(Long id);
+  List<Cancha> listarCanchas(); // NUEVO
+  List<String> listarLocalidades(); // NUEVO
 
   List<Partido> listarPartidosSegunFiltro(
     String filtroNivel,
@@ -16,11 +19,13 @@ public interface ServicioPartido {
     String cupoMaximo,
     String fecha,
     String filtroHora,
-    String distancia
+    String filtroPartido,
+    String filtroLocalidad
   );
 
   List<String> obtenerFechasDisponibles();
   List<String> obtenerHorasDisponibles();
-  List<Integer> obtenerDistanciasDisponibles();
+  List<String> obtenerProvinciasDisponibles();
+  List<String> obtenerLocalidadesDisponibles();
   List<Integer> obtenerCuposDisponibles();
 }

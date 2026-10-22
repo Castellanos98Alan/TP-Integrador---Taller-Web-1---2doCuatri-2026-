@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -13,10 +14,12 @@ import com.tallerwebi.dominio.Usuario;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
 public class PartidosControllerTest {
@@ -49,6 +52,7 @@ public class PartidosControllerTest {
         FILTRO_TODOS,
         FILTRO_TODOS,
         FILTRO_TODOS,
+        FILTRO_TODOS,
         FILTRO_TODOS
       )
     )
@@ -61,12 +65,43 @@ public class PartidosControllerTest {
       FILTRO_TODOS,
       FILTRO_TODOS,
       FILTRO_TODOS,
+      FILTRO_TODOS,
       FILTRO_TODOS
     );
 
     // Validación
     thenLaVistaEs("partidos", mav);
     thenModeloKeyEs(listaMock, mav);
+  }
+
+  @Test
+  public void queElControladorCargueLasProvinciasYLocalidadesAlMostrarLaVista() {
+    // Preparación
+    when(servicioPartidoMock.obtenerProvinciasDisponibles())
+      .thenReturn(Arrays.asList("Buenos Aires"));
+    when(servicioPartidoMock.obtenerLocalidadesDisponibles())
+      .thenReturn(Arrays.asList("La Matanza"));
+
+    // Ejecución (Ajustá los parámetros según la firma actual de tu método en el controlador)
+    ModelAndView mav = whenUsuarioConsultaPartidos(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      "Buenos Aires",
+      "La Matanza"
+    );
+
+    // Validación
+    ModelMap modelo = mav.getModelMap();
+    assertThat(modelo.get("provinciasDisponibles"), notNullValue());
+    assertThat(modelo.get("localidadesDisponibles"), notNullValue());
+    assertThat(modelo.get("provinciaSeleccionada"), equalTo("Buenos Aires"));
+    assertThat(modelo.get("localidadSeleccionada"), equalTo("La Matanza"));
+
+    verify(servicioPartidoMock, times(1)).obtenerProvinciasDisponibles();
+    verify(servicioPartidoMock, times(1)).obtenerLocalidadesDisponibles();
   }
 
   @Test
@@ -171,7 +206,8 @@ public class PartidosControllerTest {
     String cupoMaximo,
     String fecha,
     String filtroHora,
-    String distancia
+    String filtroPartido,
+    String filtroLocalidad
   ) {
     return partidosController.consultarPartidos(
       filtroNivel,
@@ -179,7 +215,8 @@ public class PartidosControllerTest {
       cupoMaximo,
       fecha,
       filtroHora,
-      distancia
+      filtroPartido,
+      filtroLocalidad
     );
   }
 }

@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import jakarta.persistence.*;
 
+@SuppressWarnings("PMD.TooManyFields")
 @Entity
 public class Jugador {
 
@@ -26,6 +27,13 @@ public class Jugador {
 
   @Column(nullable = false)
   private Integer puntos;
+
+  // NUEVO: ruta de la foto guardada en el proyecto
+  private String foto;
+
+  // NUEVO: posición del encuadre de la foto
+  private Integer fotoPosicionX = 50;
+  private Integer fotoPosicionY = 50;
 
   public Jugador() {}
 
@@ -118,5 +126,29 @@ public class Jugador {
 
   public void setUsuario(Usuario usuario) {
     this.usuario = usuario;
+  }
+
+  public String getFoto() {
+    return foto;
+  }
+
+  public void setFoto(String foto) {
+    this.foto = foto;
+  }
+
+  public Integer getFotoPosicionX() {
+    return fotoPosicionX != null ? fotoPosicionX : 50;
+  }
+
+  public void setFotoPosicionX(Integer fotoPosicionX) {
+    this.fotoPosicionX = fotoPosicionX;
+  }
+
+  public Integer getFotoPosicionY() {
+    return fotoPosicionY != null ? fotoPosicionY : 50;
+  }
+
+  public void setFotoPosicionY(Integer fotoPosicionY) {
+    this.fotoPosicionY = fotoPosicionY;
   }
 }

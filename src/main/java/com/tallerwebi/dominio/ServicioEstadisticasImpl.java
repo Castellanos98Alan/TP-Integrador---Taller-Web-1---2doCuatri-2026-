@@ -1,7 +1,11 @@
 package com.tallerwebi.dominio;
 
 import java.util.List;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
+@Transactional
 public class ServicioEstadisticasImpl implements ServicioEstadistica {
 
   private RepositorioEstadistica repositorioEstadisticas;
@@ -38,17 +42,17 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
     Integer puntaje = 0;
 
     for (Estadistica estadistica : estadisticas) {
-      goles += estadistica.getGoles();
-
-      asistencias += estadistica.getAsistencias();
-
-      amarillas += estadistica.getAmarillas();
-
-      rojas += estadistica.getRojas();
-
-      puntaje += estadistica.getPuntaje();
+      goles += valorOZero(estadistica.getGoles());
+      asistencias += valorOZero(estadistica.getAsistencias());
+      amarillas += valorOZero(estadistica.getAmarillas());
+      rojas += valorOZero(estadistica.getRojas());
+      puntaje += valorOZero(estadistica.getPuntaje());
     }
 
     return new Estadistica(goles, asistencias, amarillas, rojas, puntaje, jugador, null);
+  }
+
+  private Integer valorOZero(Integer valor) {
+    return valor != null ? valor : 0;
   }
 }

@@ -375,9 +375,10 @@
 
                         <div class="campo">
                             <label for="dni">DNI</label>
-                            <input type="text" id="dni" name="dni" placeholder="Sin puntos"
-                                inputmode="numeric" pattern="[0-9]{7,8}" maxlength="8"
-                                title="Ingresá un DNI de 7 u 8 números" required />
+                            <input th:field="*{dni}" type="text" id="dni"
+                                   placeholder="Sin puntos"
+                                   inputmode="numeric" pattern="[0-9]{7,8}" maxlength="8"
+                                   title="Ingresá un DNI de 7 u 8 números" required />
                             <small class="ayuda">7 u 8 números.</small>
                         </div>
 

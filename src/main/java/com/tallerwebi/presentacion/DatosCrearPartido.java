@@ -12,6 +12,9 @@ public class DatosCrearPartido {
 
   private Integer cupo;
   private String nivel;
+  private String localidad;
+  private Boolean esPrivado = false;
+  private String codigoDeAcceso;
 
   public DatosCrearPartido() {}
 
@@ -52,5 +55,29 @@ public class DatosCrearPartido {
 
   public void setNivel(String nivel) {
     this.nivel = nivel;
+  }
+
+  public String getLocalidad() {
+    return localidad;
+  }
+
+  public void setLocalidad(String localidad) {
+    this.localidad = localidad;
+  }
+
+  public Boolean getEsPrivado() {
+    return esPrivado;
+  }
+
+  public void setEsPrivado(Boolean esPrivado) {
+    this.esPrivado = esPrivado;
+  }
+
+  public String getCodigoDeAcceso() {
+    return codigoDeAcceso;
+  }
+
+  public void setCodigoDeAcceso(String codigoDeAcceso) {
+    this.codigoDeAcceso = codigoDeAcceso;
   }
 }

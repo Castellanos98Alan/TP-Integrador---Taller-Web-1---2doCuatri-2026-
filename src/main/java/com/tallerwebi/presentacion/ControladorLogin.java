@@ -54,7 +54,6 @@ public class ControladorLogin {
     return new ModelAndView("login", model);
   }
 
-  // Registra el usuario junto con los datos del jugador.
   @RequestMapping(path = "/registrarme", method = RequestMethod.POST)
   public ModelAndView registrarme(
     @ModelAttribute(ATRIBUTO_USUARIO) Usuario usuario,

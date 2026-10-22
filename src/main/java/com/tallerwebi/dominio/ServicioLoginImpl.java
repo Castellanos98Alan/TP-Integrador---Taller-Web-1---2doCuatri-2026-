@@ -21,7 +21,6 @@ public class ServicioLoginImpl implements ServicioLogin {
     this.repositorioJugador = repositorioJugador;
   }
 
-  // MODIFICADO: se conserva para compatibilidad con llamadas existentes.
   public ServicioLoginImpl(RepositorioUsuario repositorioUsuario) {
     this.repositorioUsuario = repositorioUsuario;
   }
@@ -37,14 +36,13 @@ public class ServicioLoginImpl implements ServicioLogin {
     repositorioUsuario.guardar(usuario);
   }
 
-  // MODIFICADO: registra el usuario y crea su jugador asociado.
   @Override
   public void registrar(Usuario usuario, String nombreJugador, String posicion1, String posicion2)
     throws UsuarioExistente {
     validarUsuarioNuevo(usuario);
     repositorioUsuario.guardar(usuario);
 
-    Jugador jugador = new Jugador(nombreJugador, posicion1, posicion2, "Principiante");
+    Jugador jugador = new Jugador(nombreJugador, posicion1, posicion2, "D");
 
     jugador.setUsuario(usuario);
     repositorioJugador.guardar(jugador);
@@ -59,10 +57,21 @@ public class ServicioLoginImpl implements ServicioLogin {
     if (usuarioEncontrado != null) {
       throw new UsuarioExistente();
     }
+
+    Usuario usuarioConDni = repositorioUsuario.buscarPorDni(usuario.getDni());
+
+    if (usuarioConDni != null) {
+      throw new UsuarioExistente();
+    }
   }
 
   @Override
   public void modificar(Usuario usuario) {
     repositorioUsuario.modificar(usuario);
+  }
+
+  @Override
+  public Usuario buscarUsuarioPorId(Long idUsuario) {
+    return repositorioUsuario.buscarPorId(idUsuario);
   }
 }
