@@ -106,7 +106,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
   //Primero utilice directamente el metodo buscarPartidoPorId en lugar de usar el repositorioPartido directamente
   //para que cada vez que lo use me traiga el partido con su lista de confirmados inicializada. Tambien hice una validacion
   //rapida para ver si el partido existe.
-  //Por ultimo decidi separar las validaciones en metodos privados debido a la regla de PMD y que quede mejor organizado.
+  //Por ultimo decidi separar las validaciones en metodos privados debido a la regla de PMD y que quede mejor organizado..
   @Override
   public void unirseAPartido(Long partidoId, Usuario usuarioLogueado) {
     Partido partido = buscarPartidoPorId(partidoId);
