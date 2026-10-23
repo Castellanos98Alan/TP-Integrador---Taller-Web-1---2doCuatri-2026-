@@ -7,6 +7,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.tallerwebi.dominio.repositorio.RepositorioJugador;
+import com.tallerwebi.dominio.servicio.ServicioRanking;
+import com.tallerwebi.dominio.servicio.ServicioRankingImp;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,5 +1,8 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Cancha;
+import com.tallerwebi.dominio.Partido;
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.util.List;
 

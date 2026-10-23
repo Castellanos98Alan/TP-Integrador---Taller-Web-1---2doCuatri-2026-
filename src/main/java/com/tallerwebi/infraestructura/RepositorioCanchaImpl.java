@@ -1,7 +1,7 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Cancha;
-import com.tallerwebi.dominio.RepositorioCancha;
+import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;

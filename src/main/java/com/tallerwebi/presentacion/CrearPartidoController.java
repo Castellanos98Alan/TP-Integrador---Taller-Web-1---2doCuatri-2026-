@@ -1,7 +1,7 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ServicioPartido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.servicio.ServicioPartido;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;

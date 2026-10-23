@@ -1,5 +1,9 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Estadistica;
+import com.tallerwebi.dominio.Jugador;
+import com.tallerwebi.dominio.Partido;
+import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

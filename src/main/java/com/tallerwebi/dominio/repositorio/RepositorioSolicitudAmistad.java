@@ -1,5 +1,7 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.repositorio;
 
+import com.tallerwebi.dominio.SolicitudAmistad;
+import com.tallerwebi.dominio.Usuario;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 

@@ -1,6 +1,6 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.repositorio;
 
-import java.util.List;
+import com.tallerwebi.dominio.Usuario;
 
 public interface RepositorioUsuario {
   Usuario buscarUsuario(String email, String password);

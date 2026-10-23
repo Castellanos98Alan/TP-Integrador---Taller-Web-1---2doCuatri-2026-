@@ -4,6 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
+import com.tallerwebi.dominio.repositorio.RepositorioJugador;
+import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;

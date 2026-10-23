@@ -4,6 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
+import com.tallerwebi.dominio.servicio.ServicioEstadistica;
+import com.tallerwebi.dominio.servicio.ServicioEstadisticasImpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
