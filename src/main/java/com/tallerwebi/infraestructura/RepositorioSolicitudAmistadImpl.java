@@ -70,4 +70,22 @@ public class RepositorioSolicitudAmistadImpl implements RepositorioSolicitudAmis
 
     return cantidad > 0;
   }
+
+  @Override
+  public Boolean sonAmigos(Usuario usuario1, Usuario usuario2) {
+    String query =
+      "FROM SolicitudAmistad " +
+      "WHERE estado = :estado " +
+      "AND ((emisor = :usuario1 AND receptor = :usuario2) " +
+      "OR (emisor = :usuario2 AND receptor = :usuario1))";
+
+    return !sessionFactory
+      .getCurrentSession()
+      .createQuery(query, SolicitudAmistad.class)
+      .setParameter("estado", SolicitudAmistad.EstadoSolicitud.ACEPTADA)
+      .setParameter("usuario1", usuario1)
+      .setParameter("usuario2", usuario2)
+      .getResultList()
+      .isEmpty();
+  }
 }

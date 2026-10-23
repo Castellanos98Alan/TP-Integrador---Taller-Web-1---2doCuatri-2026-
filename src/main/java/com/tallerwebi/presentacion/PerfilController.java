@@ -3,10 +3,7 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.servicio.ServicioEstadistica;
-import com.tallerwebi.dominio.servicio.ServicioJugador;
-import com.tallerwebi.dominio.servicio.ServicioLogin;
-import com.tallerwebi.dominio.servicio.ServicioRanking;
+import com.tallerwebi.dominio.servicio.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
@@ -14,12 +11,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +35,7 @@ public class PerfilController {
   private final ServicioJugador servicioJugador;
   private final ServicioRanking servicioRanking;
   private final ServicioEstadistica servicioEstadistica;
+  private final ServicioSolicitudAmistad servicioSolicitudAmistad;
 
   private static final String USUARIO = "USUARIO";
   private static final String REDIRECT_LOGIN = "redirect:/login";
@@ -48,15 +48,16 @@ public class PerfilController {
     ServicioLogin servicioLogin,
     ServicioJugador servicioJugador,
     ServicioRanking servicioRanking,
-    ServicioEstadistica servicioEstadistica
+    ServicioEstadistica servicioEstadistica,
+    ServicioSolicitudAmistad servicioSolicitudAmistad
   ) {
     this.servicioLogin = servicioLogin;
     this.servicioJugador = servicioJugador;
     this.servicioRanking = servicioRanking;
     this.servicioEstadistica = servicioEstadistica;
+    this.servicioSolicitudAmistad = servicioSolicitudAmistad;
   }
 
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   @GetMapping("/perfil")
   public ModelAndView mostrarFormulario(HttpServletRequest request) {
     HttpSession session = request.getSession();
@@ -67,40 +68,23 @@ public class PerfilController {
     }
 
     Jugador jugador = servicioJugador.buscarPorUsuarioId(usuario.getId());
-    ModelAndView modelAndView = new ModelAndView("perfil");
+
+    Map<String, Object> model = new ModelMap();
 
     if (jugador != null) {
       Estadistica estadisticas = servicioEstadistica.obtenerEstadisticasGenerales(jugador);
 
-      modelAndView.addObject("partidosJugados", jugador.getPartidosJugados());
-      modelAndView.addObject("victorias", jugador.getPartidosGanados());
-      modelAndView.addObject("derrotas", jugador.getPartidosPerdidos());
-      modelAndView.addObject("goles", estadisticas.getGoles());
-      modelAndView.addObject("asistencias", estadisticas.getAsistencias());
-      modelAndView.addObject("amarillas", estadisticas.getAmarillas());
-      modelAndView.addObject("rojas", estadisticas.getRojas());
-      modelAndView.addObject("puntajeTotal", estadisticas.getPuntaje());
+      model = cargarDatosDelJugador(usuario, jugador, estadisticas);
     }
 
-    modelAndView.addObject("email", usuario.getEmail());
-    modelAndView.addObject("rol", usuario.getRol());
-    modelAndView.addObject("activo", usuario.getActivo());
-    modelAndView.addObject("nickname", usuario.getNickname());
-    modelAndView.addObject("nombreJugador", jugador != null ? jugador.getNombre() : null);
-    modelAndView.addObject("biografia", usuario.getBiografia());
-    modelAndView.addObject("zona", usuario.getZona());
-    modelAndView.addObject("posicion1", jugador != null ? jugador.getPosicion1() : null);
-    modelAndView.addObject("posicion2", jugador != null ? jugador.getPosicion2() : null);
-    modelAndView.addObject("puntos", jugador != null ? jugador.getPuntos() : 0);
-    modelAndView.addObject(
-      "nivel",
-      jugador != null ? servicioRanking.calcularNivel(jugador.getPuntos()) : "D"
-    );
-    modelAndView.addObject(FOTO, jugador != null ? jugador.getFoto() : null);
-    modelAndView.addObject("fotoPosicionX", jugador != null ? jugador.getFotoPosicionX() : 50);
-    modelAndView.addObject("fotoPosicionY", jugador != null ? jugador.getFotoPosicionY() : 50);
+    model.put("email", usuario.getEmail());
+    model.put("rol", usuario.getRol());
+    model.put("activo", usuario.getActivo());
 
-    return modelAndView;
+    model.put("esMiPerfil", true);
+    model.put("idUsuarioPerfil", usuario.getId());
+
+    return new ModelAndView("perfil", model);
   }
 
   @GetMapping("/editar-perfil")
@@ -244,5 +228,93 @@ public class PerfilController {
       return ".webp";
     }
     return null;
+  }
+
+  @GetMapping("/perfil/{idUsuario}")
+  public ModelAndView verPerfilJugador(
+    @PathVariable("idUsuario") Long idUsuario,
+    @RequestParam(value = "solicitudEnviada", required = false) Boolean solicitudEnviada,
+    @RequestParam(value = "errorAmistad", required = false) Boolean errorAmistad,
+    HttpServletRequest request
+  ) {
+    HttpSession session = request.getSession();
+    Usuario usuarioLogueado = (Usuario) session.getAttribute(USUARIO);
+
+    if (usuarioLogueado == null) {
+      return new ModelAndView(REDIRECT_LOGIN);
+    }
+
+    Usuario usuarioPerfil = servicioLogin.buscarUsuarioPorId(idUsuario);
+
+    if (usuarioPerfil == null) {
+      return new ModelAndView("redirect:/ranking");
+    }
+
+    Jugador jugador = servicioJugador.buscarPorUsuarioId(idUsuario);
+
+    if (jugador == null) {
+      return new ModelAndView("redirect:/ranking");
+    }
+
+    Estadistica estadisticas = servicioEstadistica.obtenerEstadisticasGenerales(jugador);
+
+    Map<String, Object> model = cargarDatosDelJugador(usuarioPerfil, jugador, estadisticas);
+
+    model.put("esMiPerfil", usuarioLogueado.getId().equals(usuarioPerfil.getId()));
+
+    model.put("idUsuarioPerfil", usuarioPerfil.getId());
+
+    Boolean sonAmigos = servicioSolicitudAmistad.sonAmigos(usuarioLogueado, usuarioPerfil);
+
+    model.put("sonAmigos", sonAmigos);
+
+    if (Boolean.TRUE.equals(solicitudEnviada)) {
+      model.put("mensajeAmistad", "Solicitud de amistad enviada correctamente.");
+    }
+
+    if (Boolean.TRUE.equals(errorAmistad)) {
+      model.put("errorAmistad", "Ya le enviaste una solicitud a esta persona.");
+    }
+
+    return new ModelAndView("perfil", model);
+  }
+
+  private Map<String, Object> cargarDatosDelJugador(
+    Usuario usuario,
+    Jugador jugador,
+    Estadistica estadisticas
+  ) {
+    Map<String, Object> model = new ModelMap();
+
+    model.put("email", usuario.getEmail());
+    model.put("rol", usuario.getRol());
+    model.put("activo", usuario.getActivo());
+
+    model.put("nickname", usuario.getNickname());
+    model.put("biografia", usuario.getBiografia());
+    model.put("zona", usuario.getZona());
+
+    model.put("nombreJugador", jugador.getNombre());
+    model.put("posicion1", jugador.getPosicion1());
+    model.put("posicion2", jugador.getPosicion2());
+    model.put("puntos", jugador.getPuntos());
+
+    model.put("nivel", servicioRanking.calcularNivel(jugador.getPuntos()));
+
+    model.put(FOTO, jugador.getFoto());
+    model.put("fotoPosicionX", jugador.getFotoPosicionX());
+    model.put("fotoPosicionY", jugador.getFotoPosicionY());
+
+    model.put("partidosJugados", jugador.getPartidosJugados());
+    model.put("victorias", jugador.getPartidosGanados());
+    model.put("derrotas", jugador.getPartidosPerdidos());
+
+    model.put("goles", estadisticas.getGoles());
+    model.put("asistencias", estadisticas.getAsistencias());
+    model.put("amarillas", estadisticas.getAmarillas());
+    model.put("rojas", estadisticas.getRojas());
+    model.put("puntajeTotal", estadisticas.getPuntaje());
+
+    return model;
   }
 }

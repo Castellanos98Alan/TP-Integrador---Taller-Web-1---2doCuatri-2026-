@@ -16,4 +16,6 @@ public interface RepositorioSolicitudAmistad {
   SolicitudAmistad buscarPorId(Integer id);
 
   boolean existeSolicitudPendienteEntre(Usuario emisor, Usuario receptor);
+
+  Boolean sonAmigos(Usuario usuario1, Usuario usuario2);
 }
