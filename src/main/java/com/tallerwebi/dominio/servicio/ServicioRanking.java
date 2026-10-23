@@ -1,5 +1,6 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Jugador;
 import java.util.List;
 
 public interface ServicioRanking {

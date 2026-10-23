@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.tallerwebi.dominio.Cancha;
-import com.tallerwebi.dominio.RepositorioCancha;
+import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
 import org.hibernate.SessionFactory;

@@ -7,7 +7,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-import com.tallerwebi.dominio.RepositorioPartido;
+import com.tallerwebi.dominio.repositorio.RepositorioCancha;
+import com.tallerwebi.dominio.repositorio.RepositorioPartido;
+import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
+import com.tallerwebi.dominio.servicio.ServicioPartido;
+import com.tallerwebi.dominio.servicio.ServicioPartidoImpl;
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

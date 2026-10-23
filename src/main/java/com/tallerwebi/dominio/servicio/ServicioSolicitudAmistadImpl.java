@@ -1,6 +1,9 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.SolicitudAmistad;
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.SolicitudAmistadInvalida;
+import com.tallerwebi.dominio.repositorio.RepositorioSolicitudAmistad;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

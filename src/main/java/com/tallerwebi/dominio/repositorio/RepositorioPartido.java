@@ -1,5 +1,6 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.repositorio;
 
+import com.tallerwebi.dominio.Partido;
 import java.util.List;
 
 public interface RepositorioPartido {

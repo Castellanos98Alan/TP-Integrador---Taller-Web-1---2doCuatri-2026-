@@ -5,8 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Jugador;
-import com.tallerwebi.dominio.ServicioRanking;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.servicio.ServicioRanking;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

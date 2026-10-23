@@ -1,10 +1,9 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ServicioLogin;
-import com.tallerwebi.dominio.ServicioSolicitudAmistad;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.servicio.ServicioLogin;
+import com.tallerwebi.dominio.servicio.ServicioSolicitudAmistad;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.tallerwebi.dominio.Jugador;
-import com.tallerwebi.dominio.RepositorioJugador;
+import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
 import java.util.List;

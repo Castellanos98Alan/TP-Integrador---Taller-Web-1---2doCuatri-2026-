@@ -7,8 +7,8 @@ import static org.hamcrest.Matchers.notNullValue;
 
 import com.tallerwebi.dominio.Cancha;
 import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.RepositorioPartido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;

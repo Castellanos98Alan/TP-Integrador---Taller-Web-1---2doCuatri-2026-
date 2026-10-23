@@ -1,5 +1,12 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Cancha;
+import com.tallerwebi.dominio.InscripcionPartido;
+import com.tallerwebi.dominio.Partido;
+import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.repositorio.RepositorioCancha;
+import com.tallerwebi.dominio.repositorio.RepositorioPartido;
+import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.time.LocalDateTime;
 import java.util.*;

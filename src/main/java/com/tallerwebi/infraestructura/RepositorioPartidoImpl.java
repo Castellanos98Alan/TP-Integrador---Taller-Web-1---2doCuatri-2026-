@@ -1,9 +1,7 @@
 package com.tallerwebi.infraestructura;
 
-import com.tallerwebi.dominio.InscripcionPartido;
 import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.RepositorioPartido;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
