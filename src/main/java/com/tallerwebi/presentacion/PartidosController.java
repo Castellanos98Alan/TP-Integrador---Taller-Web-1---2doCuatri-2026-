@@ -1,7 +1,9 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.servicio.ServicioJugador;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -22,10 +24,12 @@ import org.springframework.web.servlet.ModelAndView;
 public class PartidosController {
 
   private ServicioPartido servicioPartido;
+  private ServicioJugador servicioJugador;
 
   @Autowired
-  public PartidosController(ServicioPartido servicioPartido) {
+  public PartidosController(ServicioPartido servicioPartido, ServicioJugador servicioJugador) {
     this.servicioPartido = servicioPartido;
+    this.servicioJugador = servicioJugador;
   }
 
   private static final String FILTRO_TODOS = "TODOS";
@@ -184,7 +188,8 @@ public class PartidosController {
     }
 
     try {
-      servicioPartido.unirseAPartido(idPartido, usuarioLogueado);
+      Jugador jugadorLogueado = servicioJugador.buscarPorUsuarioId(usuarioLogueado.getId());
+      servicioPartido.unirseAPartido(idPartido, jugadorLogueado);
       return new ModelAndView("redirect:/partido/" + idPartido + "/sala-de-espera");
     } catch (Exception e) {
       Map<String, Object> model = new ModelMap();

@@ -237,8 +237,8 @@ public class Partido {
     List<Usuario> usuariosConfirmados = new ArrayList<>();
     if (this.inscripciones != null) {
       for (InscripcionPartido inscripcion : this.inscripciones) {
-        if (inscripcion.getUsuario() != null) {
-          usuariosConfirmados.add(inscripcion.getUsuario());
+        if (inscripcion.getJugador() != null) {
+          usuariosConfirmados.add(inscripcion.getJugador().getUsuario());
         }
       }
     }

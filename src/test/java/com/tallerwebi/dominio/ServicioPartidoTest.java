@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
+import com.tallerwebi.dominio.servicio.ServicioJugador;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
 import com.tallerwebi.dominio.servicio.ServicioPartidoImpl;
 import com.tallerwebi.presentacion.DatosCrearPartido;
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.Test;
 public class ServicioPartidoTest {
 
   private ServicioPartido servicioPartido;
+  private ServicioJugador servicioJugador;
   private RepositorioPartido repositorioPartidoMock;
 
   private RepositorioCancha repositorioCanchaMock;
@@ -242,10 +244,11 @@ public class ServicioPartidoTest {
     Usuario usuario = new Usuario();
     usuario.setId(100L);
     usuario.setEmail("test@unlam.edu.ar");
+    Jugador jugador = servicioJugador.buscarPorUsuarioId(usuario.getId());
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
 
-    servicioPartido.unirseAPartido(partidoId, usuario);
+    servicioPartido.unirseAPartido(partidoId, jugador);
 
     assertThat(partido.getConfirmados(), hasSize(1));
     assertThat(partido.getConfirmados(), hasItem(usuario));
@@ -257,13 +260,13 @@ public class ServicioPartidoTest {
   public void queLanceExcepcionSiElPartidoNoExisteAlQuererUnirse() {
     Long partidoIdInexistente = 99L;
     Usuario usuario = new Usuario();
-
+    Jugador jugador = servicioJugador.buscarPorUsuarioId(usuario.getId());
     when(repositorioPartidoMock.buscarPorId(partidoIdInexistente)).thenReturn(null);
 
     Exception exception = assertThrows(
       RuntimeException.class,
       () -> {
-        servicioPartido.unirseAPartido(partidoIdInexistente, usuario);
+        servicioPartido.unirseAPartido(partidoIdInexistente, jugador);
       }
     );
 
@@ -278,13 +281,13 @@ public class ServicioPartidoTest {
     partido.setEstado(Partido.EstadoPartido.CANCELADO);
 
     Usuario usuario = new Usuario();
-
+    Jugador jugador = servicioJugador.buscarPorUsuarioId(usuario.getId());
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
 
     Exception exception = assertThrows(
       RuntimeException.class,
       () -> {
-        servicioPartido.unirseAPartido(partidoId, usuario);
+        servicioPartido.unirseAPartido(partidoId, jugador);
       }
     );
 
@@ -302,10 +305,10 @@ public class ServicioPartidoTest {
 
     Usuario usuario = new Usuario();
     usuario.setId(100L);
-
+    Jugador jugador = servicioJugador.buscarPorUsuarioId(usuario.getId());
     InscripcionPartido inscripcionExistente = new InscripcionPartido();
     inscripcionExistente.setPartido(partido);
-    inscripcionExistente.setUsuario(usuario);
+    inscripcionExistente.setJugador(jugador);
     partido.getInscripciones().add(inscripcionExistente);
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
@@ -313,7 +316,7 @@ public class ServicioPartidoTest {
     Exception exception = assertThrows(
       RuntimeException.class,
       () -> {
-        servicioPartido.unirseAPartido(partidoId, usuario);
+        servicioPartido.unirseAPartido(partidoId, jugador);
       }
     );
 
@@ -333,26 +336,29 @@ public class ServicioPartidoTest {
     usuario1.setId(101L);
     Usuario usuario2 = new Usuario();
     usuario2.setId(102L);
+    Jugador jugador1 = servicioJugador.buscarPorUsuarioId(usuario1.getId());
+    Jugador jugador2 = servicioJugador.buscarPorUsuarioId(usuario2.getId());
 
     InscripcionPartido inscripcion1 = new InscripcionPartido();
     inscripcion1.setPartido(partido);
-    inscripcion1.setUsuario(usuario1);
+    inscripcion1.setJugador(jugador1);
     partido.getInscripciones().add(inscripcion1);
 
     InscripcionPartido inscripcion2 = new InscripcionPartido();
     inscripcion2.setPartido(partido);
-    inscripcion2.setUsuario(usuario2);
+    inscripcion2.setJugador(jugador2);
     partido.getInscripciones().add(inscripcion2);
 
     Usuario usuarioNuevo = new Usuario();
     usuarioNuevo.setId(103L);
+    Jugador jugadorNuevo = servicioJugador.buscarPorUsuarioId(usuarioNuevo.getId());
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
 
     Exception exception = assertThrows(
       RuntimeException.class,
       () -> {
-        servicioPartido.unirseAPartido(partidoId, usuarioNuevo);
+        servicioPartido.unirseAPartido(partidoId, jugadorNuevo);
       }
     );
 
@@ -377,12 +383,13 @@ public class ServicioPartidoTest {
 
     Usuario usuario = new Usuario();
     usuario.setId(100L);
+    Jugador jugador = servicioJugador.buscarPorUsuarioId(usuario.getId());
 
     when(repositorioPartidoMock.buscarPorId(partidoIdNuevo)).thenReturn(partidoNuevo);
     when(repositorioPartidoMock.buscarPartidosPorUsuario(usuario.getId()))
       .thenReturn(List.of(partidoExistente));
 
-    servicioPartido.unirseAPartido(partidoIdNuevo, usuario);
+    servicioPartido.unirseAPartido(partidoIdNuevo, jugador);
 
     assertThat(partidoNuevo.getConfirmados(), hasSize(1));
     assertThat(partidoNuevo.getConfirmados(), hasItem(usuario));
