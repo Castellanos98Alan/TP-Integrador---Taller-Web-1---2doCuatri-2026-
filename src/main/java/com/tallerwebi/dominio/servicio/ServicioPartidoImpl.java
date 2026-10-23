@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.Cancha;
 import com.tallerwebi.dominio.InscripcionPartido;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.Partido.EstadoPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
@@ -122,6 +123,13 @@ public class ServicioPartidoImpl implements ServicioPartido {
     InscripcionPartido nuevaInscripcion = new InscripcionPartido(partido, usuarioLogueado);
     partido.getInscripciones().add(nuevaInscripcion);
     partido.setCantJugadores(partido.getInscripciones().size());
+
+    // Disparador del balanceo automático
+    int cupoMaximo = partido.getCupoMaximo();
+    if (partido.getCantJugadores() == cupoMaximo) {
+        balancearEquipos(partido);
+        partido.setEstado(EstadoPartido.ACTIVO);
+    }
 
     repositorioPartido.modificar(partido);
   }
@@ -343,5 +351,9 @@ public class ServicioPartidoImpl implements ServicioPartido {
       }
     }
     return new ArrayList<>(cuposUnicos);
+  }
+
+  @Override
+  public void balancearEquipos(Partido partido) {
   }
 }

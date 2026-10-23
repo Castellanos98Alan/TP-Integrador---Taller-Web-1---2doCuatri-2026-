@@ -11,6 +11,7 @@ public interface ServicioPartido {
   void crearPartido(DatosCrearPartido datos, Usuario creador);
   void cancelarPartido(Long partidoId, Usuario usuarioLogueado);
   void unirseAPartido(Long partidoId, Usuario usuarioLogueado);
+  void balancearEquipos(Partido partido);
 
   Partido buscarPartidoPorId(Long id);
   List<Cancha> listarCanchas(); // NUEVO
