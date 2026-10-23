@@ -70,7 +70,6 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
 
-
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
@@ -101,13 +100,11 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
 
-
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
       servicioEstadistica
-
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -185,13 +182,11 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
 
-
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
       servicioEstadistica
-
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -211,13 +206,11 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
 
-
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
       servicioEstadistica
-
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -239,13 +232,11 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
 
-
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
       servicioEstadistica
-
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -265,13 +256,11 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
 
-
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
       servicioEstadistica
-
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -312,13 +301,11 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
 
-
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
       servicioEstadistica
-
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -350,7 +337,6 @@ public class PerfilControllerTest {
       servicioJugador,
       servicioRanking,
       servicioEstadistica
-
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -373,9 +359,7 @@ public class PerfilControllerTest {
     verify(servicioLogin).modificar(usuario);
     verify(servicioJugador).guardar(org.mockito.ArgumentMatchers.any(Jugador.class));
 
-
     assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
-
 
     assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
   }
@@ -439,6 +423,5 @@ public class PerfilControllerTest {
         Files.deleteIfExists(Path.of("src/main/webapp/" + jugador.getFoto()));
       }
     }
-
   }
 }
