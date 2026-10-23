@@ -17,6 +17,7 @@ import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -507,24 +508,86 @@ public class ServicioPartidoTest {
     // poMaximo(), equalTo(22));
   }
 
-  @Test
-  public void deberiaFormarDosEquiposDeCincoConDiezJugadores() {
+@Test
+public void deberiaFormarDosEquiposDeCincoConDiezJugadores() {
+  // 1. Configuración del escenario (Given)
+  Partido partido = new Partido();
+  partido.setId(1L);
+  
+  Equipo local = new Equipo();
+  local.setId(1L);
+  local.setNombre("Equipo Local");
+  
+  Equipo visitante = new Equipo();
+  visitante.setId(2L);
+  visitante.setNombre("Equipo Visitante");
+  
+  partido.setEquipo1(local);
+  partido.setEquipo2(visitante);
+
+  // Crear 10 inscripciones con jugadores y puntajes descendentes (de 100 a 10)
+  List<InscripcionPartido> inscripciones = new ArrayList<>();
+  for (int i = 0; i < 10; i++) {
+    Jugador jugador = new Jugador();
+    jugador.setId((long) i);
+    jugador.setPuntos((10 - i) * 10); // Jugador 0=100pts, Jugador 1=90pts, etc.
+
+    InscripcionPartido inscripcion = new InscripcionPartido();
+    inscripcion.setPartido(partido);
+    inscripcion.setJugador(jugador);
+    
+    inscripciones.add(inscripcion);
+  }
+  
+  // Desordenamos la lista inicial para verificar que el método realmente la ordene por puntos
+  Collections.shuffle(inscripciones);
+  partido.setInscripciones(inscripciones);
+
+  // 2. Ejecución de la lógica (When)
+  servicioPartido.balancearEquipos(partido);
+
+  // 3. Verificaciones (Then)
+  List<InscripcionPartido> inscripcionesOrdenadas = partido.getInscripciones();
+
+  // Contadores para verificar distribución
+  int cantLocal = 0;
+  int cantVisitante = 0;
+
+  for (InscripcionPartido ins : inscripcionesOrdenadas) {
+    if (ins.getEquipo().equals(local)) {
+      cantLocal++;
+    } else if (ins.getEquipo().equals(visitante)) {
+      cantVisitante++;
+    }
   }
 
-  @Test
-  public void deberiaFormarDosEquiposDeSiesteConCatorceJugadores() {
-  }
+  // Verificación A: Cada equipo debe tener exactamente 5 jugadores asignados
+  assertThat(cantLocal, is(5));
+  assertThat(cantVisitante, is(5));
+
+  // Verificación B: El algoritmo Snake Draft debe asignar los índices correctos al equipo Local
+  // Índices esperados en Local: 0 (100pts), 3 (70pts), 4 (60pts), 7 (30pts), 8 (20pts)
+  assertThat(inscripcionesOrdenadas.get(0).getEquipo(), is(local));
+  assertThat(inscripcionesOrdenadas.get(3).getEquipo(), is(local));
+  assertThat(inscripcionesOrdenadas.get(4).getEquipo(), is(local));
+  assertThat(inscripcionesOrdenadas.get(7).getEquipo(), is(local));
+  assertThat(inscripcionesOrdenadas.get(8).getEquipo(), is(local));
+
+  // Verificación C: Los índices intermedios deben ir al visitante (1, 2, 5, 6, 9)
+  assertThat(inscripcionesOrdenadas.get(1).getEquipo(), is(visitante));
+  assertThat(inscripcionesOrdenadas.get(2).getEquipo(), is(visitante));
+  assertThat(inscripcionesOrdenadas.get(5).getEquipo(), is(visitante));
+}
 
   @Test
-  public void deberiaFormarDosEquiposDeOnceConVeintidosJugadores() {
-  }
+  public void deberiaFormarDosEquiposDeSiesteConCatorceJugadores() {}
 
   @Test
-  public void noDeberiaBalancearSiElCupoTodaviaNoEstaCompleto() {
-  }
+  public void deberiaFormarDosEquiposDeOnceConVeintidosJugadores() {}
 
   @Test
-  public void deberiaElegirLaDivisionConMenorDiferenciaDePuntos() {
-  }
+  public void noDeberiaBalancearSiElCupoTodaviaNoEstaCompleto() {}
 
+  @Test
+  public void deberiaElegirLaDivisionConMenorDiferenciaDePuntos() {}
 }
