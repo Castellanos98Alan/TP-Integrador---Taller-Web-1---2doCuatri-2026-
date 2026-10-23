@@ -479,6 +479,28 @@ public class ServicioPartidoTest {
     verify(repositorioPartidoMock, never()).guardar(any());
     //assertThat("La lista no debería estar vacía", resultado.size(), greaterThan(0));
     //Partido partido = resultado.get(0);
-    //assertThat(partido.getCupoMaximo(), equalTo(22));
+    //assertThat(partido.getCu
+    // poMaximo(), equalTo(22));
   }
+
+  @Test
+  public void deberiaFormarDosEquiposDeCincoConDiezJugadores() {
+  }
+
+  @Test
+  public void deberiaFormarDosEquiposDeSiesteConCatorceJugadores() {
+  }
+
+  @Test
+  public void deberiaFormarDosEquiposDeOnceConVeintidosJugadores() {
+  }
+
+  @Test
+  public void noDeberiaBalancearSiElCupoTodaviaNoEstaCompleto() {
+  }
+
+  @Test
+  public void deberiaElegirLaDivisionConMenorDiferenciaDePuntos() {
+  }
+
 }
