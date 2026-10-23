@@ -5,8 +5,8 @@ import com.tallerwebi.dominio.Equipo;
 import com.tallerwebi.dominio.InscripcionPartido;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.Partido.EstadoPartido;
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
@@ -24,17 +24,20 @@ public class ServicioPartidoImpl implements ServicioPartido {
   private final RepositorioPartido repositorioPartido;
   private final RepositorioCancha repositorioCancha;
   private final RepositorioUsuario repositorioUsuario;
+  private ServicioJugador servicioJugador;
   private static final int HORAS_MINIMAS_ENTRE_PARTIDOS = 3;
 
   @Autowired
   public ServicioPartidoImpl(
     RepositorioPartido repositorioPartido,
     RepositorioCancha repositorioCancha,
-    RepositorioUsuario repositorioUsuario
+    RepositorioUsuario repositorioUsuario,
+    ServicioJugador servicioJugador
   ) {
     this.repositorioCancha = repositorioCancha;
     this.repositorioPartido = repositorioPartido;
     this.repositorioUsuario = repositorioUsuario;
+    this.servicioJugador = servicioJugador;
   }
 
   //spint 2
@@ -129,8 +132,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
     // Disparador del balanceo automático
     int cupoMaximo = partido.getCupoMaximo();
     if (partido.getCantJugadores() == cupoMaximo) {
-        balancearEquipos(partido);
-        partido.setEstado(EstadoPartido.ACTIVO);
+      balancearEquipos(partido);
+      partido.setEstado(EstadoPartido.ACTIVO);
     }
 
     repositorioPartido.modificar(partido);
@@ -360,10 +363,9 @@ public class ServicioPartidoImpl implements ServicioPartido {
     List<InscripcionPartido> inscripciones = partido.getInscripciones();
 
     // Ordenar de mayor a menor segun puntos del jugador
-    inscripciones.sort((i1, i2) -> Integer.compare(
-        i2.getJugador().getPuntos(), 
-        i1.getJugador().getPuntos()
-    ));
+    inscripciones.sort((i1, i2) ->
+      Integer.compare(i2.getJugador().getPuntos(), i1.getJugador().getPuntos())
+    );
 
     Equipo equipoLocal = partido.getEquipo1();
     Equipo equipoVisitante = partido.getEquipo2();
@@ -371,13 +373,12 @@ public class ServicioPartidoImpl implements ServicioPartido {
     // Reparto Snake Draft: los índices 0, 3, 4, 7, 8 van al Local
     for (int i = 0; i < inscripciones.size(); i++) {
       InscripcionPartido inscripcion = inscripciones.get(i);
-      
+
       if (i % 4 == 0 || i % 4 == 3) {
         inscripcion.setEquipo(equipoLocal);
       } else {
         inscripcion.setEquipo(equipoVisitante);
       }
     }
-    
   }
 }
