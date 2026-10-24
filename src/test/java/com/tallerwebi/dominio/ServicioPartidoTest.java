@@ -508,86 +508,384 @@ public class ServicioPartidoTest {
     // poMaximo(), equalTo(22));
   }
 
-@Test
-public void deberiaFormarDosEquiposDeCincoConDiezJugadores() {
-  // 1. Configuración del escenario (Given)
-  Partido partido = new Partido();
-  partido.setId(1L);
-  
-  Equipo local = new Equipo();
-  local.setId(1L);
-  local.setNombre("Equipo Local");
-  
-  Equipo visitante = new Equipo();
-  visitante.setId(2L);
-  visitante.setNombre("Equipo Visitante");
-  
-  partido.setEquipo1(local);
-  partido.setEquipo2(visitante);
+  @Test
+  public void deberiaFormarDosEquiposDeCincoConDiezJugadores() {
+    // 1. Configuración del escenario (Given)
+    Partido partido = new Partido();
+    partido.setId(1L);
 
-  // Crear 10 inscripciones con jugadores y puntajes descendentes (de 100 a 10)
-  List<InscripcionPartido> inscripciones = new ArrayList<>();
-  for (int i = 0; i < 10; i++) {
-    Jugador jugador = new Jugador();
-    jugador.setId((long) i);
-    jugador.setPuntos((10 - i) * 10); // Jugador 0=100pts, Jugador 1=90pts, etc.
+    Equipo local = new Equipo();
+    local.setId(1L);
+    local.setNombre("Equipo Local");
 
-    InscripcionPartido inscripcion = new InscripcionPartido();
-    inscripcion.setPartido(partido);
-    inscripcion.setJugador(jugador);
-    
-    inscripciones.add(inscripcion);
-  }
-  
-  // Desordenamos la lista inicial para verificar que el método realmente la ordene por puntos
-  Collections.shuffle(inscripciones);
-  partido.setInscripciones(inscripciones);
+    Equipo visitante = new Equipo();
+    visitante.setId(2L);
+    visitante.setNombre("Equipo Visitante");
 
-  // 2. Ejecución de la lógica (When)
-  servicioPartido.balancearEquipos(partido);
+    partido.setEquipo1(local);
+    partido.setEquipo2(visitante);
 
-  // 3. Verificaciones (Then)
-  List<InscripcionPartido> inscripcionesOrdenadas = partido.getInscripciones();
+    // Crear 10 inscripciones con jugadores y puntajes descendentes (de 100 a 10)
+    List<InscripcionPartido> inscripciones = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+      Jugador jugador = new Jugador();
+      jugador.setId((long) i);
+      jugador.setPuntos((10 - i) * 10); // Jugador 0=100pts, Jugador 1=90pts, etc.
 
-  // Contadores para verificar distribución
-  int cantLocal = 0;
-  int cantVisitante = 0;
+      InscripcionPartido inscripcion = new InscripcionPartido();
+      inscripcion.setPartido(partido);
+      inscripcion.setJugador(jugador);
 
-  for (InscripcionPartido ins : inscripcionesOrdenadas) {
-    if (ins.getEquipo().equals(local)) {
-      cantLocal++;
-    } else if (ins.getEquipo().equals(visitante)) {
-      cantVisitante++;
+      inscripciones.add(inscripcion);
     }
+
+    // Desordenamos la lista inicial para verificar que el método realmente la ordene por puntos
+    Collections.shuffle(inscripciones);
+    partido.setInscripciones(inscripciones);
+
+    // 2. Ejecución de la lógica (When)
+    servicioPartido.balancearEquipos(partido);
+
+    // 3. Verificaciones (Then)
+    List<InscripcionPartido> inscripcionesOrdenadas = partido.getInscripciones();
+
+    // Contadores para verificar distribución
+    int cantLocal = 0;
+    int cantVisitante = 0;
+
+    for (InscripcionPartido ins : inscripcionesOrdenadas) {
+      if (ins.getEquipo().equals(local)) {
+        cantLocal++;
+      } else if (ins.getEquipo().equals(visitante)) {
+        cantVisitante++;
+      }
+    }
+
+    // Verificación A: Cada equipo debe tener exactamente 5 jugadores asignados
+    assertThat(cantLocal, is(5));
+    assertThat(cantVisitante, is(5));
+
+    // Verificación B: El algoritmo Snake Draft debe asignar los índices correctos al equipo Local
+    // Índices esperados en Local: 0 (100pts), 3 (70pts), 4 (60pts), 7 (30pts), 8 (20pts)
+    assertThat(inscripcionesOrdenadas.get(0).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(3).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(4).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(7).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(8).getEquipo(), is(local));
+
+    // Verificación C: Los índices intermedios deben ir al visitante (1, 2, 5, 6, 9)
+    assertThat(inscripcionesOrdenadas.get(1).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(2).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(5).getEquipo(), is(visitante));
   }
 
-  // Verificación A: Cada equipo debe tener exactamente 5 jugadores asignados
-  assertThat(cantLocal, is(5));
-  assertThat(cantVisitante, is(5));
+  @Test
+  public void deberiaFormarDosEquiposDeSieteConCatorceJugadores() {
+    Partido partido = new Partido();
+    partido.setId(1L);
 
-  // Verificación B: El algoritmo Snake Draft debe asignar los índices correctos al equipo Local
-  // Índices esperados en Local: 0 (100pts), 3 (70pts), 4 (60pts), 7 (30pts), 8 (20pts)
-  assertThat(inscripcionesOrdenadas.get(0).getEquipo(), is(local));
-  assertThat(inscripcionesOrdenadas.get(3).getEquipo(), is(local));
-  assertThat(inscripcionesOrdenadas.get(4).getEquipo(), is(local));
-  assertThat(inscripcionesOrdenadas.get(7).getEquipo(), is(local));
-  assertThat(inscripcionesOrdenadas.get(8).getEquipo(), is(local));
+    Equipo local = new Equipo();
+    local.setId(1L);
+    local.setNombre("Equipo Local");
 
-  // Verificación C: Los índices intermedios deben ir al visitante (1, 2, 5, 6, 9)
-  assertThat(inscripcionesOrdenadas.get(1).getEquipo(), is(visitante));
-  assertThat(inscripcionesOrdenadas.get(2).getEquipo(), is(visitante));
-  assertThat(inscripcionesOrdenadas.get(5).getEquipo(), is(visitante));
-}
+    Equipo visitante = new Equipo();
+    visitante.setId(2L);
+    visitante.setNombre("Equipo Visitante");
+
+    partido.setEquipo1(local);
+    partido.setEquipo2(visitante);
+
+    List<InscripcionPartido> inscripciones = new ArrayList<>();
+
+    for (int i = 0; i < 14; i++) {
+      Jugador jugador = new Jugador();
+      jugador.setId((long) i);
+      jugador.setPuntos((14 - i) * 10);
+
+      InscripcionPartido inscripcion = new InscripcionPartido();
+      inscripcion.setPartido(partido);
+      inscripcion.setJugador(jugador);
+
+      inscripciones.add(inscripcion);
+    }
+
+    Collections.shuffle(inscripciones);
+    partido.setInscripciones(inscripciones);
+
+    servicioPartido.balancearEquipos(partido);
+
+    List<InscripcionPartido> inscripcionesOrdenadas = partido.getInscripciones();
+
+    int cantLocal = 0;
+    int cantVisitante = 0;
+
+    for (InscripcionPartido ins : inscripcionesOrdenadas) {
+      if (ins.getEquipo().equals(local)) {
+        cantLocal++;
+      } else if (ins.getEquipo().equals(visitante)) {
+        cantVisitante++;
+      }
+    }
+
+    assertThat(cantLocal, is(7));
+    assertThat(cantVisitante, is(7));
+
+    assertThat(inscripcionesOrdenadas.get(0).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(3).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(4).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(7).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(8).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(11).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(12).getEquipo(), is(local));
+
+    assertThat(inscripcionesOrdenadas.get(1).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(2).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(5).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(6).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(9).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(10).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(13).getEquipo(), is(visitante));
+  }
 
   @Test
-  public void deberiaFormarDosEquiposDeSiesteConCatorceJugadores() {}
+  public void deberiaFormarDosEquiposDeOnceConVeintidosJugadores() {
+    Partido partido = new Partido();
+    partido.setId(1L);
+
+    Equipo local = new Equipo();
+    local.setId(1L);
+    local.setNombre("Equipo Local");
+
+    Equipo visitante = new Equipo();
+    visitante.setId(2L);
+    visitante.setNombre("Equipo Visitante");
+
+    partido.setEquipo1(local);
+    partido.setEquipo2(visitante);
+
+    List<InscripcionPartido> inscripciones = new ArrayList<>();
+
+    for (int i = 0; i < 22; i++) {
+      Jugador jugador = new Jugador();
+      jugador.setId((long) i);
+      jugador.setPuntos((22 - i) * 10);
+
+      InscripcionPartido inscripcion = new InscripcionPartido();
+      inscripcion.setPartido(partido);
+      inscripcion.setJugador(jugador);
+
+      inscripciones.add(inscripcion);
+    }
+
+    Collections.shuffle(inscripciones);
+    partido.setInscripciones(inscripciones);
+
+    servicioPartido.balancearEquipos(partido);
+
+    List<InscripcionPartido> inscripcionesOrdenadas = partido.getInscripciones();
+
+    int cantLocal = 0;
+    int cantVisitante = 0;
+
+    for (InscripcionPartido ins : inscripcionesOrdenadas) {
+      if (ins.getEquipo().equals(local)) {
+        cantLocal++;
+      } else if (ins.getEquipo().equals(visitante)) {
+        cantVisitante++;
+      }
+    }
+
+    assertThat(cantLocal, is(11));
+    assertThat(cantVisitante, is(11));
+
+    assertThat(inscripcionesOrdenadas.get(0).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(3).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(4).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(7).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(8).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(11).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(12).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(15).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(16).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(19).getEquipo(), is(local));
+    assertThat(inscripcionesOrdenadas.get(20).getEquipo(), is(local));
+
+    assertThat(inscripcionesOrdenadas.get(1).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(2).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(5).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(6).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(9).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(10).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(13).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(14).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(17).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(18).getEquipo(), is(visitante));
+    assertThat(inscripcionesOrdenadas.get(21).getEquipo(), is(visitante));
+  }
 
   @Test
-  public void deberiaFormarDosEquiposDeOnceConVeintidosJugadores() {}
+  public void noDeberiaBalancearSiElCupoTodaviaNoEstaCompleto() {
+    // Given
+    Long partidoId = 1L;
 
-  @Test
-  public void noDeberiaBalancearSiElCupoTodaviaNoEstaCompleto() {}
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setCupoMaximo(10);
+    partido.setCantJugadores(8);
+    partido.setInscripciones(new ArrayList<>());
+
+    // Agregamos 8 inscripciones: todavía faltan 2 jugadores
+    for (int i = 0; i < 8; i++) {
+      Jugador jugador = new Jugador();
+      jugador.setId((long) i);
+
+      InscripcionPartido inscripcion = new InscripcionPartido(partido, jugador);
+
+      partido.getInscripciones().add(inscripcion);
+    }
+
+    Usuario usuario = new Usuario();
+    usuario.setId(100L);
+
+    Jugador nuevoJugador = new Jugador();
+    nuevoJugador.setId(100L);
+    nuevoJugador.setUsuario(usuario);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+    when(repositorioPartidoMock.buscarPartidosPorUsuario(100L)).thenReturn(new ArrayList<>());
+
+    // Spy del servicio para comprobar si se invoca el balanceo
+    ServicioPartido servicioSpy = spy(servicioPartido);
+
+    // When
+    servicioSpy.unirseAPartido(partidoId, nuevoJugador);
+
+    // Then: el balanceo no debe ejecutarse
+    verify(servicioSpy, never()).balancearEquipos(any(Partido.class));
+  }
 
   @Test
   public void deberiaElegirLaDivisionConMenorDiferenciaDePuntos() {}
+
+  @Test
+  public void deberiaAsignarUnCapitanPorEquipo() {
+    Partido partido = new Partido();
+
+    Equipo local = new Equipo();
+    local.setId(1L);
+
+    Equipo visitante = new Equipo();
+    visitante.setId(2L);
+
+    partido.setEquipo1(local);
+    partido.setEquipo2(visitante);
+
+    Jugador jugador1 = new Jugador();
+    jugador1.setPuntos(80);
+
+    Jugador jugador2 = new Jugador();
+    jugador2.setPuntos(60);
+
+    Jugador jugador3 = new Jugador();
+    jugador3.setPuntos(90);
+
+    Jugador jugador4 = new Jugador();
+    jugador4.setPuntos(70);
+
+    InscripcionPartido ins1 = new InscripcionPartido(partido, jugador1);
+    ins1.setEquipo(local);
+    ins1.setEsCapitan(true);
+
+    InscripcionPartido ins2 = new InscripcionPartido(partido, jugador2);
+    ins2.setEquipo(local);
+
+    InscripcionPartido ins3 = new InscripcionPartido(partido, jugador3);
+    ins3.setEquipo(visitante);
+
+    InscripcionPartido ins4 = new InscripcionPartido(partido, jugador4);
+    ins4.setEquipo(visitante);
+
+    partido.setInscripciones(new ArrayList<>(List.of(ins1, ins2, ins3, ins4)));
+
+    servicioPartido.asignarCapitanes(partido);
+
+    assertTrue(ins1.isEsCapitan());
+    assertFalse(ins2.isEsCapitan());
+    assertTrue(ins3.isEsCapitan());
+    assertFalse(ins4.isEsCapitan());
+  }
+
+  @Test
+  public void deberiaElegirComoCapitanAlJugadorConMasPuntos() {
+    Partido partido = new Partido();
+    Equipo local = new Equipo();
+    Equipo visitante = new Equipo();
+
+    partido.setEquipo1(local);
+    partido.setEquipo2(visitante);
+
+    Jugador jugador1 = new Jugador();
+    jugador1.setPuntos(40);
+
+    Jugador jugador2 = new Jugador();
+    jugador2.setPuntos(80);
+
+    Jugador jugador3 = new Jugador();
+    jugador3.setPuntos(60);
+
+    Jugador jugador4 = new Jugador();
+    jugador4.setPuntos(90);
+
+    InscripcionPartido ins1 = new InscripcionPartido(partido, jugador1);
+    ins1.setEquipo(local);
+
+    InscripcionPartido ins2 = new InscripcionPartido(partido, jugador2);
+    ins2.setEquipo(local);
+
+    InscripcionPartido ins3 = new InscripcionPartido(partido, jugador3);
+    ins3.setEquipo(visitante);
+
+    InscripcionPartido ins4 = new InscripcionPartido(partido, jugador4);
+    ins4.setEquipo(visitante);
+
+    partido.setInscripciones(new ArrayList<>(List.of(ins1, ins2, ins3, ins4)));
+
+    servicioPartido.asignarCapitanes(partido);
+
+    assertFalse(ins1.isEsCapitan());
+    assertTrue(ins2.isEsCapitan());
+    assertFalse(ins3.isEsCapitan());
+    assertTrue(ins4.isEsCapitan());
+  }
+
+  @Test
+  public void deberiaElegirComoCapitanAlQueSeInscribioPrimeroSiEmpatanEnPuntos() {
+    Partido partido = new Partido();
+    Equipo local = new Equipo();
+    Equipo visitante = new Equipo();
+
+    partido.setEquipo1(local);
+    partido.setEquipo2(visitante);
+
+    Jugador jugador1 = new Jugador();
+    jugador1.setPuntos(80);
+
+    Jugador jugador2 = new Jugador();
+    jugador2.setPuntos(80);
+
+    InscripcionPartido ins1 = new InscripcionPartido(partido, jugador1);
+    ins1.setEquipo(local);
+    ins1.setFechaInscripcion(LocalDateTime.of(2026, 10, 20, 10, 0));
+
+    InscripcionPartido ins2 = new InscripcionPartido(partido, jugador2);
+    ins2.setEquipo(local);
+    ins2.setFechaInscripcion(LocalDateTime.of(2026, 10, 20, 9, 0));
+
+    partido.setInscripciones(new ArrayList<>(List.of(ins1, ins2)));
+
+    servicioPartido.asignarCapitanes(partido);
+
+    assertFalse(ins1.isEsCapitan());
+    assertTrue(ins2.isEsCapitan());
+  }
 }
