@@ -2,15 +2,13 @@ package com.tallerwebi.dominio;
 
 public class DTOEstadisticaJugador {
 
-  private Long idJugador; // O idUsuario, según lo que uses para identificar al jugador
+  private Long idJugador;
   private Integer goles;
   private Integer amarillas;
   private Integer rojas;
 
-  // Constructor vacío
   public DTOEstadisticaJugador() {}
 
-  // Constructor con parámetros (opcional, pero útil)
   public DTOEstadisticaJugador(Long idJugador, Integer goles, Integer amarillas, Integer rojas) {
     this.idJugador = idJugador;
     this.goles = goles;
@@ -18,7 +16,6 @@ public class DTOEstadisticaJugador {
     this.rojas = rojas;
   }
 
-  // Getters y Setters (¡Muy importantes para que Spring pueda leer los datos del formulario!)
   public Long getIdJugador() {
     return idJugador;
   }

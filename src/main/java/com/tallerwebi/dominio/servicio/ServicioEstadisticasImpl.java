@@ -79,13 +79,10 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
     Long idPartido,
     List<DTOEstadisticaJugador> datosCargados
   ) {
-    Partido partido = repositorioPartido.buscarPorId(idPartido); // Necesitamos el objeto Partido
+    Partido partido = repositorioPartido.buscarPorId(idPartido);
 
     for (DTOEstadisticaJugador dto : datosCargados) {
-      // 1. Buscamos el Jugador (asumiendo que tenés un repositorio de jugador o un método para obtenerlo por usuario/id)
-      Jugador jugador = repositorioJugador.buscarPorUsuarioId(dto.getIdJugador()); // o dto.getIdUsuario() según tu DTO
-
-      // 2. Buscamos si ya existe la estadística para este partido y este jugador
+      Jugador jugador = repositorioJugador.buscarPorUsuarioId(dto.getIdJugador());
       Estadistica estadistica = repositorioEstadisticas.buscarPorPartidoYJugador(partido, jugador);
 
       if (estadistica == null) {
@@ -94,15 +91,12 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
         estadistica.setJugador(jugador);
       }
 
-      // 3. Seteamos los valores
       estadistica.setGoles(dto.getGoles());
       estadistica.setAmarillas(dto.getAmarillas());
       estadistica.setRojas(dto.getRojas());
-
       repositorioEstadisticas.guardar(estadistica);
     }
 
-    // 4. Cambiamos el estado del partido a EN_REVISION
     partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
     repositorioPartido.guardar(partido);
   }

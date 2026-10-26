@@ -207,7 +207,8 @@ public class ServicioEstadisticaTest {
     // Configuramos los comportamientos de los mocks
     when(repositorioPartidoMock.buscarPorId(idPartido)).thenReturn(partidoMock);
     when(repositorioJugadorMock.buscarPorUsuarioId(dto.getIdJugador())).thenReturn(jugadorMock);
-    when(repositorioEstadisticaMock.buscarPorPartidoYJugador(partidoMock, jugadorMock)).thenReturn(null); // Simulamos que no existe todavía (creación)
+    when(repositorioEstadisticaMock.buscarPorPartidoYJugador(partidoMock, jugadorMock))
+      .thenReturn(null); // Simulamos que no existe todavía (creación)
 
     // 2. Ejecución (When)
     servicioEstadistica.guardarEstadisticasYEnviarARevision(idPartido, datosCargados);
