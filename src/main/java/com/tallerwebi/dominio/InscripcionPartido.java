@@ -14,8 +14,8 @@ public class InscripcionPartido {
   private Partido partido;
 
   @ManyToOne
-  @JoinColumn(name = "usuario_id")
-  private Usuario usuario;
+  @JoinColumn(name = "jugador_id")
+  private Jugador jugador;
 
   @ManyToOne
   @JoinColumn(name = "equipo_id")
@@ -25,9 +25,9 @@ public class InscripcionPartido {
 
   public InscripcionPartido() {}
 
-  public InscripcionPartido(Partido partido, Usuario usuario) {
+  public InscripcionPartido(Partido partido, Jugador jugador) {
     this.partido = partido;
-    this.usuario = usuario;
+    this.jugador = jugador;
   }
 
   public Long getId() {
@@ -46,12 +46,12 @@ public class InscripcionPartido {
     this.partido = partido;
   }
 
-  public Usuario getUsuario() {
-    return usuario;
+  public Jugador getJugador() {
+    return this.jugador;
   }
 
-  public void setUsuario(Usuario usuario) {
-    this.usuario = usuario;
+  public void setJugador(Jugador jugador) {
+    this.jugador = jugador;
   }
 
   public Equipo getEquipo() {
