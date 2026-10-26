@@ -1,10 +1,15 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.DTOEstadisticaJugador;
 import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
 import java.util.List;
+
+import com.tallerwebi.dominio.repositorio.RepositorioPartido;
+import com.tallerwebi.infraestructura.RepositorioJugadorImpl;
+import com.tallerwebi.infraestructura.RepositorioPartidoImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServicioEstadisticasImpl implements ServicioEstadistica {
 
   private RepositorioEstadistica repositorioEstadisticas;
+  private RepositorioPartidoImpl repositorioPartido;
+  private RepositorioJugadorImpl repositorioJugador;
 
   public ServicioEstadisticasImpl(RepositorioEstadistica repositorioEstadistica) {
     this.repositorioEstadisticas = repositorioEstadistica;
@@ -58,5 +65,37 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
 
   private Integer valorOZero(Integer valor) {
     return valor != null ? valor : 0;
+  }
+
+  @Transactional
+  @Override
+  public void guardarEstadisticasYEnviarARevision(Long idPartido, List<DTOEstadisticaJugador> datosCargados) {
+
+    Partido partido = repositorioPartido.buscarPorId(idPartido); // Necesitamos el objeto Partido
+
+    for (DTOEstadisticaJugador dto : datosCargados) {
+      // 1. Buscamos el Jugador (asumiendo que tenés un repositorio de jugador o un método para obtenerlo por usuario/id)
+      Jugador jugador = repositorioJugador.buscarPorUsuarioId(dto.getIdJugador()); // o dto.getIdUsuario() según tu DTO
+
+      // 2. Buscamos si ya existe la estadística para este partido y este jugador
+      Estadistica estadistica = repositorioEstadisticas.buscarPorPartidoYJugador(partido, jugador);
+
+      if (estadistica == null) {
+        estadistica = new Estadistica();
+        estadistica.setPartido(partido);
+        estadistica.setJugador(jugador);
+      }
+
+      // 3. Seteamos los valores
+      estadistica.setGoles(dto.getGoles());
+      estadistica.setAmarillas(dto.getAmarillas());
+      estadistica.setRojas(dto.getRojas());
+
+      repositorioEstadisticas.guardar(estadistica);
+    }
+
+    // 4. Cambiamos el estado del partido a EN_REVISION
+    partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    repositorioPartido.guardar(partido);
   }
 }
