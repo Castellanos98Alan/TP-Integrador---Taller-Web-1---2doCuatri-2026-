@@ -30,7 +30,6 @@ public class HibernateConfig {
     if (dbUser == null) dbUser = "root";
     if (dbPassword == null) dbPassword = "";
 
-
     String url = String.format(
       "jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=America/Buenos_Aires&allowPublicKeyRetrieval=true",
       dbHost,

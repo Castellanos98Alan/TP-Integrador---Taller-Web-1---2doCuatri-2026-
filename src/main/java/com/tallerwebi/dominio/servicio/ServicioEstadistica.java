@@ -15,5 +15,8 @@ public interface ServicioEstadistica {
 
   List<Estadistica> obtenerEstadisticasPorPartido(Partido partido);
 
-  public void guardarEstadisticasYEnviarARevision(Long idPartido, List<DTOEstadisticaJugador> datosCargados);
+  public void guardarEstadisticasYEnviarARevision(
+    Long idPartido,
+    List<DTOEstadisticaJugador> datosCargados
+  );
 }

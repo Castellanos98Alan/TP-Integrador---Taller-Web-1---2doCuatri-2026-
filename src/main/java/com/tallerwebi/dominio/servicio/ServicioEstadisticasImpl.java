@@ -5,11 +5,11 @@ import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
-import java.util.List;
-
+import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.infraestructura.RepositorioJugadorImpl;
 import com.tallerwebi.infraestructura.RepositorioPartidoImpl;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,11 +18,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServicioEstadisticasImpl implements ServicioEstadistica {
 
   private RepositorioEstadistica repositorioEstadisticas;
-  private RepositorioPartidoImpl repositorioPartido;
-  private RepositorioJugadorImpl repositorioJugador;
+  private RepositorioPartido repositorioPartido;
+  private RepositorioJugador repositorioJugador;
 
-  public ServicioEstadisticasImpl(RepositorioEstadistica repositorioEstadistica) {
+  public ServicioEstadisticasImpl(
+    RepositorioEstadistica repositorioEstadistica,
+    RepositorioPartido repositorioPartido,
+    RepositorioJugador repositorioJugador
+  ) {
     this.repositorioEstadisticas = repositorioEstadistica;
+    this.repositorioPartido = repositorioPartido;
+    this.repositorioJugador = repositorioJugador;
   }
 
   @Override
@@ -69,8 +75,10 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
 
   @Transactional
   @Override
-  public void guardarEstadisticasYEnviarARevision(Long idPartido, List<DTOEstadisticaJugador> datosCargados) {
-
+  public void guardarEstadisticasYEnviarARevision(
+    Long idPartido,
+    List<DTOEstadisticaJugador> datosCargados
+  ) {
     Partido partido = repositorioPartido.buscarPorId(idPartido); // Necesitamos el objeto Partido
 
     for (DTOEstadisticaJugador dto : datosCargados) {

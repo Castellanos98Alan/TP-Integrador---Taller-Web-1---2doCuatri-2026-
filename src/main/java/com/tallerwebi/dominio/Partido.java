@@ -27,14 +27,16 @@ public class Partido {
   public enum EstadoEstadisticas {
     PENDIENTE_DE_CARGA,
     EN_REVISION,
-    CONFIRMADA
+    CONFIRMADA,
   }
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
   @Enumerated(EnumType.STRING)
   private EstadoEstadisticas estadoEstadisticas = EstadoEstadisticas.PENDIENTE_DE_CARGA;
+
   private String nivel;
   private Boolean esPrivado = false;
   private LocalDateTime fecha;
@@ -268,5 +270,3 @@ public class Partido {
     this.inscripciones = inscripciones;
   }
 }
-
-
