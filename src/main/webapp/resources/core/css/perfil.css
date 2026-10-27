@@ -907,6 +907,33 @@ a {
     font-size: 13px;
 }
 
+.nombre-jugador-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.nombre-jugador-link:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.alerta-amistad {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 15px 0;
+    font-weight: 600;
+}
+
+.alerta-amistad.exito {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.alerta-amistad.error {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
 
 /* Sobre mí + cuenta */
 
@@ -1372,6 +1399,7 @@ button.btn-cancelar {
 .form-footer .acciones {
     margin-left: auto;
 }
+
 
 
 /* ==========================================================

@@ -76,6 +76,7 @@
         }
 
 
+
         /* =========================
            HERO
            ========================= */
@@ -255,6 +256,22 @@
 
         .tercer-puesto {
             color: #bd7b3c;
+        }
+
+        .nombre-jugador-link {
+            color: rgb(11 31 24 / 0.87);
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .nombre-jugador-link:hover {
+            color: #00875a;
+        }
+
+        .nombre-jugador-link:visited {
+            color: #0b1f18;
         }
 
         .avatar {
@@ -604,41 +621,37 @@
 
                         <div class="d-flex gap-2 mt-2">
 
-                            <form
-                                    th:action="@{/amistad/aceptar}"
-                                    method="post">
+                            <form th:action="@{/amistad/aceptar}" method="post">
+                                <input type="hidden"
+                                       name="idSolicitud"
+                                       th:value="${solicitud.id}">
 
-                                <input
-                                        type="hidden"
-                                        name="idSolicitud"
-                                        th:value="${solicitud.id}">
+                                <input type="hidden"
+                                       name="volverA"
+                                       value="/ranking">
 
-                                <button
-                                        type="submit"
+                                <button type="submit"
                                         class="btn btn-success btn-sm">
-
                                     Aceptar
-
                                 </button>
-
                             </form>
 
 
-                            <form
-                                    th:action="@{/amistad/rechazar}"
-                                    method="post">
 
-                                <input
-                                        type="hidden"
-                                        name="idSolicitud"
-                                        th:value="${solicitud.id}">
+                            <form th:action="@{/amistad/rechazar}" method="post">
 
-                                <button
-                                        type="submit"
+                                <input type="hidden"
+                                       name="idSolicitud"
+                                       th:value="${solicitud.id}">
+
+                                <input type="hidden"
+                                       name="volverA"
+                                       value="/ranking">
+
+                                <button type="submit"
                                         class="btn btn-outline-danger btn-sm">
 
                                     Rechazar
-
                                 </button>
 
                             </form>
@@ -1190,7 +1203,17 @@
                                         ⚽
                                     </div>
 
-                                    <strong th:text="${jugador.nombre}">
+                                    <a th:if="${jugador.usuario != null}"
+                                       th:href="@{/perfil/{id}(id=${jugador.usuario.id})}"
+                                       class="nombre-jugador-link">
+
+                                        <strong th:text="${jugador.nombre}">
+                                            Jugador
+                                        </strong>
+                                    </a>
+
+                                    <strong th:if="${jugador.usuario == null}"
+                                            th:text="${jugador.nombre}">
                                         Jugador
                                     </strong>
 

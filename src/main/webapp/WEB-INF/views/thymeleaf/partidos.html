@@ -181,6 +181,10 @@
                                     th:action="@{/amistad/aceptar}"
                                     method="post">
 
+                                <input type="hidden"
+                                       name="volverA"
+                                       value="/partidos">
+
                                 <input
                                         type="hidden"
                                         name="idSolicitud"
@@ -200,6 +204,12 @@
                             <form
                                     th:action="@{/amistad/rechazar}"
                                     method="post">
+
+                                <input type="hidden"
+                                       name="volverA"
+                                       value="/partidos">
+
+
 
                                 <input
                                         type="hidden"

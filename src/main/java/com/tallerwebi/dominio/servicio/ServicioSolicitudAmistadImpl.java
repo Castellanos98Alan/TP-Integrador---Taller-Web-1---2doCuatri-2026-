@@ -28,6 +28,10 @@ public class ServicioSolicitudAmistadImpl implements ServicioSolicitudAmistad {
       throw new SolicitudAmistadInvalida("Ya le envio una solicitud a esta persona");
     }
 
+    if (repositorioSolicitudAmistad.sonAmigos(emisor, receptor)) {
+      throw new SolicitudAmistadInvalida("Este usuario ya es tu amigo");
+    }
+
     SolicitudAmistad solicitud = new SolicitudAmistad();
 
     solicitud.setEmisor(emisor);
@@ -66,5 +70,10 @@ public class ServicioSolicitudAmistadImpl implements ServicioSolicitudAmistad {
     solicitud.setEstado(SolicitudAmistad.EstadoSolicitud.RECHAZADA);
 
     repositorioSolicitudAmistad.modificar(solicitud);
+  }
+
+  @Override
+  public Boolean sonAmigos(Usuario usuarioLogueado, Usuario usuarioPerfil) {
+    return repositorioSolicitudAmistad.sonAmigos(usuarioLogueado, usuarioPerfil);
   }
 }

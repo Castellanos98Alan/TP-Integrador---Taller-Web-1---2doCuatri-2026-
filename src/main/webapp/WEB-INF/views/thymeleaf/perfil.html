@@ -101,21 +101,27 @@
 
                         <div class="d-flex gap-2 mt-2">
 
-                            <form
-                                    th:action="@{/amistad/aceptar}"
-                                    method="post">
+                            <form th:action="@{/amistad/aceptar}" method="post">
 
-                                <input
-                                        type="hidden"
-                                        name="idSolicitud"
-                                        th:value="${solicitud.id}">
+                                <input type="hidden"
+                                       name="idSolicitud"
+                                       th:value="${solicitud.id}">
 
-                                <button
-                                        type="submit"
+                                <!-- Si estoy en MI perfil -->
+                                <input th:if="${esMiPerfil}"
+                                       type="hidden"
+                                       name="volverA"
+                                       value="/perfil">
+
+                                <!-- Si estoy viendo OTRO perfil -->
+                                <input th:unless="${esMiPerfil}"
+                                       type="hidden"
+                                       name="volverA"
+                                       th:value="'/perfil/' + ${idUsuarioPerfil}">
+
+                                <button type="submit"
                                         class="btn btn-success btn-sm">
-
                                     Aceptar
-
                                 </button>
 
                             </form>
@@ -129,6 +135,18 @@
                                         type="hidden"
                                         name="idSolicitud"
                                         th:value="${solicitud.id}">
+
+                                <!-- Si estoy en MI perfil -->
+                                <input th:if="${esMiPerfil}"
+                                       type="hidden"
+                                       name="volverA"
+                                       value="/perfil">
+
+                                <!-- Si estoy viendo OTRO perfil -->
+                                <input th:unless="${esMiPerfil}"
+                                       type="hidden"
+                                       name="volverA"
+                                       th:value="'/perfil/' + ${idUsuarioPerfil}">
 
                                 <button
                                         type="submit"
@@ -200,6 +218,7 @@
 
 
                 <a class="avatar-camara"
+                   th:if="${esMiPerfil}"
                    th:href="@{/editar-perfil}"
                    title="Cambiar foto">
                     <i class="fa-solid fa-camera"></i>
@@ -217,9 +236,39 @@
                     </h2>
 
 
-                    <a th:href="@{/editar-perfil}" class="boton-editar-hero">
-                        <i class="fa-solid fa-pen"></i> Editar perfil
+                    <a th:if="${esMiPerfil}"
+                       th:href="@{/editar-perfil}"
+                       class="boton-editar-hero">
+                        <i class="fa-solid fa-pen"></i>
+                        Editar perfil
                     </a>
+
+                    <!-- Agregar amigo -->
+                    <form th:if="${!esMiPerfil and !sonAmigos}"
+                          th:action="@{/amistad/enviar}"
+                          method="post">
+
+                        <input type="hidden"
+                               name="idUsuario"
+                               th:value="${idUsuarioPerfil}">
+
+                        <button type="submit"
+                                class="btn btn-success">
+                            <i class="fa-solid fa-user-plus"></i>
+                            Agregar amigo
+                        </button>
+                    </form>
+
+
+                    <!-- Ya son amigos -->
+                    <button th:if="${!esMiPerfil and sonAmigos}"
+                            type="button"
+                            class="btn btn-secondary"
+                            disabled>
+
+                        <i class="fa-solid fa-user-check"></i>
+                        Amigos
+                    </button>
 
                 </div>
 
@@ -343,6 +392,7 @@
             <i class="fa-solid fa-gear"></i>Mi cuenta
         </a>
 
+    </div>
     </div>
 
 
@@ -825,6 +875,18 @@
 
             </div>
 
+        </div>
+
+        <div th:if="${mensajeAmistad != null}"
+             class="alerta-amistad exito">
+            <i class="fa-solid fa-circle-check"></i>
+            <span th:text="${mensajeAmistad}"></span>
+        </div>
+
+        <div th:if="${errorAmistad != null}"
+             class="alerta-amistad error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span th:text="${errorAmistad}"></span>
         </div>
 
 
