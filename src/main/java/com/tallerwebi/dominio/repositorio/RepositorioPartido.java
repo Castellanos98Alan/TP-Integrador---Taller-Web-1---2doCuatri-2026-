@@ -20,8 +20,11 @@ public interface RepositorioPartido {
 
   void guardar(Partido partido);
   void modificar(Partido partido);
-  List<Partido> buscarPartidosPorUsuario(Long usuarioId);
+
+  List<Partido> buscarPartidosPorJugador(Long idJugador);
+
 
 
   List<Partido> buscarPartidosEnRango(Long canchaId, LocalDateTime inicio, LocalDateTime fin);
+
 }

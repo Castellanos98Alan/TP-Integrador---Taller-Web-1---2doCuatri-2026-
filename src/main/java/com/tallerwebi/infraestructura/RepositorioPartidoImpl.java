@@ -96,16 +96,16 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
   //Este metodo lo que hace es comunicarse con la base de datos para poder ver los partidos
   //que tiene un usuario en especifico. Utilice una query para poder consultarle a la tabla intermedia
   //InscripcionPartido filtrandolo por el ID de usuario. Esto lo que devuelve es la lista de partidos
-  //asociado a las inscripciones del usuario.
+  //asociado a las inscripciones del jugador.
   @Override
-  public List<Partido> buscarPartidosPorUsuario(Long idUsuario) {
-    if (idUsuario == null) {
+  public List<Partido> buscarPartidosPorJugador(Long idJugador) {
+    if (idJugador == null) {
       return new ArrayList<>();
     }
-    String query = "SELECT i.partido FROM InscripcionPartido i WHERE i.usuario.id = :idUsuario";
+    String query = "SELECT i.partido FROM InscripcionPartido i WHERE i.jugador.id = :idJugador";
     return entityManager
       .createQuery(query, Partido.class)
-      .setParameter("idUsuario", idUsuario)
+      .setParameter("idJugador", idJugador)
       .getResultList();
   }
 

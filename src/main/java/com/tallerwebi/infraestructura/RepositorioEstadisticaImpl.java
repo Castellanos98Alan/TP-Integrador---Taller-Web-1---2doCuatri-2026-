@@ -63,4 +63,16 @@ public class RepositorioEstadisticaImpl implements RepositorioEstadistica {
       .setParameter("condicion", condicion)
       .getResultList();
   }
+
+  @Override
+  public Estadistica buscarPorPartidoYJugador(Partido partido, Jugador jugador) {
+    return (Estadistica) sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT e FROM Estadistica e WHERE e.partido = :partido AND e.jugador = :jugador"
+      )
+      .setParameter("partido", partido)
+      .setParameter("jugador", jugador)
+      .uniqueResult(); // O getSingleResult() dependiendo de la versión
+  }
 }

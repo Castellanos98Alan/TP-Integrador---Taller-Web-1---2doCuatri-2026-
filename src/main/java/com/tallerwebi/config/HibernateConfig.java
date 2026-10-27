@@ -29,7 +29,7 @@ public class HibernateConfig {
 
 
     if (dbUser == null) dbUser = "root";
-    if (dbPassword == null) dbPassword = "41005584Alan";
+    if (dbPassword == null) dbPassword = "";
 
 
     String url = String.format(

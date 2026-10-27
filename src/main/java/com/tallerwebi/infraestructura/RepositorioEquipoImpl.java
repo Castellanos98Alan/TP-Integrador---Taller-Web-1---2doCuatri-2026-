@@ -9,20 +9,20 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class RepositorioEquipoImpl implements RepositorioEquipo {
 
-    private final SessionFactory sessionFactory;
+  private final SessionFactory sessionFactory;
 
-    @Autowired
-    public RepositorioEquipoImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
+  @Autowired
+  public RepositorioEquipoImpl(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
 
-    @Override
-    public void guardar(Equipo equipo) {
-        sessionFactory.getCurrentSession().persist(equipo);
-    }
+  @Override
+  public void guardar(Equipo equipo) {
+    sessionFactory.getCurrentSession().persist(equipo);
+  }
 
-    @Override
-    public Equipo buscarPorId(Long id) {
-        return sessionFactory.getCurrentSession().get(Equipo.class, id);
-    }
+  @Override
+  public Equipo buscarPorId(Long id) {
+    return sessionFactory.getCurrentSession().get(Equipo.class, id);
+  }
 }

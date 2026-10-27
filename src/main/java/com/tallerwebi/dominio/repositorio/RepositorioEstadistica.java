@@ -18,4 +18,6 @@ public interface RepositorioEstadistica {
     Jugador jugador,
     Estadistica.CondicionJugador condicion
   );
+
+  public Estadistica buscarPorPartidoYJugador(Partido partido, Jugador jugador);
 }

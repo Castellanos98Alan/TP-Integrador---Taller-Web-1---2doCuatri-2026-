@@ -76,6 +76,7 @@ public class PerfilControllerTest {
       servicioRanking,
       servicioEstadistica
       //
+
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -357,6 +358,8 @@ public class PerfilControllerTest {
 
     verify(servicioLogin).modificar(usuario);
     verify(servicioJugador).guardar(org.mockito.ArgumentMatchers.any(Jugador.class));
+
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
 
     assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
   }

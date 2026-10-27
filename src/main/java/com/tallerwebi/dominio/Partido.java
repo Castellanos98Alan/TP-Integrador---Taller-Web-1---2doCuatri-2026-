@@ -24,9 +24,18 @@ public class Partido {
     PENDIENTE,
   }
 
+  public enum EstadoEstadisticas {
+    PENDIENTE_DE_CARGA,
+    EN_REVISION,
+    CONFIRMADA,
+  }
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @Enumerated(EnumType.STRING)
+  private EstadoEstadisticas estadoEstadisticas = EstadoEstadisticas.PENDIENTE_DE_CARGA;
 
   private String nivel;
   private Boolean esPrivado = false;
@@ -227,6 +236,14 @@ public class Partido {
 
   public void setCantJugadores(Integer cantJugadores) {
     this.cantJugadores = cantJugadores;
+  }
+
+  public EstadoEstadisticas getEstadoEstadisticas() {
+    return estadoEstadisticas;
+  }
+
+  public void setEstadoEstadisticas(EstadoEstadisticas estadoEstadisticas) {
+    this.estadoEstadisticas = estadoEstadisticas;
   }
 
   //Este metodo se refactorizo debido a que anteriormente teniamos en partido una lista de jugadoresConfirmados.

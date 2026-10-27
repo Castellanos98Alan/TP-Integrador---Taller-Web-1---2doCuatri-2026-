@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.DTOEstadisticaJugador;
 import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
@@ -13,4 +14,9 @@ public interface ServicioEstadistica {
   List<Estadistica> obtenerEstadisticasPorJugador(Jugador jugador);
 
   List<Estadistica> obtenerEstadisticasPorPartido(Partido partido);
+
+  public void guardarEstadisticasYEnviarARevision(
+    Long idPartido,
+    List<DTOEstadisticaJugador> datosCargados
+  );
 }
