@@ -55,6 +55,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
       throw new RuntimeException("La cancha ingresada no existe.");
     }
 
+    validarCanchaDisponible(cancha, datos.getFechaHora()); // NUEVO
+
     Partido partido = new Partido();
     partido.setCancha(cancha);
     partido.setFecha(datos.getFechaHora());
@@ -68,6 +70,28 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
 
     repositorioPartido.guardar(partido);
+  }
+
+  //Sprint3/4
+  // Valida la disponibilidad de la cancha considerando una duración estimada de 1 hora por partido.
+  // Se define una ventana de tiempo: 1 hora hacia atrás (minusHours(1)) y 1 hora hacia adelante (plusHours(1)).
+  // Si la consulta al repositorio devuelve al menos un partido activo en esa ventana, significa que el nuevo
+  // partido chocaría en horario, por lo que se lanza una excepción de negocio impidiendo su creación.
+  private void validarCanchaDisponible(Cancha cancha, LocalDateTime fechaHora) {
+    LocalDateTime inicioVentana = fechaHora.minusHours(1);
+    LocalDateTime finVentana = fechaHora.plusHours(1);
+
+    List<Partido> partidosEnLaCancha = repositorioPartido.buscarPartidosEnRango(
+      cancha.getId(),
+      inicioVentana,
+      finVentana
+    );
+
+    if (!partidosEnLaCancha.isEmpty()) {
+      throw new RuntimeException(
+        "La cancha no está disponible en esa franja horaria (los partidos duran 1 hora)."
+      );
+    }
   }
 
   @Override
@@ -113,6 +137,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
   //para que cada vez que lo use me traiga el partido con su lista de confirmados inicializada. Tambien hice una validacion
   //rapida para ver si el partido existe.
   //Por ultimo decidi separar las validaciones en metodos privados debido a la regla de PMD y que quede mejor organizado..
+
   @Override
   public void unirseAPartido(Long partidoId, Jugador usuarioLogueadoJugador) {
     Partido partido = buscarPartidoPorId(partidoId);
