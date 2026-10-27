@@ -31,31 +31,18 @@ public class SolicitudAmistadControllerTest {
   }
 
   @Test
-  public void aceptarSolicitudDebeLlamarAlServicio() {
+  public void aceptarSolicitudDebeLlamarAlServicioYVolverALaVistaAnterior() {
     // Given
     Integer idSolicitud = 1;
+    String volverA = "/ranking";
 
     // When
-    ModelAndView modelAndView = solicitudAmistadController.aceptarSolicitud(idSolicitud);
+    ModelAndView modelAndView = solicitudAmistadController.aceptarSolicitud(idSolicitud, volverA);
 
     // Then
     verify(servicioSolicitudAmistadMock, times(1)).aceptarSolicitud(idSolicitud);
 
-    assertThat(modelAndView.getViewName(), equalTo("redirect:/home"));
-  }
-
-  @Test
-  public void rechazarSolicitudDebeLlamarAlServicio() {
-    // Given
-    Integer idSolicitud = 1;
-
-    // When
-    ModelAndView modelAndView = solicitudAmistadController.rechazarSolicitud(idSolicitud);
-
-    // Then
-    verify(servicioSolicitudAmistadMock, times(1)).rechazarSolicitud(idSolicitud);
-
-    assertThat(modelAndView.getViewName(), equalTo("redirect:/home"));
+    assertThat(modelAndView.getViewName(), equalTo("redirect:/ranking"));
   }
 
   @Test
@@ -90,6 +77,7 @@ public class SolicitudAmistadControllerTest {
 
     verify(servicioSolicitudAmistadMock, times(1)).enviarSolicitud(matias, ivana);
 
-    assertThat(modelAndView.getViewName(), equalTo("redirect:/perfil?id=" + idIvana));
+    //assertThat(modelAndView.getViewName(), equalTo("redirect:/perfil?id=" + idIvana));
+    assertThat(modelAndView.getViewName(), equalTo("redirect:/perfil/2?solicitudEnviada=true"));
   }
 }

@@ -8,8 +8,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
+import com.tallerwebi.dominio.servicio.ServicioJugador;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -26,6 +29,8 @@ public class PartidosControllerTest {
 
   private PartidosController partidosController;
   private ServicioPartido servicioPartidoMock;
+  private ServicioJugador servicioJugadorMock;
+  private ServicioBalanceoEquipo servicioBalanceoEquipoMock;
   private HttpServletRequest requestMock;
   private HttpSession sessionMock;
   private Model modelMock;
@@ -33,7 +38,8 @@ public class PartidosControllerTest {
   @BeforeEach
   public void init() {
     servicioPartidoMock = mock(ServicioPartido.class);
-    partidosController = new PartidosController(servicioPartidoMock);
+    servicioJugadorMock = mock(ServicioJugador.class);
+    partidosController = new PartidosController(servicioPartidoMock, servicioJugadorMock);
 
     requestMock = mock(HttpServletRequest.class);
     sessionMock = mock(HttpSession.class);
@@ -157,13 +163,14 @@ public class PartidosControllerTest {
   public void unirseAlPartidoConSesionActivaDeberiaRedirigirASalaDeEspera() {
     Usuario usuario = new Usuario();
     usuario.setId(1L);
+    Jugador jugador = servicioJugadorMock.buscarPorUsuarioId(usuario.getId());
 
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
 
     ModelAndView modelAndView = partidosController.unirseAlPartido(1L, requestMock);
 
-    verify(servicioPartidoMock, times(1)).unirseAPartido(1L, usuario);
+    verify(servicioPartidoMock, times(1)).unirseAPartido(1L, jugador);
     assertThat(
       modelAndView.getViewName(),
       equalToIgnoringCase("redirect:/partido/1/sala-de-espera")
@@ -174,17 +181,18 @@ public class PartidosControllerTest {
   public void unirseAlPartidoConExcepcionDeberiaLanzarError() {
     Usuario usuario = new Usuario();
     usuario.setId(1L);
+    Jugador jugador = servicioJugadorMock.buscarPorUsuarioId(usuario.getId());
 
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
 
     doThrow(new RuntimeException("Cupo maximo alcanzado"))
       .when(servicioPartidoMock)
-      .unirseAPartido(1L, usuario);
+      .unirseAPartido(1L, jugador);
 
     ModelAndView modelAndView = partidosController.unirseAlPartido(1L, requestMock);
 
-    verify(servicioPartidoMock, times(1)).unirseAPartido(1L, usuario);
+    verify(servicioPartidoMock, times(1)).unirseAPartido(1L, jugador);
 
     assertThat(
       modelAndView.getViewName(),

@@ -24,9 +24,18 @@ public class Partido {
     PENDIENTE,
   }
 
+  public enum EstadoEstadisticas {
+    PENDIENTE_DE_CARGA,
+    EN_REVISION,
+    CONFIRMADA,
+  }
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @Enumerated(EnumType.STRING)
+  private EstadoEstadisticas estadoEstadisticas = EstadoEstadisticas.PENDIENTE_DE_CARGA;
 
   private String nivel;
   private Boolean esPrivado = false;
@@ -229,6 +238,14 @@ public class Partido {
     this.cantJugadores = cantJugadores;
   }
 
+  public EstadoEstadisticas getEstadoEstadisticas() {
+    return estadoEstadisticas;
+  }
+
+  public void setEstadoEstadisticas(EstadoEstadisticas estadoEstadisticas) {
+    this.estadoEstadisticas = estadoEstadisticas;
+  }
+
   //Este metodo se refactorizo debido a que anteriormente teniamos en partido una lista de jugadoresConfirmados.
   //Al crear la entidad intermedia InscripcionPartido cambiamos toda la logica, ahora los partidos tienen una lista
   //de Inscripciones, donde dentro estaran los jugadores.
@@ -237,8 +254,8 @@ public class Partido {
     List<Usuario> usuariosConfirmados = new ArrayList<>();
     if (this.inscripciones != null) {
       for (InscripcionPartido inscripcion : this.inscripciones) {
-        if (inscripcion.getUsuario() != null) {
-          usuariosConfirmados.add(inscripcion.getUsuario());
+        if (inscripcion.getJugador() != null) {
+          usuariosConfirmados.add(inscripcion.getJugador().getUsuario());
         }
       }
     }

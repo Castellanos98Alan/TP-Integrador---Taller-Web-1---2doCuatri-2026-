@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class InscripcionPartido {
@@ -14,8 +15,8 @@ public class InscripcionPartido {
   private Partido partido;
 
   @ManyToOne
-  @JoinColumn(name = "usuario_id")
-  private Usuario usuario;
+  @JoinColumn(name = "jugador_id")
+  private Jugador jugador;
 
   @ManyToOne
   @JoinColumn(name = "equipo_id")
@@ -23,11 +24,15 @@ public class InscripcionPartido {
 
   private Boolean confirmado = true;
 
+  private boolean esCapitan;
+
+  private LocalDateTime fechaInscripcion;
+
   public InscripcionPartido() {}
 
-  public InscripcionPartido(Partido partido, Usuario usuario) {
+  public InscripcionPartido(Partido partido, Jugador jugador) {
     this.partido = partido;
-    this.usuario = usuario;
+    this.jugador = jugador;
   }
 
   public Long getId() {
@@ -46,12 +51,12 @@ public class InscripcionPartido {
     this.partido = partido;
   }
 
-  public Usuario getUsuario() {
-    return usuario;
+  public Jugador getJugador() {
+    return this.jugador;
   }
 
-  public void setUsuario(Usuario usuario) {
-    this.usuario = usuario;
+  public void setJugador(Jugador jugador) {
+    this.jugador = jugador;
   }
 
   public Equipo getEquipo() {
@@ -68,5 +73,21 @@ public class InscripcionPartido {
 
   public void setConfirmado(Boolean confirmado) {
     this.confirmado = confirmado;
+  }
+
+  public boolean isEsCapitan() {
+    return esCapitan;
+  }
+
+  public void setEsCapitan(boolean esCapitan) {
+    this.esCapitan = esCapitan;
+  }
+
+  public LocalDateTime getFechaInscripcion() {
+    return fechaInscripcion;
+  }
+
+  public void setFechaInscripcion(LocalDateTime fechaInscripcion) {
+    this.fechaInscripcion = fechaInscripcion;
   }
 }

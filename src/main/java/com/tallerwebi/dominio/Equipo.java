@@ -29,7 +29,6 @@ public class Equipo {
   public Equipo(Long id, String nombre) {
     this.id = id;
     this.nombre = nombre;
-    //this.jugadores = jugadores;
   }
 
   public Long getId() {

@@ -3,6 +3,8 @@ package com.tallerwebi.presentacion;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,15 +12,13 @@ import static org.mockito.Mockito.when;
 import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.servicio.ServicioEstadistica;
-import com.tallerwebi.dominio.servicio.ServicioJugador;
-import com.tallerwebi.dominio.servicio.ServicioLogin;
-import com.tallerwebi.dominio.servicio.ServicioRanking;
+import com.tallerwebi.dominio.servicio.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -34,13 +34,15 @@ public class PerfilControllerTest {
     ServicioLogin servicioLogin,
     ServicioJugador servicioJugador,
     ServicioRanking servicioRanking,
-    ServicioEstadistica servicioEstadistica
+    ServicioEstadistica servicioEstadistica,
+    ServicioSolicitudAmistad servicioSolicitudAmistad
   ) {
     return new PerfilController(
       servicioLogin,
       servicioJugador,
       servicioRanking,
-      servicioEstadistica
+      servicioEstadistica,
+      servicioSolicitudAmistad
     );
   }
 
@@ -69,25 +71,46 @@ public class PerfilControllerTest {
     ServicioJugador servicioJugador = mock(ServicioJugador.class);
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
+    ServicioSolicitudAmistad servicioSolicitudAmistad = mock(ServicioSolicitudAmistad.class);
 
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
-      servicioEstadistica
-      //
+      servicioEstadistica,
+      servicioSolicitudAmistad
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpSession session = mock(HttpSession.class);
+
     Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    Jugador jugadorFalso = new Jugador();
+    jugadorFalso.setPuntos(0);
+    jugadorFalso.setNivel("D");
+
+    jugadorFalso.setUsuario(usuario);
+
+    Estadistica estadisticaFalsa = new Estadistica();
+    estadisticaFalsa.setGoles(0);
+    estadisticaFalsa.setAsistencias(0);
+    estadisticaFalsa.setAmarillas(0);
+    estadisticaFalsa.setRojas(0);
+    estadisticaFalsa.setPuntaje(0);
+
+    when(servicioEstadistica.obtenerEstadisticasGenerales(any(Jugador.class)))
+      .thenReturn(estadisticaFalsa);
+
+    when(servicioJugador.buscarPorUsuarioId(usuario.getId())).thenReturn(jugadorFalso);
 
     when(request.getSession()).thenReturn(session);
-    when(session.getAttribute(USUARIO)).thenReturn(usuario);
-
+    when(session.getAttribute("USUARIO")).thenReturn(usuario); // Asegurate de usar el literal correcto o la constante
+    when(servicioRanking.calcularNivel(0)).thenReturn("D");
     ModelAndView modelAndView = controlador.mostrarFormulario(request);
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("PERFIL")); // Ajustá a tu constante
 
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase(VISTA_PERFIL));
     assertEquals(0, modelAndView.getModel().get("puntos"));
     assertEquals("D", modelAndView.getModel().get("nivel"));
   }
@@ -98,12 +121,13 @@ public class PerfilControllerTest {
     ServicioJugador servicioJugador = mock(ServicioJugador.class);
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
-
+    ServicioSolicitudAmistad servicioSolicitudAmistad = mock(ServicioSolicitudAmistad.class);
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
-      servicioEstadistica
+      servicioEstadistica,
+      servicioSolicitudAmistad
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -134,12 +158,13 @@ public class PerfilControllerTest {
     ServicioJugador servicioJugador = mock(ServicioJugador.class);
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
-
+    ServicioSolicitudAmistad servicioSolicitudAmistad = mock(ServicioSolicitudAmistad.class);
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
-      servicioEstadistica
+      servicioEstadistica,
+      servicioSolicitudAmistad
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -180,12 +205,13 @@ public class PerfilControllerTest {
     ServicioJugador servicioJugador = mock(ServicioJugador.class);
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
-
+    ServicioSolicitudAmistad servicioSolicitudAmistad = mock(ServicioSolicitudAmistad.class);
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
-      servicioEstadistica
+      servicioEstadistica,
+      servicioSolicitudAmistad
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -204,12 +230,13 @@ public class PerfilControllerTest {
     ServicioJugador servicioJugador = mock(ServicioJugador.class);
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
-
+    ServicioSolicitudAmistad servicioSolicitudAmistad = mock(ServicioSolicitudAmistad.class);
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
-      servicioEstadistica
+      servicioEstadistica,
+      servicioSolicitudAmistad
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -230,12 +257,13 @@ public class PerfilControllerTest {
     ServicioJugador servicioJugador = mock(ServicioJugador.class);
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
-
+    ServicioSolicitudAmistad servicioSolicitudAmistad = mock(ServicioSolicitudAmistad.class);
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
-      servicioEstadistica
+      servicioEstadistica,
+      servicioSolicitudAmistad
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -254,12 +282,13 @@ public class PerfilControllerTest {
     ServicioJugador servicioJugador = mock(ServicioJugador.class);
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
-
+    ServicioSolicitudAmistad servicioSolicitudAmistad = mock(ServicioSolicitudAmistad.class);
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
-      servicioEstadistica
+      servicioEstadistica,
+      servicioSolicitudAmistad
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -299,12 +328,13 @@ public class PerfilControllerTest {
     ServicioJugador servicioJugador = mock(ServicioJugador.class);
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
-
+    ServicioSolicitudAmistad servicioSolicitudAmistad = mock(ServicioSolicitudAmistad.class);
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
-      servicioEstadistica
+      servicioEstadistica,
+      servicioSolicitudAmistad
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -330,12 +360,13 @@ public class PerfilControllerTest {
     ServicioJugador servicioJugador = mock(ServicioJugador.class);
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
-
+    ServicioSolicitudAmistad servicioSolicitudAmistad = mock(ServicioSolicitudAmistad.class);
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
-      servicioEstadistica
+      servicioEstadistica,
+      servicioSolicitudAmistad
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -359,6 +390,8 @@ public class PerfilControllerTest {
     verify(servicioJugador).guardar(org.mockito.ArgumentMatchers.any(Jugador.class));
 
     assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
+
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
   }
 
   @Test
@@ -367,12 +400,13 @@ public class PerfilControllerTest {
     ServicioJugador servicioJugador = mock(ServicioJugador.class);
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
-
+    ServicioSolicitudAmistad servicioSolicitudAmistad = mock(ServicioSolicitudAmistad.class);
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
       servicioRanking,
-      servicioEstadistica
+      servicioEstadistica,
+      servicioSolicitudAmistad
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);

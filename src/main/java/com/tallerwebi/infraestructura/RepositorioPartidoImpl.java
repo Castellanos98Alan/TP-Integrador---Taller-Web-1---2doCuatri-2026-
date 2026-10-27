@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
+import java.time.LocalDateTime; // NUEVO
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,16 +96,38 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
   //Este metodo lo que hace es comunicarse con la base de datos para poder ver los partidos
   //que tiene un usuario en especifico. Utilice una query para poder consultarle a la tabla intermedia
   //InscripcionPartido filtrandolo por el ID de usuario. Esto lo que devuelve es la lista de partidos
-  //asociado a las inscripciones del usuario.
+  //asociado a las inscripciones del jugador.
   @Override
-  public List<Partido> buscarPartidosPorUsuario(Long idUsuario) {
-    if (idUsuario == null) {
+  public List<Partido> buscarPartidosPorJugador(Long idJugador) {
+    if (idJugador == null) {
       return new ArrayList<>();
     }
-    String query = "SELECT i.partido FROM InscripcionPartido i WHERE i.usuario.id = :idUsuario";
+    String query = "SELECT i.partido FROM InscripcionPartido i WHERE i.jugador.id = :idJugador";
     return entityManager
       .createQuery(query, Partido.class)
-      .setParameter("idUsuario", idUsuario)
+      .setParameter("idJugador", idJugador)
+      .getResultList();
+  }
+
+  @Override
+  public List<Partido> buscarPartidosEnRango(
+    Long canchaId,
+    LocalDateTime inicio,
+    LocalDateTime fin
+  ) {
+    String query =
+      "select p from Partido p where p.cancha.id = :canchaId " +
+      "and p.fecha > :inicio and p.fecha < :fin " +
+      "and p.estado <> :finalizado and p.estado <> :cancelado";
+
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(query, Partido.class)
+      .setParameter("canchaId", canchaId)
+      .setParameter("inicio", inicio)
+      .setParameter("fin", fin)
+      .setParameter("finalizado", Partido.EstadoPartido.FINALIZADO)
+      .setParameter("cancelado", Partido.EstadoPartido.CANCELADO)
       .getResultList();
   }
 

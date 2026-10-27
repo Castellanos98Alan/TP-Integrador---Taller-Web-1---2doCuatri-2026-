@@ -1,8 +1,11 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.Cancha;
+import com.tallerwebi.dominio.Equipo;
 import com.tallerwebi.dominio.InscripcionPartido;
+import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
+import com.tallerwebi.dominio.Partido.EstadoPartido;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
@@ -21,17 +24,23 @@ public class ServicioPartidoImpl implements ServicioPartido {
   private final RepositorioPartido repositorioPartido;
   private final RepositorioCancha repositorioCancha;
   private final RepositorioUsuario repositorioUsuario;
+  private ServicioJugador servicioJugador;
+  private final ServicioBalanceoEquipo servicioBalanceoEquipo;
   private static final int HORAS_MINIMAS_ENTRE_PARTIDOS = 3;
 
   @Autowired
   public ServicioPartidoImpl(
     RepositorioPartido repositorioPartido,
     RepositorioCancha repositorioCancha,
-    RepositorioUsuario repositorioUsuario
+    RepositorioUsuario repositorioUsuario,
+    ServicioJugador servicioJugador,
+    ServicioBalanceoEquipo servicioBalanceoEquipo
   ) {
     this.repositorioCancha = repositorioCancha;
     this.repositorioPartido = repositorioPartido;
     this.repositorioUsuario = repositorioUsuario;
+    this.servicioJugador = servicioJugador;
+    this.servicioBalanceoEquipo = servicioBalanceoEquipo;
   }
 
   //spint 2
@@ -49,6 +58,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
       throw new RuntimeException("La cancha ingresada no existe.");
     }
 
+    validarCanchaDisponible(cancha, datos.getFechaHora()); // NUEVO
+
     Partido partido = new Partido();
     partido.setCancha(cancha);
     partido.setFecha(datos.getFechaHora());
@@ -62,6 +73,28 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
 
     repositorioPartido.guardar(partido);
+  }
+
+  //Sprint3/4
+  // Valida la disponibilidad de la cancha considerando una duración estimada de 1 hora por partido.
+  // Se define una ventana de tiempo: 1 hora hacia atrás (minusHours(1)) y 1 hora hacia adelante (plusHours(1)).
+  // Si la consulta al repositorio devuelve al menos un partido activo en esa ventana, significa que el nuevo
+  // partido chocaría en horario, por lo que se lanza una excepción de negocio impidiendo su creación.
+  private void validarCanchaDisponible(Cancha cancha, LocalDateTime fechaHora) {
+    LocalDateTime inicioVentana = fechaHora.minusHours(1);
+    LocalDateTime finVentana = fechaHora.plusHours(1);
+
+    List<Partido> partidosEnLaCancha = repositorioPartido.buscarPartidosEnRango(
+      cancha.getId(),
+      inicioVentana,
+      finVentana
+    );
+
+    if (!partidosEnLaCancha.isEmpty()) {
+      throw new RuntimeException(
+        "La cancha no está disponible en esa franja horaria (los partidos duran 1 hora)."
+      );
+    }
   }
 
   @Override
@@ -106,9 +139,10 @@ public class ServicioPartidoImpl implements ServicioPartido {
   //Primero utilice directamente el metodo buscarPartidoPorId en lugar de usar el repositorioPartido directamente
   //para que cada vez que lo use me traiga el partido con su lista de confirmados inicializada. Tambien hice una validacion
   //rapida para ver si el partido existe.
-  //Por ultimo decidi separar las validaciones en metodos privados debido a la regla de PMD y que quede mejor organizado.
+  //Por ultimo decidi separar las validaciones en metodos privados debido a la regla de PMD y que quede mejor organizado..
+
   @Override
-  public void unirseAPartido(Long partidoId, Usuario usuarioLogueado) {
+  public void unirseAPartido(Long partidoId, Jugador usuarioLogueadoJugador) {
     Partido partido = buscarPartidoPorId(partidoId);
 
     if (partido == null) {
@@ -116,12 +150,23 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
 
     validarEstadoDelPartido(partido);
-    validarCuposYDisponibilidad(partido, usuarioLogueado);
-    validarHorarioParaInscripcion(partido, usuarioLogueado);
+    validarCuposYDisponibilidad(partido, usuarioLogueadoJugador);
+    validarHorarioParaInscripcion(partido, usuarioLogueadoJugador);
 
-    InscripcionPartido nuevaInscripcion = new InscripcionPartido(partido, usuarioLogueado);
+    InscripcionPartido nuevaInscripcion = new InscripcionPartido(partido, usuarioLogueadoJugador);
+
+    nuevaInscripcion.setFechaInscripcion(LocalDateTime.now());
+
     partido.getInscripciones().add(nuevaInscripcion);
     partido.setCantJugadores(partido.getInscripciones().size());
+
+    // Disparador del balanceo automático
+    int cupoMaximo = partido.getCupoMaximo();
+    if (partido.getCantJugadores() == cupoMaximo) {
+      servicioBalanceoEquipo.balancearEquipos(partido);
+      servicioBalanceoEquipo.asignarCapitanes(partido);
+      partido.setEstado(EstadoPartido.ACTIVO);
+    }
 
     repositorioPartido.modificar(partido);
   }
@@ -142,7 +187,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
   //confirmados, si es asi significa que el usuario ya esta dentro de la sala de espera.
   //Por ultimo valido que el partido tenga un cupo maximo de jugadores, para luego validar si los usuarios anotados supera el
   //cupo maximo de jugadores
-  private void validarCuposYDisponibilidad(Partido partido, Usuario usuarioLogueado) {
+  private void validarCuposYDisponibilidad(Partido partido, Jugador usuarioLogueadoJugador) {
     if (partido.getInscripciones() == null) {
       partido.setInscripciones(new ArrayList<>());
     }
@@ -150,7 +195,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
     boolean inscripto = partido
       .getInscripciones()
       .stream()
-      .anyMatch(i -> i.getUsuario().equals(usuarioLogueado));
+      .anyMatch(i -> i.getJugador().equals(usuarioLogueadoJugador));
 
     if (inscripto) {
       throw new RuntimeException("Ya estas anotado en la sala de espera de este partido.");
@@ -198,9 +243,9 @@ public class ServicioPartidoImpl implements ServicioPartido {
   //Este metodo sirve para poder validar el horario para que el usuario pueda inscribirse, en este metodo
   //buscamos directamente los partidos del usuario, donde mandaremos todos los datos al momento de utilizar
   //validarDiferenciaHoraria para que haga la comparacion de las fechas.
-  private void validarHorarioParaInscripcion(Partido partidoNuevo, Usuario usuarioLogueado) {
-    List<Partido> partidosUsuario = repositorioPartido.buscarPartidosPorUsuario(
-      usuarioLogueado.getId()
+  private void validarHorarioParaInscripcion(Partido partidoNuevo, Jugador usuarioLogueadoJugador) {
+    List<Partido> partidosUsuarioJugador = repositorioPartido.buscarPartidosPorJugador(
+      usuarioLogueadoJugador.getId()
     );
     LocalDateTime fechaHoraNuevoPartido = partidoNuevo.getFecha();
 
@@ -208,7 +253,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
       return;
     }
 
-    for (Partido partidoExistente : partidosUsuario) {
+    for (Partido partidoExistente : partidosUsuarioJugador) {
       validarDiferenciaHoraria(partidoExistente.getFecha(), fechaHoraNuevoPartido);
     }
   }
