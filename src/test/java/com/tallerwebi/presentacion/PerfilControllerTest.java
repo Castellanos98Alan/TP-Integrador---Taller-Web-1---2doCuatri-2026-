@@ -3,6 +3,8 @@ package com.tallerwebi.presentacion;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -69,6 +72,7 @@ public class PerfilControllerTest {
     ServicioRanking servicioRanking = mock(ServicioRanking.class);
     ServicioEstadistica servicioEstadistica = mock(ServicioEstadistica.class);
     ServicioSolicitudAmistad servicioSolicitudAmistad = mock(ServicioSolicitudAmistad.class);
+
     PerfilController controlador = crearControlador(
       servicioLogin,
       servicioJugador,
@@ -79,14 +83,34 @@ public class PerfilControllerTest {
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpSession session = mock(HttpSession.class);
+
     Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    Jugador jugadorFalso = new Jugador();
+    jugadorFalso.setPuntos(0);
+    jugadorFalso.setNivel("D");
+
+    jugadorFalso.setUsuario(usuario);
+
+    Estadistica estadisticaFalsa = new Estadistica();
+    estadisticaFalsa.setGoles(0);
+    estadisticaFalsa.setAsistencias(0);
+    estadisticaFalsa.setAmarillas(0);
+    estadisticaFalsa.setRojas(0);
+    estadisticaFalsa.setPuntaje(0);
+
+    when(servicioEstadistica.obtenerEstadisticasGenerales(any(Jugador.class)))
+      .thenReturn(estadisticaFalsa);
+
+    when(servicioJugador.buscarPorUsuarioId(usuario.getId())).thenReturn(jugadorFalso);
 
     when(request.getSession()).thenReturn(session);
-    when(session.getAttribute(USUARIO)).thenReturn(usuario);
-
+    when(session.getAttribute("USUARIO")).thenReturn(usuario); // Asegurate de usar el literal correcto o la constante
+    when(servicioRanking.calcularNivel(0)).thenReturn("D");
     ModelAndView modelAndView = controlador.mostrarFormulario(request);
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("PERFIL")); // Ajustá a tu constante
 
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase(VISTA_PERFIL));
     assertEquals(0, modelAndView.getModel().get("puntos"));
     assertEquals("D", modelAndView.getModel().get("nivel"));
   }

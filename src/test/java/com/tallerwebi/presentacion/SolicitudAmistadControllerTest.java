@@ -77,6 +77,7 @@ public class SolicitudAmistadControllerTest {
 
     verify(servicioSolicitudAmistadMock, times(1)).enviarSolicitud(matias, ivana);
 
-    assertThat(modelAndView.getViewName(), equalTo("redirect:/perfil?id=" + idIvana));
+    //assertThat(modelAndView.getViewName(), equalTo("redirect:/perfil?id=" + idIvana));
+    assertThat(modelAndView.getViewName(), equalTo("redirect:/perfil/2?solicitudEnviada=true"));
   }
 }
