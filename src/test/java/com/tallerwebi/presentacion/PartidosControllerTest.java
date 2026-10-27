@@ -11,6 +11,7 @@ import static org.mockito.Mockito.*;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
 import com.tallerwebi.dominio.servicio.ServicioJugador;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +30,7 @@ public class PartidosControllerTest {
   private PartidosController partidosController;
   private ServicioPartido servicioPartidoMock;
   private ServicioJugador servicioJugadorMock;
+  private ServicioBalanceoEquipo servicioBalanceoEquipoMock;
   private HttpServletRequest requestMock;
   private HttpSession sessionMock;
   private Model modelMock;

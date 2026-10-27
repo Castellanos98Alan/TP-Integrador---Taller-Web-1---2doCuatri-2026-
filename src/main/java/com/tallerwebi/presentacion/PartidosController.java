@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
 import com.tallerwebi.dominio.servicio.ServicioJugador;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
 import jakarta.servlet.http.HttpServletRequest;
@@ -189,7 +190,9 @@ public class PartidosController {
 
     try {
       Jugador jugadorLogueado = servicioJugador.buscarPorUsuarioId(usuarioLogueado.getId());
+
       servicioPartido.unirseAPartido(idPartido, jugadorLogueado);
+
       return new ModelAndView("redirect:/partido/" + idPartido + "/sala-de-espera");
     } catch (Exception e) {
       Map<String, Object> model = new ModelMap();

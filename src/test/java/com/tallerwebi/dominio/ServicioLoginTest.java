@@ -90,7 +90,7 @@ public class ServicioLoginTest {
           jugador != null &&
           "Juan".equals(jugador.getNombre()) &&
           "Defensor".equals(jugador.getPosicion1()) &&
-          "Principiante".equals(jugador.getNivel()) &&
+          "D".equals(jugador.getNivel()) &&
           jugador.getUsuario() == usuario
         )
       );
