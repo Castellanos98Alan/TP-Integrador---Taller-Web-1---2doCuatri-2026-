@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class InscripcionPartido {
@@ -22,6 +23,10 @@ public class InscripcionPartido {
   private Equipo equipo;
 
   private Boolean confirmado = true;
+
+  private boolean esCapitan;
+
+  private LocalDateTime fechaInscripcion;
 
   public InscripcionPartido() {}
 
@@ -68,5 +73,21 @@ public class InscripcionPartido {
 
   public void setConfirmado(Boolean confirmado) {
     this.confirmado = confirmado;
+  }
+
+  public boolean isEsCapitan() {
+    return esCapitan;
+  }
+
+  public void setEsCapitan(boolean esCapitan) {
+    this.esCapitan = esCapitan;
+  }
+
+  public LocalDateTime getFechaInscripcion() {
+    return fechaInscripcion;
+  }
+
+  public void setFechaInscripcion(LocalDateTime fechaInscripcion) {
+    this.fechaInscripcion = fechaInscripcion;
   }
 }

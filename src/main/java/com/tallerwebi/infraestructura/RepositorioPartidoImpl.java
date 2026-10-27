@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
+import java.time.LocalDateTime; // NUEVO
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,6 +106,29 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
     return entityManager
       .createQuery(query, Partido.class)
       .setParameter("idJugador", idJugador)
+      .getResultList();
+  }
+
+
+  @Override
+  public List<Partido> buscarPartidosEnRango(
+    Long canchaId,
+    LocalDateTime inicio,
+    LocalDateTime fin
+  ) {
+    String query =
+      "select p from Partido p where p.cancha.id = :canchaId " +
+      "and p.fecha > :inicio and p.fecha < :fin " +
+      "and p.estado <> :finalizado and p.estado <> :cancelado";
+
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(query, Partido.class)
+      .setParameter("canchaId", canchaId)
+      .setParameter("inicio", inicio)
+      .setParameter("fin", fin)
+      .setParameter("finalizado", Partido.EstadoPartido.FINALIZADO)
+      .setParameter("cancelado", Partido.EstadoPartido.CANCELADO)
       .getResultList();
   }
 
