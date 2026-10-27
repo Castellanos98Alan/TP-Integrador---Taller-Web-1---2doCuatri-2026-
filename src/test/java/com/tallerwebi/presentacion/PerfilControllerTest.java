@@ -366,6 +366,8 @@ public class PerfilControllerTest {
     verify(servicioJugador).guardar(org.mockito.ArgumentMatchers.any(Jugador.class));
 
     assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
+
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
   }
 
   @Test

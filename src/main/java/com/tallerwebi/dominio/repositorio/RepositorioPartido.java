@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio.repositorio;
 
 import com.tallerwebi.dominio.Partido;
+import java.time.LocalDateTime; // NUEVO
 import java.util.List;
 
 public interface RepositorioPartido {
@@ -17,5 +18,8 @@ public interface RepositorioPartido {
 
   void guardar(Partido partido);
   void modificar(Partido partido);
-  List<Partido> buscarPartidosPorUsuario(Long usuarioId);
+
+  List<Partido> buscarPartidosPorJugador(Long idJugador);
+
+  List<Partido> buscarPartidosEnRango(Long canchaId, LocalDateTime inicio, LocalDateTime fin);
 }

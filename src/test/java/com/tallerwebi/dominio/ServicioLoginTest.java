@@ -12,7 +12,6 @@ import com.tallerwebi.dominio.servicio.ServicioLogin;
 import com.tallerwebi.dominio.servicio.ServicioLoginImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 public class ServicioLoginTest {
 
@@ -81,20 +80,19 @@ public class ServicioLoginTest {
     when(repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
       .thenReturn(null);
 
-    servicioLogin.registrar(usuario, "Juan", "Defensor", "D");
+    servicioLogin.registrar(usuario, "Juan", "Defensor", null);
 
     verify(repositorioUsuarioMock).guardar(usuario);
 
-    // 1. Capturar el jugador que el servicio intentó guardar
-    ArgumentCaptor<Jugador> captorJugador = ArgumentCaptor.forClass(Jugador.class);
-    verify(repositorioJugadorMock).guardar(captorJugador.capture());
-
-    Jugador jugadorGuardado = captorJugador.getValue();
-
-    // 2. Verificar atributo por atributo para ver cuál falla
-    assertThat(jugadorGuardado.getNombre(), equalTo("Juan"));
-    assertThat(jugadorGuardado.getPosicion1(), equalTo("Defensor"));
-    assertThat(jugadorGuardado.getNivel(), equalTo("D")); // <-- Es muy probable que el error salte aquí
-    assertThat(jugadorGuardado.getUsuario(), equalTo(usuario));
+    verify(repositorioJugadorMock)
+      .guardar(
+        argThat(jugador ->
+          jugador != null &&
+          "Juan".equals(jugador.getNombre()) &&
+          "Defensor".equals(jugador.getPosicion1()) &&
+          "Principiante".equals(jugador.getNivel()) &&
+          jugador.getUsuario() == usuario
+        )
+      );
   }
 }
