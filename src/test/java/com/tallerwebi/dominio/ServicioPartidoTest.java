@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
+import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
 import com.tallerwebi.dominio.servicio.ServicioJugador;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
 import com.tallerwebi.dominio.servicio.ServicioPartidoImpl;
@@ -29,6 +30,7 @@ public class ServicioPartidoTest {
   private RepositorioPartido repositorioPartidoMock;
   private RepositorioCancha repositorioCanchaMock;
   private RepositorioUsuario repositorioUsuarioMock;
+  private ServicioBalanceoEquipo servicioBalanceoEquipoMock;
 
   private static final String FILTRO_TODOS = "TODOS";
 
@@ -41,13 +43,15 @@ public class ServicioPartidoTest {
     repositorioUsuarioMock = mock(RepositorioUsuario.class);
     repositorioCanchaMock = mock(RepositorioCancha.class);
     servicioJugadorMock = mock(ServicioJugador.class);
+    servicioBalanceoEquipoMock = mock(ServicioBalanceoEquipo.class);
 
     servicioPartido =
       new ServicioPartidoImpl(
         repositorioPartidoMock,
         repositorioCanchaMock,
         repositorioUsuarioMock,
-        servicioJugadorMock
+        servicioJugadorMock,
+        servicioBalanceoEquipoMock
       );
   }
 
@@ -544,7 +548,7 @@ public class ServicioPartidoTest {
     partido.setInscripciones(inscripciones);
 
     // 2. Ejecución de la lógica (When)
-    servicioPartido.balancearEquipos(partido);
+    servicioBalanceoEquipoMock.balancearEquipos(partido);
 
     // 3. Verificaciones (Then)
     List<InscripcionPartido> inscripcionesOrdenadas = partido.getInscripciones();
@@ -612,7 +616,7 @@ public class ServicioPartidoTest {
     Collections.shuffle(inscripciones);
     partido.setInscripciones(inscripciones);
 
-    servicioPartido.balancearEquipos(partido);
+    servicioBalanceoEquipoMock.balancearEquipos(partido);
 
     List<InscripcionPartido> inscripcionesOrdenadas = partido.getInscripciones();
 
@@ -680,7 +684,7 @@ public class ServicioPartidoTest {
     Collections.shuffle(inscripciones);
     partido.setInscripciones(inscripciones);
 
-    servicioPartido.balancearEquipos(partido);
+    servicioBalanceoEquipoMock.balancearEquipos(partido);
 
     List<InscripcionPartido> inscripcionesOrdenadas = partido.getInscripciones();
 
@@ -756,14 +760,16 @@ public class ServicioPartidoTest {
 
     // Spy del servicio para comprobar si se invoca el balanceo
     ServicioPartido servicioSpy = spy(servicioPartido);
+    ServicioBalanceoEquipo servicioSpy2 = spy(servicioBalanceoEquipoMock);
 
     // When
     servicioSpy.unirseAPartido(partidoId, nuevoJugador);
 
     // Then: el balanceo no debe ejecutarse
-    verify(servicioSpy, never()).balancearEquipos(any(Partido.class));
+    verify(servicioSpy2, never()).balancearEquipos(any(Partido.class));
   }
- //Test  deberiaElegirLaDivisionConMenorDiferenciaDePuntos
+
+  //Test  deberiaElegirLaDivisionConMenorDiferenciaDePuntos
   @Test
   public void deberiaElegirLaDivisionConMenorDiferenciaDePuntos() {}
   //  @Test

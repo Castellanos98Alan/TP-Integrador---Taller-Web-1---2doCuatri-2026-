@@ -109,7 +109,6 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       .getResultList();
   }
 
-
   @Override
   public List<Partido> buscarPartidosEnRango(
     Long canchaId,
