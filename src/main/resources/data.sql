@@ -5,7 +5,6 @@ WHERE NOT EXISTS (
     SELECT 1 FROM Usuario WHERE email = 'test@unlam.edu.ar'
 );
 
-
 INSERT INTO Cancha(id, nombre, localidad)
 VALUES(null, 'Cancha Los Leones', 'San Justo');
 INSERT INTO Cancha(id, nombre, localidad)

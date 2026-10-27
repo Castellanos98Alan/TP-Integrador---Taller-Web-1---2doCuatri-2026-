@@ -25,6 +25,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
   private final RepositorioCancha repositorioCancha;
   private final RepositorioUsuario repositorioUsuario;
   private ServicioJugador servicioJugador;
+  private final ServicioBalanceoEquipo servicioBalanceoEquipo;
   private static final int HORAS_MINIMAS_ENTRE_PARTIDOS = 3;
 
   @Autowired
@@ -32,12 +33,14 @@ public class ServicioPartidoImpl implements ServicioPartido {
     RepositorioPartido repositorioPartido,
     RepositorioCancha repositorioCancha,
     RepositorioUsuario repositorioUsuario,
-    ServicioJugador servicioJugador
+    ServicioJugador servicioJugador,
+    ServicioBalanceoEquipo servicioBalanceoEquipo
   ) {
     this.repositorioCancha = repositorioCancha;
     this.repositorioPartido = repositorioPartido;
     this.repositorioUsuario = repositorioUsuario;
     this.servicioJugador = servicioJugador;
+    this.servicioBalanceoEquipo = servicioBalanceoEquipo;
   }
 
   //spint 2
@@ -160,8 +163,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
     // Disparador del balanceo automático
     int cupoMaximo = partido.getCupoMaximo();
     if (partido.getCantJugadores() == cupoMaximo) {
-      balancearEquipos(partido);
-      asignarCapitanes(partido);
+      servicioBalanceoEquipo.balancearEquipos(partido);
+      servicioBalanceoEquipo.asignarCapitanes(partido);
       partido.setEstado(EstadoPartido.ACTIVO);
     }
 
@@ -386,85 +389,4 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
     return new ArrayList<>(cuposUnicos);
   }
-
-  @Override
-  public void balancearEquipos(Partido partido) {
-    List<InscripcionPartido> inscripciones = partido.getInscripciones();
-
-    // Ordenar de mayor a menor segun puntos del jugador
-    inscripciones.sort((i1, i2) ->
-      Integer.compare(i2.getJugador().getPuntos(), i1.getJugador().getPuntos())
-    );
-
-    Equipo equipoLocal = partido.getEquipo1();
-    Equipo equipoVisitante = partido.getEquipo2();
-
-    // Reparto Snake Draft: los índices 0, 3, 4, 7, 8 van al Local
-    for (int i = 0; i < inscripciones.size(); i++) {
-      InscripcionPartido inscripcion = inscripciones.get(i);
-
-      if (i % 4 == 0 || i % 4 == 3) {
-        inscripcion.setEquipo(equipoLocal);
-      } else {
-        inscripcion.setEquipo(equipoVisitante);
-      }
-    }
-  }
-    @Override
-    public void asignarCapitanes(Partido partido) {
-      List<InscripcionPartido> inscripciones = partido.getInscripciones();
-
-      for (InscripcionPartido inscripcion : inscripciones) {
-        inscripcion.setEsCapitan(false);
-      }
-
-      InscripcionPartido capitanEquipo1 = elegirCapitan(inscripciones, partido.getEquipo1());
-
-      InscripcionPartido capitanEquipo2 = elegirCapitan(inscripciones, partido.getEquipo2());
-
-      if (capitanEquipo1 != null) {
-        capitanEquipo1.setEsCapitan(true);
-      }
-
-      if (capitanEquipo2 != null) {
-        capitanEquipo2.setEsCapitan(true);
-      }
-    }
-
-    private InscripcionPartido elegirCapitan(List<InscripcionPartido> inscripciones, Equipo equipo) {
-      InscripcionPartido mejorCandidato = null;
-
-      for (InscripcionPartido inscripcion : inscripciones) {
-        if (
-          Objects.equals(inscripcion.getEquipo(), equipo) &&
-          esMejorCandidato(inscripcion, mejorCandidato)
-        ) {
-          mejorCandidato = inscripcion;
-        }
-      }
-
-      return mejorCandidato;
-    }
-
-    private boolean esMejorCandidato(InscripcionPartido candidato, InscripcionPartido actual) {
-      if (actual == null) {
-        return true;
-      }
-
-      int puntosCandidato = candidato.getJugador().getPuntos();
-      int puntosActual = actual.getJugador().getPuntos();
-
-      if (puntosCandidato != puntosActual) {
-        return puntosCandidato > puntosActual;
-      }
-
-      LocalDateTime fechaCandidato = candidato.getFechaInscripcion();
-      LocalDateTime fechaActual = actual.getFechaInscripcion();
-
-      if (fechaCandidato == null) {
-        return false;
-      }
-
-      return fechaActual == null || fechaCandidato.isBefore(fechaActual);
-    }
 }
