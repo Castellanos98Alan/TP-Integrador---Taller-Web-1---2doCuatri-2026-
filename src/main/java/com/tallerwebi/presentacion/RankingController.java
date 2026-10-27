@@ -1,7 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.Jugador;
-import com.tallerwebi.dominio.ServicioRanking;
+import com.tallerwebi.dominio.servicio.ServicioRanking;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;

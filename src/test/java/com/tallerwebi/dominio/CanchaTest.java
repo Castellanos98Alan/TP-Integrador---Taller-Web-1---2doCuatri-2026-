@@ -20,6 +20,16 @@ public class CanchaTest {
   }
 
   @Test
+  public void queSePuedanAsignarYObtenerProvinciaYLocalidad() {
+    Cancha cancha = new Cancha();
+    cancha.setProvincia("Buenos Aires");
+    cancha.setLocalidad("La Matanza");
+
+    assertThat(cancha.getProvincia(), equalTo("Buenos Aires"));
+    assertThat(cancha.getLocalidad(), equalTo("La Matanza"));
+  }
+
+  @Test
   public void queSePuedanAsignarYObtenerValoresConSettersYGetters() {
     // Preparación
     Cancha cancha = new Cancha();

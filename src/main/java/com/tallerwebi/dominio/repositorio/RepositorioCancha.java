@@ -1,5 +1,6 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.repositorio;
 
+import com.tallerwebi.dominio.Cancha;
 import java.util.List;
 
 public interface RepositorioCancha {

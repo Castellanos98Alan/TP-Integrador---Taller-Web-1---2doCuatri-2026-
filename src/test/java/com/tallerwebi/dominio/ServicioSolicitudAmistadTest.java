@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.excepcion.SolicitudAmistadInvalida;
+import com.tallerwebi.dominio.repositorio.RepositorioSolicitudAmistad;
+import com.tallerwebi.dominio.servicio.ServicioSolicitudAmistad;
+import com.tallerwebi.dominio.servicio.ServicioSolicitudAmistadImpl;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

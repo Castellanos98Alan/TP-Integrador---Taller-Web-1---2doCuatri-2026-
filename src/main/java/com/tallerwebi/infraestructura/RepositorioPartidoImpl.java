@@ -1,10 +1,13 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.RepositorioPartido;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.repositorio.RepositorioPartido;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
+import java.time.LocalDateTime; // NUEVO
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -15,6 +18,9 @@ import org.springframework.stereotype.Repository;
 public class RepositorioPartidoImpl implements RepositorioPartido {
 
   private SessionFactory sessionFactory;
+
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Autowired
   public RepositorioPartidoImpl(SessionFactory sessionFactory) {
@@ -85,6 +91,45 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
   @Override
   public void modificar(Partido partido) {
     sessionFactory.getCurrentSession().merge(partido);
+  }
+
+  //Este metodo lo que hace es comunicarse con la base de datos para poder ver los partidos
+  //que tiene un usuario en especifico. Utilice una query para poder consultarle a la tabla intermedia
+  //InscripcionPartido filtrandolo por el ID de usuario. Esto lo que devuelve es la lista de partidos
+  //asociado a las inscripciones del jugador.
+  @Override
+  public List<Partido> buscarPartidosPorJugador(Long idJugador) {
+    if (idJugador == null) {
+      return new ArrayList<>();
+    }
+    String query = "SELECT i.partido FROM InscripcionPartido i WHERE i.jugador.id = :idJugador";
+    return entityManager
+      .createQuery(query, Partido.class)
+      .setParameter("idJugador", idJugador)
+      .getResultList();
+  }
+
+
+  @Override
+  public List<Partido> buscarPartidosEnRango(
+    Long canchaId,
+    LocalDateTime inicio,
+    LocalDateTime fin
+  ) {
+    String query =
+      "select p from Partido p where p.cancha.id = :canchaId " +
+      "and p.fecha > :inicio and p.fecha < :fin " +
+      "and p.estado <> :finalizado and p.estado <> :cancelado";
+
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(query, Partido.class)
+      .setParameter("canchaId", canchaId)
+      .setParameter("inicio", inicio)
+      .setParameter("fin", fin)
+      .setParameter("finalizado", Partido.EstadoPartido.FINALIZADO)
+      .setParameter("cancelado", Partido.EstadoPartido.CANCELADO)
+      .getResultList();
   }
 
   private void inyectarParametrosFiltro(

@@ -9,11 +9,11 @@ import static org.mockito.Mockito.when;
 
 import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
-import com.tallerwebi.dominio.ServicioEstadistica;
-import com.tallerwebi.dominio.ServicioJugador;
-import com.tallerwebi.dominio.ServicioLogin;
-import com.tallerwebi.dominio.ServicioRanking;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.servicio.ServicioEstadistica;
+import com.tallerwebi.dominio.servicio.ServicioJugador;
+import com.tallerwebi.dominio.servicio.ServicioLogin;
+import com.tallerwebi.dominio.servicio.ServicioRanking;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.nio.file.Files;
@@ -75,6 +75,8 @@ public class PerfilControllerTest {
       servicioJugador,
       servicioRanking,
       servicioEstadistica
+      //
+
     );
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -356,6 +358,8 @@ public class PerfilControllerTest {
 
     verify(servicioLogin).modificar(usuario);
     verify(servicioJugador).guardar(org.mockito.ArgumentMatchers.any(Jugador.class));
+
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
 
     assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
   }

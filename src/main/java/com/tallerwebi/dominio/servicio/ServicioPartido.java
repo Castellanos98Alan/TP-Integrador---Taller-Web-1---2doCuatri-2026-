@@ -1,5 +1,9 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Cancha;
+import com.tallerwebi.dominio.Jugador;
+import com.tallerwebi.dominio.Partido;
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.util.List;
 
@@ -7,7 +11,9 @@ import java.util.List;
 public interface ServicioPartido {
   void crearPartido(DatosCrearPartido datos, Usuario creador);
   void cancelarPartido(Long partidoId, Usuario usuarioLogueado);
-  void unirseAPartido(Long partidoId, Usuario usuarioLogueado);
+  void unirseAPartido(Long partidoId, Jugador usuarioLogueadoJugador);
+  void balancearEquipos(Partido partido);
+  //  void asignarCapitanes(Partido partido);
 
   Partido buscarPartidoPorId(Long id);
   List<Cancha> listarCanchas(); // NUEVO

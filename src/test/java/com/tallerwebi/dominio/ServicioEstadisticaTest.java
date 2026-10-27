@@ -4,6 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
+import com.tallerwebi.dominio.repositorio.RepositorioJugador;
+import com.tallerwebi.dominio.repositorio.RepositorioPartido;
+import com.tallerwebi.dominio.servicio.ServicioEstadistica;
+import com.tallerwebi.dominio.servicio.ServicioEstadisticasImpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +19,21 @@ public class ServicioEstadisticaTest {
 
   private ServicioEstadistica servicioEstadistica;
   private RepositorioEstadistica repositorioEstadisticaMock;
+  private RepositorioPartido repositorioPartidoMock;
+  private RepositorioJugador repositorioJugadorMock;
 
   @BeforeEach
   public void init() {
     this.repositorioEstadisticaMock = mock(RepositorioEstadistica.class);
-    this.servicioEstadistica = new ServicioEstadisticasImpl(this.repositorioEstadisticaMock);
+    this.repositorioPartidoMock = mock(RepositorioPartido.class);
+    this.repositorioJugadorMock = mock(RepositorioJugador.class);
+
+    this.servicioEstadistica =
+      new ServicioEstadisticasImpl(
+        this.repositorioEstadisticaMock,
+        this.repositorioPartidoMock,
+        this.repositorioJugadorMock
+      );
   }
 
   @Test
@@ -177,5 +192,37 @@ public class ServicioEstadisticaTest {
     Jugador jugador = new Jugador(nombre, posicion1, posicion2, nivel);
 
     return jugador;
+  }
+
+  @Test
+  public void queSePuedanGuardarEstadisticasYEnviarARevision() {
+    // 1. Preparación (Given)
+    Long idPartido = 1L;
+    Partido partidoMock = mock(Partido.class);
+    Jugador jugadorMock = mock(Jugador.class);
+
+    DTOEstadisticaJugador dto = new DTOEstadisticaJugador(10L, 2, 1, 0); // idJugador, goles, amarillas, rojas
+    List<DTOEstadisticaJugador> datosCargados = List.of(dto);
+
+    // Configuramos los comportamientos de los mocks
+    when(repositorioPartidoMock.buscarPorId(idPartido)).thenReturn(partidoMock);
+    when(repositorioJugadorMock.buscarPorUsuarioId(dto.getIdJugador())).thenReturn(jugadorMock);
+    when(repositorioEstadisticaMock.buscarPorPartidoYJugador(partidoMock, jugadorMock))
+      .thenReturn(null); // Simulamos que no existe todavía (creación)
+
+    // 2. Ejecución (When)
+    servicioEstadistica.guardarEstadisticasYEnviarARevision(idPartido, datosCargados);
+
+    // 3. Verificación (Then)
+    // Verificamos que se haya buscado el partido y el jugador
+    verify(repositorioPartidoMock, times(1)).buscarPorId(idPartido);
+    verify(repositorioJugadorMock, times(1)).buscarPorUsuarioId(dto.getIdJugador());
+
+    // Verificamos que se haya intentado guardar la estadística
+    verify(repositorioEstadisticaMock, times(1)).guardar(any(Estadistica.class));
+
+    // Verificamos que se haya cambiado el estado del partido a EN_REVISION y se haya guardado/actualizado
+    verify(partidoMock, times(1)).setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    verify(repositorioPartidoMock, times(1)).guardar(partidoMock);
   }
 }

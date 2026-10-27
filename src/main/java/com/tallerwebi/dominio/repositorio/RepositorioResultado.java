@@ -1,4 +1,7 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.repositorio;
+
+import com.tallerwebi.dominio.Partido;
+import com.tallerwebi.dominio.Resultado;
 
 public interface RepositorioResultado {
   void guardar(Resultado resultado);

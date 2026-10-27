@@ -1,8 +1,8 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.RepositorioResultado;
 import com.tallerwebi.dominio.Resultado;
+import com.tallerwebi.dominio.repositorio.RepositorioResultado;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

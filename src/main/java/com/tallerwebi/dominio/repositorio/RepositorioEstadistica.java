@@ -1,5 +1,8 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.repositorio;
 
+import com.tallerwebi.dominio.Estadistica;
+import com.tallerwebi.dominio.Jugador;
+import com.tallerwebi.dominio.Partido;
 import java.util.List;
 
 public interface RepositorioEstadistica {
@@ -15,4 +18,6 @@ public interface RepositorioEstadistica {
     Jugador jugador,
     Estadistica.CondicionJugador condicion
   );
+
+  public Estadistica buscarPorPartidoYJugador(Partido partido, Jugador jugador);
 }

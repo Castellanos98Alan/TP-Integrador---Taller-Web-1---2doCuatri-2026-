@@ -3,7 +3,7 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.RepositorioEstadistica;
+import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
@@ -62,5 +62,17 @@ public class RepositorioEstadisticaImpl implements RepositorioEstadistica {
       .setParameter("jugador", jugador)
       .setParameter("condicion", condicion)
       .getResultList();
+  }
+
+  @Override
+  public Estadistica buscarPorPartidoYJugador(Partido partido, Jugador jugador) {
+    return (Estadistica) sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT e FROM Estadistica e WHERE e.partido = :partido AND e.jugador = :jugador"
+      )
+      .setParameter("partido", partido)
+      .setParameter("jugador", jugador)
+      .uniqueResult(); // O getSingleResult() dependiendo de la versión
   }
 }

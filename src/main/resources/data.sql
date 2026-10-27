@@ -1,5 +1,9 @@
-INSERT INTO Usuario(id, email, password, rol, activo)
-VALUES(null, 'test@unlam.edu.ar', 'test', 'ADMIN', true);
+-- Inserta el usuario de prueba solo si no existe previamente
+INSERT INTO Usuario (id, email, password, rol, activo)
+SELECT null, 'test@unlam.edu.ar', 'test', 'ADMIN', true
+WHERE NOT EXISTS (
+    SELECT 1 FROM Usuario WHERE email = 'test@unlam.edu.ar'
+);
 
 
 INSERT INTO Cancha(id, nombre, localidad)
@@ -49,7 +53,7 @@ VALUES (
            'Mediocampista',
            60,
            'A',
-           (SELECT id FROM Usuario WHERE email = 'test@unlam.edu.ar'),
+           (SELECT id FROM Usuario WHERE email = 'test@unlam.edu.ar' LIMIT 1),
            3,
            2,
            1
@@ -77,8 +81,9 @@ VALUES (
                WHERE usuario_id = (
                    SELECT id
                    FROM Usuario
-                   WHERE email = 'test@unlam.edu.ar'
+                   WHERE email = 'test@unlam.edu.ar' LIMIT 1
                )
+        LIMIT 1
            ),
            NULL
        );

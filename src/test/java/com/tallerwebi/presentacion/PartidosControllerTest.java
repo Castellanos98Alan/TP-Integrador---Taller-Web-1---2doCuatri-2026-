@@ -2,27 +2,33 @@ package com.tallerwebi.presentacion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.ServicioPartido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.servicio.ServicioJugador;
+import com.tallerwebi.dominio.servicio.ServicioPartido;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
 public class PartidosControllerTest {
 
   private PartidosController partidosController;
   private ServicioPartido servicioPartidoMock;
+  private ServicioJugador servicioJugadorMock;
   private HttpServletRequest requestMock;
   private HttpSession sessionMock;
   private Model modelMock;
@@ -30,7 +36,8 @@ public class PartidosControllerTest {
   @BeforeEach
   public void init() {
     servicioPartidoMock = mock(ServicioPartido.class);
-    partidosController = new PartidosController(servicioPartidoMock);
+    servicioJugadorMock = mock(ServicioJugador.class);
+    partidosController = new PartidosController(servicioPartidoMock, servicioJugadorMock);
 
     requestMock = mock(HttpServletRequest.class);
     sessionMock = mock(HttpSession.class);
@@ -69,6 +76,36 @@ public class PartidosControllerTest {
     // Validación
     thenLaVistaEs("partidos", mav);
     thenModeloKeyEs(listaMock, mav);
+  }
+
+  @Test
+  public void queElControladorCargueLasProvinciasYLocalidadesAlMostrarLaVista() {
+    // Preparación
+    when(servicioPartidoMock.obtenerProvinciasDisponibles())
+      .thenReturn(Arrays.asList("Buenos Aires"));
+    when(servicioPartidoMock.obtenerLocalidadesDisponibles())
+      .thenReturn(Arrays.asList("La Matanza"));
+
+    // Ejecución (Ajustá los parámetros según la firma actual de tu método en el controlador)
+    ModelAndView mav = whenUsuarioConsultaPartidos(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      "Buenos Aires",
+      "La Matanza"
+    );
+
+    // Validación
+    ModelMap modelo = mav.getModelMap();
+    assertThat(modelo.get("provinciasDisponibles"), notNullValue());
+    assertThat(modelo.get("localidadesDisponibles"), notNullValue());
+    assertThat(modelo.get("provinciaSeleccionada"), equalTo("Buenos Aires"));
+    assertThat(modelo.get("localidadSeleccionada"), equalTo("La Matanza"));
+
+    verify(servicioPartidoMock, times(1)).obtenerProvinciasDisponibles();
+    verify(servicioPartidoMock, times(1)).obtenerLocalidadesDisponibles();
   }
 
   @Test
@@ -124,13 +161,14 @@ public class PartidosControllerTest {
   public void unirseAlPartidoConSesionActivaDeberiaRedirigirASalaDeEspera() {
     Usuario usuario = new Usuario();
     usuario.setId(1L);
+    Jugador jugador = servicioJugadorMock.buscarPorUsuarioId(usuario.getId());
 
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
 
     ModelAndView modelAndView = partidosController.unirseAlPartido(1L, requestMock);
 
-    verify(servicioPartidoMock, times(1)).unirseAPartido(1L, usuario);
+    verify(servicioPartidoMock, times(1)).unirseAPartido(1L, jugador);
     assertThat(
       modelAndView.getViewName(),
       equalToIgnoringCase("redirect:/partido/1/sala-de-espera")
@@ -141,17 +179,18 @@ public class PartidosControllerTest {
   public void unirseAlPartidoConExcepcionDeberiaLanzarError() {
     Usuario usuario = new Usuario();
     usuario.setId(1L);
+    Jugador jugador = servicioJugadorMock.buscarPorUsuarioId(usuario.getId());
 
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
 
     doThrow(new RuntimeException("Cupo maximo alcanzado"))
       .when(servicioPartidoMock)
-      .unirseAPartido(1L, usuario);
+      .unirseAPartido(1L, jugador);
 
     ModelAndView modelAndView = partidosController.unirseAlPartido(1L, requestMock);
 
-    verify(servicioPartidoMock, times(1)).unirseAPartido(1L, usuario);
+    verify(servicioPartidoMock, times(1)).unirseAPartido(1L, jugador);
 
     assertThat(
       modelAndView.getViewName(),

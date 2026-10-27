@@ -3,6 +3,7 @@ package com.tallerwebi.dominio;
 //import jakarta.persistence.ManyToMany;
 //import jakarta.persistence.ManyToOne;
 //import jakarta.persistence.OneToMany;
+
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,9 +24,18 @@ public class Partido {
     PENDIENTE,
   }
 
+  public enum EstadoEstadisticas {
+    PENDIENTE_DE_CARGA,
+    EN_REVISION,
+    CONFIRMADA,
+  }
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @Enumerated(EnumType.STRING)
+  private EstadoEstadisticas estadoEstadisticas = EstadoEstadisticas.PENDIENTE_DE_CARGA;
 
   private String nivel;
   private Boolean esPrivado = false;
@@ -53,8 +63,18 @@ public class Partido {
   @ManyToOne(fetch = FetchType.EAGER)
   private Usuario organizador;
 
-  @OneToMany(fetch = FetchType.EAGER)
-  private List<Usuario> confirmados = new ArrayList<>();
+  //Cree InscripcionPartido como entidad intermedia para equipo, jugador y partido. Utilice OneToMany ya
+  //que antes los confirmados era un ManyToMany. Cascade lo investigue y lo que hace es que te garantiza
+  // que la base de datos se mantenga perfectamente sincronizada con las entidades, en este caso con partido.
+  //orphanRemoval para poder borrar el espacio que ocupa en la base de datos, sin esto se eliminaria el jugador
+  //pero seguiria ocupando espacio en la base de datos.
+  @OneToMany(
+    mappedBy = "partido",
+    fetch = FetchType.EAGER,
+    cascade = CascadeType.ALL,
+    orphanRemoval = true
+  )
+  private List<InscripcionPartido> inscripciones = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.EAGER)
   private Equipo equipo1;
@@ -138,14 +158,6 @@ public class Partido {
     this.esPrivado = esPrivado;
   }
 
-  public List<Usuario> getConfirmados() {
-    return confirmados;
-  }
-
-  public void setConfirmados(List<Usuario> confirmados) {
-    this.confirmados = confirmados;
-  }
-
   public String getCodigoDeAcceso() {
     return this.codigoDeAcceso;
   }
@@ -224,5 +236,37 @@ public class Partido {
 
   public void setCantJugadores(Integer cantJugadores) {
     this.cantJugadores = cantJugadores;
+  }
+
+  public EstadoEstadisticas getEstadoEstadisticas() {
+    return estadoEstadisticas;
+  }
+
+  public void setEstadoEstadisticas(EstadoEstadisticas estadoEstadisticas) {
+    this.estadoEstadisticas = estadoEstadisticas;
+  }
+
+  //Este metodo se refactorizo debido a que anteriormente teniamos en partido una lista de jugadoresConfirmados.
+  //Al crear la entidad intermedia InscripcionPartido cambiamos toda la logica, ahora los partidos tienen una lista
+  //de Inscripciones, donde dentro estaran los jugadores.
+  //Realizo un forEach para poder traer a los usuariosConfirmados que estan dentro de inscripcion.
+  public List<Usuario> getConfirmados() {
+    List<Usuario> usuariosConfirmados = new ArrayList<>();
+    if (this.inscripciones != null) {
+      for (InscripcionPartido inscripcion : this.inscripciones) {
+        if (inscripcion.getJugador() != null) {
+          usuariosConfirmados.add(inscripcion.getJugador().getUsuario());
+        }
+      }
+    }
+    return usuariosConfirmados;
+  }
+
+  public List<InscripcionPartido> getInscripciones() {
+    return inscripciones;
+  }
+
+  public void setInscripciones(List<InscripcionPartido> inscripciones) {
+    this.inscripciones = inscripciones;
   }
 }

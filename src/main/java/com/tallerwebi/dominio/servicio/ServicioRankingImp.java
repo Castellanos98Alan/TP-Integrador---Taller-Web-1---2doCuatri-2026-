@@ -1,7 +1,8 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Jugador;
+import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
