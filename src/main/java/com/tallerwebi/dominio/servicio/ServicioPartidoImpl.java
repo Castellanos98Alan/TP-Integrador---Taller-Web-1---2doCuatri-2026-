@@ -152,7 +152,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
 
     InscripcionPartido nuevaInscripcion = new InscripcionPartido(partido, usuarioLogueadoJugador);
 
-    //    nuevaInscripcion.setFechaInscripcion(LocalDateTime.now());
+    nuevaInscripcion.setFechaInscripcion(LocalDateTime.now());
 
     partido.getInscripciones().add(nuevaInscripcion);
     partido.setCantJugadores(partido.getInscripciones().size());
@@ -160,8 +160,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
     // Disparador del balanceo automático
     int cupoMaximo = partido.getCupoMaximo();
     if (partido.getCantJugadores() == cupoMaximo) {
-      //      balancearEquipos(partido);
-      //      asignarCapitanes(partido);
+      balancearEquipos(partido);
+      asignarCapitanes(partido);
       partido.setEstado(EstadoPartido.ACTIVO);
     }
 
@@ -410,61 +410,61 @@ public class ServicioPartidoImpl implements ServicioPartido {
       }
     }
   }
-  //  @Override
-  //  public void asignarCapitanes(Partido partido) {
-  //    List<InscripcionPartido> inscripciones = partido.getInscripciones();
-  //
-  //    for (InscripcionPartido inscripcion : inscripciones) {
-  //      inscripcion.setEsCapitan(false);
-  //    }
-  //
-  //    InscripcionPartido capitanEquipo1 = elegirCapitan(inscripciones, partido.getEquipo1());
-  //
-  //    InscripcionPartido capitanEquipo2 = elegirCapitan(inscripciones, partido.getEquipo2());
-  //
-  //    if (capitanEquipo1 != null) {
-  //      capitanEquipo1.setEsCapitan(true);
-  //    }
-  //
-  //    if (capitanEquipo2 != null) {
-  //      capitanEquipo2.setEsCapitan(true);
-  //    }
-  //  }
-  //
-  //  private InscripcionPartido elegirCapitan(List<InscripcionPartido> inscripciones, Equipo equipo) {
-  //    InscripcionPartido mejorCandidato = null;
-  //
-  //    for (InscripcionPartido inscripcion : inscripciones) {
-  //      if (
-  //        Objects.equals(inscripcion.getEquipo(), equipo) &&
-  //        esMejorCandidato(inscripcion, mejorCandidato)
-  //      ) {
-  //        mejorCandidato = inscripcion;
-  //      }
-  //    }
-  //
-  //    return mejorCandidato;
-  //  }
-  //
-  //  private boolean esMejorCandidato(InscripcionPartido candidato, InscripcionPartido actual) {
-  //    if (actual == null) {
-  //      return true;
-  //    }
-  //
-  //    int puntosCandidato = candidato.getJugador().getPuntos();
-  //    int puntosActual = actual.getJugador().getPuntos();
-  //
-  //    if (puntosCandidato != puntosActual) {
-  //      return puntosCandidato > puntosActual;
-  //    }
-  //
-  //    LocalDateTime fechaCandidato = candidato.getFechaInscripcion();
-  //    LocalDateTime fechaActual = actual.getFechaInscripcion();
-  //
-  //    if (fechaCandidato == null) {
-  //      return false;
-  //    }
-  //
-  //    return fechaActual == null || fechaCandidato.isBefore(fechaActual);
-  //  }
+    @Override
+    public void asignarCapitanes(Partido partido) {
+      List<InscripcionPartido> inscripciones = partido.getInscripciones();
+
+      for (InscripcionPartido inscripcion : inscripciones) {
+        inscripcion.setEsCapitan(false);
+      }
+
+      InscripcionPartido capitanEquipo1 = elegirCapitan(inscripciones, partido.getEquipo1());
+
+      InscripcionPartido capitanEquipo2 = elegirCapitan(inscripciones, partido.getEquipo2());
+
+      if (capitanEquipo1 != null) {
+        capitanEquipo1.setEsCapitan(true);
+      }
+
+      if (capitanEquipo2 != null) {
+        capitanEquipo2.setEsCapitan(true);
+      }
+    }
+
+    private InscripcionPartido elegirCapitan(List<InscripcionPartido> inscripciones, Equipo equipo) {
+      InscripcionPartido mejorCandidato = null;
+
+      for (InscripcionPartido inscripcion : inscripciones) {
+        if (
+          Objects.equals(inscripcion.getEquipo(), equipo) &&
+          esMejorCandidato(inscripcion, mejorCandidato)
+        ) {
+          mejorCandidato = inscripcion;
+        }
+      }
+
+      return mejorCandidato;
+    }
+
+    private boolean esMejorCandidato(InscripcionPartido candidato, InscripcionPartido actual) {
+      if (actual == null) {
+        return true;
+      }
+
+      int puntosCandidato = candidato.getJugador().getPuntos();
+      int puntosActual = actual.getJugador().getPuntos();
+
+      if (puntosCandidato != puntosActual) {
+        return puntosCandidato > puntosActual;
+      }
+
+      LocalDateTime fechaCandidato = candidato.getFechaInscripcion();
+      LocalDateTime fechaActual = actual.getFechaInscripcion();
+
+      if (fechaCandidato == null) {
+        return false;
+      }
+
+      return fechaActual == null || fechaCandidato.isBefore(fechaActual);
+    }
 }
