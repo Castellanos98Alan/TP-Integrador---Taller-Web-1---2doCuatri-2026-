@@ -343,4 +343,33 @@ public class RepositorioPartidoTest {
       filtroTodo07
     );
   }
+
+  //Axel
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaBuscarSoloLosPartidosDeLaCanchaQueEstanDentroDeLaHora() {
+    // Given
+    Cancha cancha = givenExisteUnaCancha("Cancha Los Leones");
+    LocalDateTime fecha = LocalDateTime.of(2026, 10, 20, 18, 0);
+    givenTengoUnPartidoEnLaCancha(cancha, fecha.plusMinutes(30));
+    givenTengoUnPartidoEnLaCancha(cancha, fecha.plusHours(1));
+
+    // When
+    List<Partido> partidos = repositorioPartido.buscarPartidosEnRango(
+            cancha.getId(),
+            fecha.minusHours(1),
+            fecha.plusHours(1)
+    );
+
+    // Then
+    assertThat(partidos.size(), is(equalTo(1)));
+  }
+
+  private void givenTengoUnPartidoEnLaCancha(Cancha cancha, LocalDateTime fecha) {
+    Partido partido = new Partido();
+    partido.setCancha(cancha);
+    partido.setFecha(fecha);
+    sessionFactory.getCurrentSession().persist(partido);
+  }
 }
