@@ -918,20 +918,30 @@ a {
 }
 
 .alerta-amistad {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin: 15px 0;
-    font-weight: 600;
-}
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 
-.alerta-amistad.exito {
-    background-color: #d1e7dd;
-    color: #0f5132;
+    padding: 8px 12px;
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    width: fit-content;
+    max-width: 360px;
+
+    margin: 8px 0 12px 0;
 }
 
 .alerta-amistad.error {
     background-color: #f8d7da;
     color: #842029;
+}
+
+.alerta-amistad.exito {
+    background-color: #d1e7dd;
+    color: #0f5132;
 }
 
 

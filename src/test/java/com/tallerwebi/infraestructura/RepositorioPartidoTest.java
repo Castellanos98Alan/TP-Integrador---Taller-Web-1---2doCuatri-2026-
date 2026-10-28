@@ -357,9 +357,9 @@ public class RepositorioPartidoTest {
 
     // When
     List<Partido> partidos = repositorioPartido.buscarPartidosEnRango(
-            cancha.getId(),
-            fecha.minusHours(1),
-            fecha.plusHours(1)
+      cancha.getId(),
+      fecha.minusHours(1),
+      fecha.plusHours(1)
     );
 
     // Then
