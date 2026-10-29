@@ -180,7 +180,7 @@ mvn clean verify
 - **Axel Gaete**
 - **Tomas Canosa**
 - **Santiago Navarro**
-- Juan Pablo Campas**
+- **Juan Pablo Campas**
 
 ---
 
