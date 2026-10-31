@@ -932,10 +932,27 @@
 
                         <span>Rango</span>
 
-                        <select disabled>
+                        <select name="rango"
+                                onchange="this.form.submit()">
 
-                            <option>
+                            <option value=""
+                                    th:selected="${rangoSeleccionado == null or rangoSeleccionado == ''}">
                                 Todos los rangos
+                            </option>
+
+                            <option value="principiante"
+                                    th:selected="${rangoSeleccionado == 'principiante'}">
+                                Principiante (C - D)
+                            </option>
+
+                            <option value="intermedio"
+                                    th:selected="${rangoSeleccionado == 'intermedio'}">
+                                Intermedio (B - A)
+                            </option>
+
+                            <option value="avanzado"
+                                    th:selected="${rangoSeleccionado == 'avanzado'}">
+                                Avanzado (S - SS)
                             </option>
 
                         </select>
@@ -950,13 +967,18 @@
 
                         <span>Vista</span>
 
-                        <select disabled>
+                        <select name="vista"
+                                onchange="this.form.submit()">
 
-                            <option>
+                            <option value="general"
+                                    th:selected="${vistaSeleccionada == null
+                         or vistaSeleccionada == ''
+                         or vistaSeleccionada == 'general'}">
                                 General
                             </option>
 
-                            <option>
+                            <option value="amigos"
+                                    th:selected="${vistaSeleccionada == 'amigos'}">
                                 Amigos
                             </option>
 

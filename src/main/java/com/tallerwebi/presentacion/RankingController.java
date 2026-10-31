@@ -1,7 +1,9 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.Jugador;
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.servicio.ServicioRanking;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-/**
- * Controlador para la vista.
- */
 @Controller
 public class RankingController {
 
@@ -28,25 +27,35 @@ public class RankingController {
   @RequestMapping(path = "/ranking", method = RequestMethod.GET)
   public ModelAndView mostrarRanking(
     @RequestParam(value = "nivel", required = false) String nivel,
-    @RequestParam(value = "posicion", required = false) String posicion
+    @RequestParam(value = "posicion", required = false) String posicion,
+    @RequestParam(value = "rango", required = false) String rango,
+    @RequestParam(value = "vista", required = false) String vista,
+    HttpServletRequest request
   ) {
     Map<String, Object> modelo = new ModelMap();
 
-    List<Jugador> ranking;
+    Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute("USUARIO");
 
-    if (nivel != null && !nivel.isEmpty() && posicion != null && !posicion.isEmpty()) {
-      ranking = servicioRanking.obtenerRankingFiltradoPorNivelYPosicion(nivel, posicion);
-    } else if (nivel != null && !nivel.isEmpty()) {
-      ranking = servicioRanking.obtenerRankingFiltradoPorNivel(nivel);
-    } else if (posicion != null && !posicion.isEmpty()) {
-      ranking = servicioRanking.obtenerRankingFiltradoPorPosicion(posicion);
-    } else {
-      ranking = servicioRanking.obtenerRanking();
+    Long usuarioId = null;
+
+    if (usuarioLogueado != null) {
+      usuarioId = usuarioLogueado.getId();
     }
 
+    List<Jugador> ranking = servicioRanking.obtenerRankingFiltrado(
+      nivel,
+      posicion,
+      rango,
+      vista,
+      usuarioId
+    );
+
     modelo.put("ranking", ranking);
+
     modelo.put("nivelSeleccionado", nivel);
     modelo.put("posicionSeleccionada", posicion);
+    modelo.put("rangoSeleccionado", rango);
+    modelo.put("vistaSeleccionada", vista);
 
     return new ModelAndView("ranking", modelo);
   }
