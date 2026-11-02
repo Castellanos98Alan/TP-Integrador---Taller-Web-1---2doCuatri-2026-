@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -310,20 +311,22 @@ public class PartidosControllerTest {
   }
 
   @Test
-  public void expulsarJugadorConErrorGuardaErrorEnSesionYRedirige() {
-    Usuario noOrganizador = new Usuario();
-    noOrganizador.setId(1L);
+  public void expulsarJugadorConErrorGuardaErrorEnModelYRedirige() {
+    Long idPartido = 1L;
+    Long idJugador = 2L;
+    Usuario usuarioLogueado = new Usuario();
 
     when(requestMock.getSession()).thenReturn(sessionMock);
-    when(sessionMock.getAttribute("USUARIO")).thenReturn(noOrganizador);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioLogueado);
 
-    doThrow(new RuntimeException("Solo el organizador puede expulsar jugadores."))
+    doThrow(new RuntimeException("Error al expulsar"))
       .when(servicioPartidoMock)
-      .expulsarJugador(1L, 2L, noOrganizador);
+      .expulsarJugador(idPartido, idJugador, usuarioLogueado);
 
-    ModelAndView mav = partidosController.expulsarJugador(1L, 2L, requestMock);
+    ModelAndView mav = partidosController.expulsarJugador(idPartido, idJugador, requestMock);
 
-    verify(sessionMock, times(1)).setAttribute(eq("error"), anyString());
-    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/partido/1/sala-de-espera"));
+    // Verificamos que el error ahora viaja en el Model y no en la sesión
+    assertEquals("redirect:/partido/" + idPartido + "/sala-de-espera", mav.getViewName());
+    assertEquals("Error al expulsar", mav.getModel().get("error"));
   }
 }

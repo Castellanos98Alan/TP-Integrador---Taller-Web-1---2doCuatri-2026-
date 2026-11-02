@@ -239,11 +239,13 @@ public class PartidosController {
     if (usuarioLogueado == null) return new ModelAndView("redirect:/login");
 
     try {
-      // El servicio debe validar que usuarioLogueado sea el organizador del partido
       servicioPartido.expulsarJugador(idPartido, idJugador, usuarioLogueado);
+      return new ModelAndView(REDIRECT_PARTIDO + idPartido + SALA_ESPERA);
     } catch (Exception e) {
-      request.getSession().setAttribute(ATRIBUTO_ERROR, e.getMessage()); // O usar Flash Attributes si tienen Spring MVC completo
+      // Ahora enviamos el error al ModelMap para que aparezca en la URL
+      Map<String, Object> model = new ModelMap();
+      model.put(ATRIBUTO_ERROR, e.getMessage());
+      return new ModelAndView(REDIRECT_PARTIDO + idPartido + SALA_ESPERA, model);
     }
-    return new ModelAndView(REDIRECT_PARTIDO + idPartido + SALA_ESPERA);
   }
 }

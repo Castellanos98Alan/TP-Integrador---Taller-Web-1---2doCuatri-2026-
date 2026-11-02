@@ -67,6 +67,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
     partido.setNivel(datos.getNivel());
     partido.setOrganizador(creador);
     partido.setEsPrivado(datos.getEsPrivado());
+    partido.setEstado(EstadoPartido.ABIERTO);
 
     if (Boolean.TRUE.equals(datos.getEsPrivado())) {
       partido.setCodigoDeAcceso(UUID.randomUUID().toString().substring(0, 8));
@@ -174,11 +175,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
   //Metodo privado que valida el estado del partido, con esto logro ver si el partido tiene estado Finalizado o Cancelado
   //si es asi, entonces el usuario no podra ingresar al partido.
   private void validarEstadoDelPartido(Partido partido) {
-    if (
-      partido.getEstado() == Partido.EstadoPartido.FINALIZADO ||
-      partido.getEstado() == Partido.EstadoPartido.CANCELADO
-    ) {
-      throw new RuntimeException("No se puede unir a un partido finalizado o cancelado.");
+    if (partido.getEstado() != EstadoPartido.ABIERTO) {
+      throw new RuntimeException("El partido ya no acepta nuevos jugadores.");
     }
   }
 
@@ -426,15 +424,16 @@ public class ServicioPartidoImpl implements ServicioPartido {
   }
 
   private void validarOrganizador(Partido partido, Usuario organizador) {
-    if (partido.getOrganizador() == null || !partido.getOrganizador().equals(organizador)) {
+    if (
+      partido.getOrganizador() == null ||
+      !partido.getOrganizador().getId().equals(organizador.getId())
+    ) {
       throw new RuntimeException("Solo el organizador puede expulsar jugadores.");
     }
   }
 
   private void validarPartidoModificable(Partido partido, String mensajeError) {
-    if (
-      partido.getEstado() == EstadoPartido.ACTIVO || partido.getEstado() == EstadoPartido.FINALIZADO
-    ) {
+    if (partido.getEstado() != EstadoPartido.ABIERTO) {
       throw new RuntimeException(mensajeError);
     }
   }

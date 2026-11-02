@@ -22,6 +22,7 @@ public class Partido {
     FINALIZADO,
     CANCELADO,
     PENDIENTE,
+    ABIERTO,
   }
 
   public enum EstadoEstadisticas {
