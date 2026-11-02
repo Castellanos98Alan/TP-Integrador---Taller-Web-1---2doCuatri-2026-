@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.WrapperEstadistica;
+import com.tallerwebi.dominio.excepcion.EstadisticasNoGuardadas;
 import com.tallerwebi.dominio.servicio.ServicioEstadistica;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -27,7 +28,7 @@ public class EstadisticaController {
   @PostMapping("/partido/{id}/guardar-estadisticas")
   public ModelAndView guardarEstadisticas(
     @PathVariable("id") Long idPartido,
-    @ModelAttribute WrapperEstadistica wrapperEstadistica,
+    @ModelAttribute("formulario") WrapperEstadistica wrapperEstadistica,
     HttpServletRequest request,
     Model modelo
   ) {
@@ -46,19 +47,17 @@ public class EstadisticaController {
         wrapperEstadistica.getEstadisticas()
       );
 
-      modelo.addAttribute(
-        "exito",
-        "Las estadisticas se guardaron correctamente y estan en revision."
-      );
       return new ModelAndView(
-        "redirect:/partido/" + idPartido + "/sala-de-espera",
-        (ModelMap) modelo
+        "redirect:/partido/" +
+        idPartido +
+        "/sala-de-espera?exito=Estadisticas+guardadas+correctamente"
       );
-    } catch (Exception e) {
-      modelo.addAttribute("error", e.getMessage());
+    } catch (EstadisticasNoGuardadas e) {
       return new ModelAndView(
-        "redirect:/partido/" + idPartido + "/estadisticas",
-        (ModelMap) modelo
+        "redirect:/partido/" +
+        idPartido +
+        "/cargar-estadisticas?error=" +
+        "No se pudo guardar las estadisticas"
       );
     }
   }

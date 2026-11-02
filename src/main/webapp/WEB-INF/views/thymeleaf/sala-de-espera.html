@@ -194,11 +194,13 @@
                     <div class="d-flex gap-2 mt-2">
                         <form th:action="@{/amistad/aceptar}" method="post">
                             <input type="hidden" name="idSolicitud" th:value="${solicitud.id}">
+                            <input type="hidden" name="volverA" th:value="${#httpServletRequest.requestURI}">
                             <button type="submit" class="btn btn-success btn-sm">Aceptar</button>
                         </form>
 
                         <form th:action="@{/amistad/rechazar}" method="post">
                             <input type="hidden" name="idSolicitud" th:value="${solicitud.id}">
+                            <input type="hidden" name="volverA" th:value="${#httpServletRequest.requestURI}">
                             <button type="submit" class="btn btn-outline-danger btn-sm">Rechazar</button>
                         </form>
                     </div>
@@ -225,14 +227,30 @@
         </div>
     </div>
 
-    <!-- Alertas de éxito o error -->
-    <div th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
-        <span th:text="${exito}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <!-- ALERTAS DE ÉXITO O ERROR (Integradas con las excepciones personalizadas) -->
+    <div th:if="${exito != null and !exito.isEmpty()}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px; background-color: #d1fae5; color: #065f46;">
+        <i class="fa-solid fa-circle-check me-2"></i>
+        <span th:text="${exito}">¡Operación realizada con éxito!</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-        <span th:text="${error}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+    <div th:if="${error != null and !error.isEmpty()}" class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px; background-color: #fee2e2; color: #991b1b;">
+        <i class="fa-solid fa-circle-exclamation me-2"></i>
+        <span th:text="${error}">Ha ocurrido un error al procesar la solicitud.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- ALERTA DE REVISIÓN DE ESTADÍSTICAS PARA EL CAPITÁN RIVAL -->
+    <div th:if="${puedeRevisarEstadisticas}" class="alert alert-warning alert-dismissible fade show border-0 shadow-sm mb-4 d-flex justify-content-between align-items-center" role="alert" style="border-radius: 12px; background-color: #fef3c7; color: #92400e;">
+        <div class="d-flex align-items-center">
+            <i class="fa-solid fa-triangle-exclamation fs-4 me-3"></i>
+            <div>
+                <strong>¡Atención Capitán!</strong> El equipo rival cargó las estadísticas del partido y están pendientes de tu revisión y aprobación.
+            </div>
+        </div>
+        <a th:href="@{/partido/{id}/revisar-estadisticas(id=${partido.id})}" class="btn btn-warning fw-bold text-dark px-4 py-2" style="border-radius: 10px; background-color: #f59e0b; border: none;">
+            <i class="fa-solid fa-clipboard-check me-1"></i> Revisar Estadísticas
+        </a>
     </div>
 
     <!-- HERO DEL PARTIDO CON DATOS REALES -->
@@ -280,12 +298,20 @@
                         </div>
                     </div>
 
-                    <div class="ms-auto">
+                    <div class="ms-auto d-flex gap-2">
+                        <!-- BOTÓN UNIRSE AL PARTIDO -->
                         <form th:action="@{/partido/{id}/unirse(id=${partido.id})}" method="post">
                             <button type="submit" class="btn btn-warning btn-lg fw-bold text-dark px-4 py-2" style="border-radius: 12px; background-color: #ffe600;">
                                 <i class="fa-solid fa-user-plus me-1"></i> ¡Unirme al Partido!
                             </button>
                         </form>
+
+                        <!-- BOTÓN CARGAR ESTADÍSTICAS (Visible únicamente para el organizador 1 hora después) -->
+                        <div th:if="${puedeCargarEstadisticas}">
+                            <a th:href="@{/partido/{id}/cargar-estadisticas(id=${partido.id})}" class="btn btn-success btn-lg fw-bold px-4 py-2 text-white" style="border-radius: 12px; background-color: #059669;">
+                                <i class="fa-solid fa-clipboard-user me-1"></i> Cargar Estadísticas
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -317,7 +343,7 @@
                         <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador" alt="Avatar">
                         <div>
                             <!-- Muestra nickname si existe, sino el nombre del jugador -->
-                            <strong class="d-block text-dark" style="font-size: 14px;" th:text="${ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
+                            <strong class="d-block text-dark" style="font-size: 14px;" th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
                             <span class="badge-posicion">Confirmado</span>
                         </div>
                     </div>
@@ -364,7 +390,7 @@
                                 <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador" alt="Avatar">
                                 <div>
                                     <!-- Muestra nickname si existe, sino el nombre del jugador -->
-                                    <strong class="d-block text-dark" style="font-size: 13px;" th:text="${ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
+                                    <strong class="d-block text-dark" style="font-size: 13px;" th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
                                     <div class="d-flex gap-1 mt-1">
                                         <span class="badge-posicion">Titular</span>
                                         <span th:if="${ins.esCapitan}" class="badge bg-warning text-dark" style="font-size: 10px;">
@@ -389,7 +415,7 @@
                                 <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador" alt="Avatar">
                                 <div>
                                     <!-- Muestra nickname si existe, sino el nombre del jugador -->
-                                    <strong class="d-block text-dark" style="font-size: 13px;" th:text="${ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
+                                    <strong class="d-block text-dark" style="font-size: 13px;" th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
                                     <div class="d-flex gap-1 mt-1">
                                         <span class="badge-posicion">Titular</span>
                                         <span th:if="${ins.esCapitan}" class="badge bg-warning text-dark" style="font-size: 10px;">

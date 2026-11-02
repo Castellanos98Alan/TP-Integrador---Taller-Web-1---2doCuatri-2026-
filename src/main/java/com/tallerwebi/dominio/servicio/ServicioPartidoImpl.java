@@ -7,6 +7,7 @@ import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Partido.EstadoPartido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
@@ -146,7 +147,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
     Partido partido = buscarPartidoPorId(partidoId);
 
     if (partido == null) {
-      throw new RuntimeException("El partido no existe.");
+      throw new PartidoNoEncontrado("El partido" + partidoId + " no existe.");
     }
 
     validarEstadoDelPartido(partido);
@@ -178,7 +179,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
       partido.getEstado() == Partido.EstadoPartido.FINALIZADO ||
       partido.getEstado() == Partido.EstadoPartido.CANCELADO
     ) {
-      throw new RuntimeException("No se puede unir a un partido finalizado o cancelado.");
+      throw new EstadoPartidoInvalido("No se puede unir a un partido finalizado o cancelado.");
     }
   }
 
@@ -195,17 +196,17 @@ public class ServicioPartidoImpl implements ServicioPartido {
     boolean inscripto = partido
       .getInscripciones()
       .stream()
-      .anyMatch(i -> i.getJugador().equals(usuarioLogueadoJugador));
+      .anyMatch(i -> i.getJugador().getId().equals(usuarioLogueadoJugador.getId()));
 
     if (inscripto) {
-      throw new RuntimeException("Ya estas anotado en la sala de espera de este partido.");
+      throw new JugadorInscripto("Ya estas anotado en la sala de espera de este partido.");
     }
 
     if (
       partido.getCupoMaximo() != null &&
       partido.getInscripciones().size() >= partido.getCupoMaximo()
     ) {
-      throw new RuntimeException("Cupo maximo alcanzado.");
+      throw new CupoMaximoAlcanzado("Cupo maximo alcanzado.");
     }
   }
 
@@ -230,7 +231,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
     );
 
     if (Math.abs(horasDeDiferencia) < HORAS_MINIMAS_ENTRE_PARTIDOS) {
-      throw new RuntimeException(
+      throw new DiferenciaHoraria(
         "No podes unirte, es necesario que haya al menos 3 horas de diferencia (" +
         fechaYHoraExistente.format(
           java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")

@@ -305,7 +305,7 @@ public class ServicioPartidoTest {
       () -> servicioPartido.unirseAPartido(partidoId, jugador)
     );
 
-    assertEquals("El partido no existe.", exception.getMessage());
+    assertEquals("El partido" + partidoId + " no existe.", exception.getMessage());
   }
 
   @Test
