@@ -110,12 +110,12 @@ public class ServicioPartidoImpl implements ServicioPartido {
   @Override
   public void cancelarPartido(Long partidoId, Usuario usuarioLogueado) {
     Partido partido = repositorioPartido.buscarPorId(partidoId);
+    if (partido == null) throw new RuntimeException("El partido no existe.");
 
-    if (partido == null) {
-      throw new RuntimeException("El partido no existe.");
-    }
-
-    if (partido.getOrganizador() == null || !partido.getOrganizador().equals(usuarioLogueado)) {
+    if (
+      partido.getOrganizador() == null ||
+      !partido.getOrganizador().getId().equals(usuarioLogueado.getId())
+    ) {
       throw new RuntimeException("No estas autorizado para cancelar este partido.");
     }
 
@@ -330,22 +330,21 @@ public class ServicioPartidoImpl implements ServicioPartido {
 
   @Override
   public List<String> obtenerProvinciasDisponibles() {
-    Set<String> provincias = new TreeSet<>();
-    List<Partido> partidos = repositorioPartido.buscarPartidosPorFiltro(
-      FILTRO_TODOS,
-      FILTRO_TODOS,
-      FILTRO_TODOS,
-      FILTRO_TODOS,
-      FILTRO_TODOS,
-      FILTRO_TODOS,
-      FILTRO_TODOS
-    );
-    for (Partido partido : partidos) {
-      if (partido.getCancha() != null && partido.getCancha().getProvincia() != null) {
-        provincias.add(partido.getCancha().getProvincia());
-      }
-    }
-    return new ArrayList<>(provincias);
+    return repositorioPartido
+      .buscarPartidosPorFiltro(
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS
+      )
+      .stream()
+      .filter(p -> p.getCancha() != null && p.getCancha().getProvincia() != null)
+      .map(p -> p.getCancha().getProvincia())
+      .distinct()
+      .collect(java.util.stream.Collectors.toList());
   }
 
   @Override
@@ -370,23 +369,93 @@ public class ServicioPartidoImpl implements ServicioPartido {
 
   @Override
   public List<Integer> obtenerCuposDisponibles() {
-    List<Partido> todosLosPartidos = repositorioPartido.buscarPartidosPorFiltro(
-      FILTRO_TODOS,
-      FILTRO_TODOS,
-      FILTRO_TODOS,
-      FILTRO_TODOS,
-      FILTRO_TODOS,
-      FILTRO_TODOS,
-      FILTRO_TODOS
+    return repositorioPartido
+      .buscarPartidosPorFiltro(
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS
+      )
+      .stream()
+      .map(Partido::getCupoMaximo)
+      .filter(Objects::nonNull)
+      .distinct()
+      .collect(java.util.stream.Collectors.toList());
+  }
+
+  private static final String MENSAJE_PARTIDO_NO_EXISTE = "El partido no existe.";
+
+  @Override
+  public void abandonarPartido(Long partidoId, Jugador jugador) {
+    Partido partido = obtenerPartidoValidado(partidoId);
+    validarPartidoModificable(
+      partido,
+      "No puedes abandonar un partido que ya está en curso o finalizado."
     );
+    InscripcionPartido inscripcion = obtenerInscripcionJugador(
+      partido,
+      jugador.getId(),
+      "No estás inscripto en este partido."
+    );
+    removerInscripcionYGuardar(partido, inscripcion);
+  }
 
-    Set<Integer> cuposUnicos = new TreeSet<>();
+  @Override
+  public void expulsarJugador(Long partidoId, Long idJugadorAExpulsar, Usuario organizador) {
+    Partido partido = obtenerPartidoValidado(partidoId);
+    validarOrganizador(partido, organizador);
+    validarPartidoModificable(
+      partido,
+      "No puedes expulsar jugadores de un partido que ya está en curso o finalizado."
+    );
+    InscripcionPartido inscripcion = obtenerInscripcionJugador(
+      partido,
+      idJugadorAExpulsar,
+      "El jugador no está inscripto en este partido."
+    );
+    removerInscripcionYGuardar(partido, inscripcion);
+  }
 
-    for (Partido partido : todosLosPartidos) {
-      if (partido.getCupoMaximo() != null) {
-        cuposUnicos.add(partido.getCupoMaximo());
-      }
+  private Partido obtenerPartidoValidado(Long partidoId) {
+    Partido partido = buscarPartidoPorId(partidoId);
+    if (partido == null) throw new RuntimeException(MENSAJE_PARTIDO_NO_EXISTE);
+    return partido;
+  }
+
+  private void validarOrganizador(Partido partido, Usuario organizador) {
+    if (partido.getOrganizador() == null || !partido.getOrganizador().equals(organizador)) {
+      throw new RuntimeException("Solo el organizador puede expulsar jugadores.");
     }
-    return new ArrayList<>(cuposUnicos);
+  }
+
+  private void validarPartidoModificable(Partido partido, String mensajeError) {
+    if (
+      partido.getEstado() == EstadoPartido.ACTIVO || partido.getEstado() == EstadoPartido.FINALIZADO
+    ) {
+      throw new RuntimeException(mensajeError);
+    }
+  }
+
+  private InscripcionPartido obtenerInscripcionJugador(
+    Partido partido,
+    Long idJugador,
+    String mensajeError
+  ) {
+    if (partido.getInscripciones() == null) throw new RuntimeException(mensajeError);
+    return partido
+      .getInscripciones()
+      .stream()
+      .filter(i -> i.getJugador().getId().equals(idJugador))
+      .findFirst()
+      .orElseThrow(() -> new RuntimeException(mensajeError));
+  }
+
+  private void removerInscripcionYGuardar(Partido partido, InscripcionPartido inscripcion) {
+    partido.getInscripciones().remove(inscripcion);
+    partido.setCantJugadores(partido.getInscripciones().size());
+    repositorioPartido.modificar(partido);
   }
 }

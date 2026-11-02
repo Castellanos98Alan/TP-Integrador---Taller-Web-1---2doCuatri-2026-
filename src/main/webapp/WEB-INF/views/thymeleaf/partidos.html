@@ -395,28 +395,33 @@
                             </div>
 
                             <!-- Acción para unirse -->
-                            <div class="mt-auto">
-                                <!-- Formulario si el partido es privado: pide el código antes de redirigir -->
-                                <form th:if="${partido.esPrivado != null and partido.esPrivado}"
-                                      th:action="@{/partido/{id}/sala-de-espera(id=${partido.id})}"
-                                      method="GET">
+                            <div class="mt-auto" th:with="soyOrganizador=${session.USUARIO != null and partido.organizador != null and partido.organizador.id == session.USUARIO.id},
+                                                        estoyInscripto=${session.USUARIO != null and partido.inscripciones != null and partido.inscripciones.![jugador.usuario.id].contains(session.USUARIO.id)}">
+
+                                <!-- CASO 1: Ya estoy inscripto o soy el creador (Entra directo sin código) -->
+                                <a th:if="${soyOrganizador or estoyInscripto}"
+                                th:href="@{/partido/{id}/sala-de-espera(id=${partido.id})}"
+                                class="btn btn-success w-100 fw-bold">
+                                Ir a la sala <i class="fa-solid fa-arrow-right-to-bracket ms-1"></i>
+                                </a>
+
+                                <!-- CASO 2: No estoy inscripto y es Privado (Pide código) -->
+                                <form th:if="${!(soyOrganizador or estoyInscripto) and partido.esPrivado != null and partido.esPrivado}"
+                                    th:action="@{/partido/{id}/sala-de-espera(id=${partido.id})}"
+                                    method="GET">
                                     <div class="mb-2">
-                                        <input type="text"
-                                               name="codigoAcceso"
-                                               class="form-control form-control-sm"
-                                               placeholder="Ingresá el código de acceso"
-                                               required>
+                                        <input type="text" name="codigoAcceso" class="form-control form-control-sm" placeholder="Ingresá el código de acceso" required>
                                     </div>
                                     <button type="submit" class="btn btn-warning text-dark w-100 fw-bold">
                                         Entrar con código <i class="fa-solid fa-key ms-1"></i>
                                     </button>
                                 </form>
 
-                                <!-- Enlace directo si el partido es público -->
-                                <a th:unless="${partido.esPrivado != null and partido.esPrivado}"
-                                   th:href="@{/partido/{id}/sala-de-espera(id=${partido.id})}"
-                                   class="btn btn-outline-success w-100 fw-bold">
-                                    Unirme <i class="fa-solid fa-arrow-right ms-1"></i>
+                                <!-- CASO 3: No estoy inscripto y es Público (Botón normal) -->
+                                <a th:if="${!(soyOrganizador or estoyInscripto) and (partido.esPrivado == null or !partido.esPrivado)}"
+                                th:href="@{/partido/{id}/sala-de-espera(id=${partido.id})}"
+                                class="btn btn-outline-success w-100 fw-bold">
+                                Unirme <i class="fa-solid fa-arrow-right ms-1"></i>
                                 </a>
                             </div>
 
