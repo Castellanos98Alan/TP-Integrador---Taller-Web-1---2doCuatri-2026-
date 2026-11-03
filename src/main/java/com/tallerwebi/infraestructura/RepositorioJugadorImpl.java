@@ -63,6 +63,17 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
   }
 
   @Override
+  public Jugador buscarPorId(Long id) {
+    String query = "SELECT j FROM Jugador j WHERE j.id = :id";
+    List<Jugador> jugadores = sessionFactory
+      .getCurrentSession()
+      .createQuery(query, Jugador.class)
+      .setParameter("id", id)
+      .getResultList();
+    return jugadores.isEmpty() ? null : jugadores.get(0);
+  }
+
+  @Override
   public void modificar(Jugador jugador) {
     sessionFactory.getCurrentSession().merge(jugador);
   }

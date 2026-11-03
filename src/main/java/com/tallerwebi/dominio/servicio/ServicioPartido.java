@@ -36,4 +36,5 @@ public interface ServicioPartido {
 
   void invitarJugador(Long idPartido, Long idJugador, Usuario usuarioQueInvita)
     throws InvitacionAlPartidoException;
+  List<Partido> buscarPartidosPorJugador(Long idJugador);
 }

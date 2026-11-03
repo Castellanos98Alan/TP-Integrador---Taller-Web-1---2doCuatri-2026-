@@ -11,7 +11,9 @@ import static org.mockito.Mockito.*;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.excepcion.CupoMaximoAlcanzado;
 import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
+import com.tallerwebi.dominio.servicio.ServicioEstadistica;
 import com.tallerwebi.dominio.servicio.ServicioJugador;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
 import com.tallerwebi.dominio.servicio.ServicioSolicitudAmistad;
@@ -33,6 +35,7 @@ public class PartidosControllerTest {
   private ServicioJugador servicioJugadorMock;
   private ServicioBalanceoEquipo servicioBalanceoEquipoMock;
   private ServicioSolicitudAmistad servicioSolicitudAmistadMock;
+  private ServicioEstadistica servicioEstadisticaMock;
   private HttpServletRequest requestMock;
   private HttpSession sessionMock;
   private Model modelMock;
@@ -41,13 +44,11 @@ public class PartidosControllerTest {
   public void init() {
     servicioPartidoMock = mock(ServicioPartido.class);
     servicioJugadorMock = mock(ServicioJugador.class);
-    servicioSolicitudAmistadMock = mock(ServicioSolicitudAmistad.class);
+
+    servicioEstadisticaMock = mock(ServicioEstadistica.class);
     partidosController =
-      new PartidosController(
-        servicioPartidoMock,
-        servicioJugadorMock,
-        servicioSolicitudAmistadMock
-      );
+      new PartidosController(servicioPartidoMock, servicioJugadorMock, servicioEstadisticaMock, servicioSolicitudAmistadMock);
+
     requestMock = mock(HttpServletRequest.class);
     sessionMock = mock(HttpSession.class);
     modelMock = mock(Model.class);
@@ -133,7 +134,7 @@ public class PartidosControllerTest {
     );
 
     verify(servicioPartidoMock, times(1)).cancelarPartido(idPartido, usuarioLogueado);
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/partidos"));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/partido/"));
   }
 
   @Test
@@ -188,12 +189,16 @@ public class PartidosControllerTest {
   public void unirseAlPartidoConExcepcionDeberiaLanzarError() {
     Usuario usuario = new Usuario();
     usuario.setId(1L);
-    Jugador jugador = servicioJugadorMock.buscarPorUsuarioId(usuario.getId());
+
+    Jugador jugador = new Jugador();
+    jugador.setId(1L);
 
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+    when(servicioJugadorMock.buscarPorUsuarioId(usuario.getId())).thenReturn(jugador);
 
-    doThrow(new RuntimeException("Cupo maximo alcanzado"))
+    // Simulamos que el servicio lanza la excepción de negocio cuando intenta unirse
+    doThrow(new CupoMaximoAlcanzado("Cupo maximo alcanzado"))
       .when(servicioPartidoMock)
       .unirseAPartido(1L, jugador);
 
@@ -201,9 +206,10 @@ public class PartidosControllerTest {
 
     verify(servicioPartidoMock, times(1)).unirseAPartido(1L, jugador);
 
+    // Verificamos que ahora el controlador redirige a la sala de espera con el error en la URL
     assertThat(
       modelAndView.getViewName(),
-      equalToIgnoringCase("redirect:/partido/1/sala-de-espera")
+      equalToIgnoringCase("redirect:/partido/1/sala-de-espera?error=Cupo+maximo+alcanzado")
     );
   }
 
