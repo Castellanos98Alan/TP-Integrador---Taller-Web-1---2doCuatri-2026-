@@ -1,24 +1,21 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Jugador;
-import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
+import com.tallerwebi.dominio.servicio.ServicioEstadistica;
 import com.tallerwebi.dominio.servicio.ServicioJugador;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 //import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -27,11 +24,20 @@ public class PartidosController {
 
   private ServicioPartido servicioPartido;
   private ServicioJugador servicioJugador;
+  private ServicioEstadistica servicioEstadistica;
+  private static final String ATRIBUTO_ERROR = "error";
+  private static final String SESION_USUARIO = "USUARIO";
+  private static final String REDIRECT_PARTIDO = "redirect:/partido/";
 
   @Autowired
-  public PartidosController(ServicioPartido servicioPartido, ServicioJugador servicioJugador) {
+  public PartidosController(
+    ServicioPartido servicioPartido,
+    ServicioJugador servicioJugador,
+    ServicioEstadistica servicioEstadistica
+  ) {
     this.servicioPartido = servicioPartido;
     this.servicioJugador = servicioJugador;
+    this.servicioEstadistica = servicioEstadistica;
   }
 
   private static final String FILTRO_TODOS = "TODOS";
@@ -112,7 +118,7 @@ public class PartidosController {
     Model model,
     HttpServletRequest request
   ) {
-    Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute("USUARIO");
+    Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute(SESION_USUARIO);
 
     if (usuarioLogueado == null) {
       return new ModelAndView("redirect:/login");
@@ -125,7 +131,7 @@ public class PartidosController {
       model.addAttribute("error", e.getMessage());
     }
 
-    return new ModelAndView("redirect:/partidos");
+    return new ModelAndView(REDIRECT_PARTIDO);
   }
 
   @RequestMapping(path = "/cancelar-partido", method = RequestMethod.GET)
@@ -145,22 +151,34 @@ public class PartidosController {
   @RequestMapping(path = "/partido/{id}/sala-de-espera", method = RequestMethod.GET)
   public ModelAndView verSalaDeEspera(
     @PathVariable("id") Long idPartido,
+    @RequestParam(value = ATRIBUTO_ERROR, required = false) String error,
     HttpServletRequest request
   ) {
     HttpSession session = request.getSession();
-    Usuario usuarioLogueado = (Usuario) session.getAttribute("USUARIO");
+    Usuario usuarioLogueado = (Usuario) session.getAttribute(SESION_USUARIO);
 
     if (usuarioLogueado == null) {
       return new ModelAndView("redirect:/login?error=Debes+iniciar+sesion+para+unirte");
     }
 
     Map<String, Object> model = new ModelMap();
+
+    if (error != null && !error.isBlank()) {
+      model.put(ATRIBUTO_ERROR, error);
+    }
+
     try {
       Partido partido = servicioPartido.buscarPartidoPorId(idPartido);
       model.put("partido", partido);
-    } catch (Exception e) {
-      model.put("error", e.getMessage());
-      return new ModelAndView("redirect:/partidos", model);
+
+      boolean puedeCargar = servicioEstadistica.puedeCargarEstadisticas(partido, usuarioLogueado);
+      model.put("puedeCargarEstadisticas", puedeCargar);
+
+      boolean puedeRevisar = servicioEstadistica.puedeRevisarEstadisticas(partido, usuarioLogueado);
+      model.put("puedeRevisarEstadisticas", puedeRevisar);
+    } catch (PartidoNoEncontrado e) {
+      model.put(ATRIBUTO_ERROR, e.getMessage());
+      return new ModelAndView(REDIRECT_PARTIDO, model);
     }
 
     return new ModelAndView("sala-de-espera", model);
@@ -182,8 +200,7 @@ public class PartidosController {
     HttpServletRequest request
   ) {
     HttpSession session = request.getSession();
-
-    Usuario usuarioLogueado = (Usuario) session.getAttribute("USUARIO");
+    Usuario usuarioLogueado = (Usuario) session.getAttribute(SESION_USUARIO);
 
     if (usuarioLogueado == null) {
       return new ModelAndView("redirect:/login?error=Debes+iniciar+sesion+para+unirte");
@@ -191,14 +208,116 @@ public class PartidosController {
 
     try {
       Jugador jugadorLogueado = servicioJugador.buscarPorUsuarioId(usuarioLogueado.getId());
-
       servicioPartido.unirseAPartido(idPartido, jugadorLogueado);
 
-      return new ModelAndView("redirect:/partido/" + idPartido + "/sala-de-espera");
-    } catch (Exception e) {
-      Map<String, Object> model = new ModelMap();
-      model.put("error", e.getMessage());
-      return new ModelAndView("redirect:/partido/" + idPartido + "/sala-de-espera", model);
+      return new ModelAndView(REDIRECT_PARTIDO + idPartido + "/sala-de-espera");
+    } catch (
+      CupoMaximoAlcanzado
+      | EstadoPartidoInvalido
+      | JugadorInscripto
+      | DiferenciaHoraria
+      | PartidoNoEncontrado e
+    ) {
+      String mensajeError = e.getMessage();
+      return new ModelAndView(
+        "redirect:/partido/" +
+        idPartido +
+        "/sala-de-espera?error=" +
+        java.net.URLEncoder.encode(mensajeError, java.nio.charset.StandardCharsets.UTF_8)
+      );
     }
+  }
+
+  @GetMapping("/partido/{id}/cargar-estadisticas")
+  public ModelAndView verVistaCargarEstadisticas(
+    @PathVariable("id") Long idPartido,
+    HttpServletRequest request
+  ) {
+    HttpSession session = request.getSession();
+    Usuario usuarioLogueado = (Usuario) session.getAttribute(SESION_USUARIO);
+
+    if (usuarioLogueado == null) {
+      return new ModelAndView("redirect:/login?error=Debes+iniciar+sesión");
+    }
+
+    Partido partido = servicioPartido.buscarPartidoPorId(idPartido);
+
+    if (partido == null) {
+      return new ModelAndView("redirect:/partidos?error=El+partido+no+existe");
+    }
+
+    boolean autorizado = servicioEstadistica.puedeCargarEstadisticas(partido, usuarioLogueado);
+
+    if (!autorizado) {
+      return new ModelAndView(
+        "redirect:/partido/" +
+        idPartido +
+        "/sala-de-espera?error=No+estás+autorizado+para+cargar+estadísticas+aún"
+      );
+    }
+
+    WrapperEstadistica wrapperEstadistica = new WrapperEstadistica();
+    if (partido.getInscripciones() != null) {
+      for (int i = 0; i < partido.getInscripciones().size(); i++) {
+        wrapperEstadistica.getEstadisticas().add(new DTOEstadisticaJugador());
+      }
+    }
+
+    Map<String, Object> model = new ModelMap();
+    model.put("partido", partido);
+    model.put("formulario", wrapperEstadistica);
+
+    return new ModelAndView("cargar-estadisticas", model);
+  }
+
+  @RequestMapping(path = "/partido/{id}/revisar-estadisticas", method = RequestMethod.GET)
+  public ModelAndView verPantallaRevisionEstadisticas(
+    @PathVariable("id") Long idPartido,
+    HttpServletRequest request
+  ) {
+    Usuario usuarioLogueado = obtenerUsuarioLogueadoDesdeSesion(request);
+    if (usuarioLogueado == null) {
+      return new ModelAndView("redirect:/login?error=Debes+iniciar+sesion");
+    }
+
+    try {
+      Partido partido = servicioPartido.buscarPartidoPorId(idPartido);
+
+      if (!servicioEstadistica.puedeRevisarEstadisticas(partido, usuarioLogueado)) {
+        String urlRedireccion =
+          REDIRECT_PARTIDO +
+          idPartido +
+          "/sala-de-espera?error=No+estás+autorizado+para+revisar+estas+estadísticas";
+        return new ModelAndView(urlRedireccion);
+      }
+
+      Map<String, Object> model = new ModelMap();
+      model.put("partido", partido);
+
+      List<Estadistica> estadisticas = servicioEstadistica.obtenerEstadisticasPorPartido(partido);
+
+      Map<String, Integer> marcador = servicioEstadistica.calcularMarcadorPartido(
+        partido,
+        estadisticas
+      );
+      Map<String, List<Estadistica>> estadisticasSeparadas =
+        servicioEstadistica.obtenerEstadisticasSeparadasPorEquipo(partido, estadisticas);
+
+      model.put("golesLocal", marcador.get("local"));
+      model.put("golesVisitante", marcador.get("visitante"));
+      model.put("estadisticasLocal", estadisticasSeparadas.get("locales"));
+      model.put("estadisticasVisitante", estadisticasSeparadas.get("visitantes"));
+
+      return new ModelAndView("revisar-estadisticas", model);
+    } catch (RevisionEstadisticasNoPermitida e) {
+      return new ModelAndView("redirect:/partidos?error=" + "No puedes revisar estas estadisticas");
+    }
+  }
+
+  private Usuario obtenerUsuarioLogueadoDesdeSesion(HttpServletRequest request) {
+    if (request == null || request.getSession() == null) {
+      return null;
+    }
+    return (Usuario) request.getSession().getAttribute("USUARIO");
   }
 }

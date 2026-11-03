@@ -16,5 +16,7 @@ public interface RepositorioJugador {
 
   Jugador buscarPorUsuarioId(Long usuarioId);
 
+  Jugador buscarPorId(Long idJugador);
+
   void modificar(Jugador jugador);
 }
