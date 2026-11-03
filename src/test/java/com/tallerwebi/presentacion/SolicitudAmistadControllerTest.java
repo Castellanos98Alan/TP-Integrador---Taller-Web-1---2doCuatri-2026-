@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.servicio.ServicioLogin;
+import com.tallerwebi.dominio.servicio.ServicioNotificacion;
 import com.tallerwebi.dominio.servicio.ServicioSolicitudAmistad;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -19,6 +20,7 @@ public class SolicitudAmistadControllerTest {
 
   private ServicioSolicitudAmistad servicioSolicitudAmistadMock;
   private ServicioLogin servicioLoginMock;
+  private ServicioNotificacion servicioNotificacionMock;
 
   @BeforeEach
   public void init() {
@@ -27,7 +29,11 @@ public class SolicitudAmistadControllerTest {
     servicioLoginMock = mock(ServicioLogin.class);
 
     solicitudAmistadController =
-      new SolicitudAmistadController(servicioSolicitudAmistadMock, servicioLoginMock);
+      new SolicitudAmistadController(
+        servicioSolicitudAmistadMock,
+        servicioLoginMock,
+        servicioNotificacionMock
+      );
   }
 
   @Test

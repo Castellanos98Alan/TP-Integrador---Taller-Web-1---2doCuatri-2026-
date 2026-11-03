@@ -7,13 +7,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Enumeration.TipoDeNotificacion;
+import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
-import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
-import com.tallerwebi.dominio.servicio.ServicioJugador;
-import com.tallerwebi.dominio.servicio.ServicioPartido;
-import com.tallerwebi.dominio.servicio.ServicioPartidoImpl;
+import com.tallerwebi.dominio.servicio.*;
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,6 +35,11 @@ public class ServicioPartidoTest {
 
   private ServicioBalanceoEquipo servicioBalanceoEquipoMock;
 
+  private ServicioNotificacion servicioNotificacionMock;
+
+  private ServicioSolicitudAmistad servicioSolicitudAmistadMock;
+  private ServicioInvitacionPartido servicioInvitacionPartidoMock;
+
   private static final String FILTRO_TODOS = "TODOS";
 
   @BeforeEach
@@ -48,7 +52,13 @@ public class ServicioPartidoTest {
 
     servicioJugadorMock = mock(ServicioJugador.class);
 
+    servicioInvitacionPartidoMock = mock(ServicioInvitacionPartido.class);
+
     servicioBalanceoEquipoMock = mock(ServicioBalanceoEquipo.class);
+
+    servicioNotificacionMock = mock(ServicioNotificacion.class);
+
+    servicioSolicitudAmistadMock = mock(ServicioSolicitudAmistad.class);
 
     servicioPartido =
       new ServicioPartidoImpl(
@@ -56,7 +66,10 @@ public class ServicioPartidoTest {
         repositorioCanchaMock,
         repositorioUsuarioMock,
         servicioJugadorMock,
-        servicioBalanceoEquipoMock
+        servicioBalanceoEquipoMock,
+        servicioNotificacionMock,
+        servicioSolicitudAmistadMock,
+        servicioInvitacionPartidoMock
       );
   }
 
@@ -889,5 +902,100 @@ public class ServicioPartidoTest {
         LocalDateTime.of(2026, 10, 20, 17, 0),
         LocalDateTime.of(2026, 10, 20, 19, 0)
       );
+  }
+
+  @Test
+  public void alInvitarUnJugadorDebeLlamarAlServicioDeInvitacion()
+    throws InvitacionAlPartidoException {
+    // Given
+
+    Long idPartido = 1L;
+    Long idJugador = 2L;
+
+    Usuario usuarioQueInvita = new Usuario();
+
+    // When
+
+    servicioPartido.invitarJugador(idPartido, idJugador, usuarioQueInvita);
+
+    // Then
+
+    verify(servicioInvitacionPartidoMock, times(1))
+      .invitarJugador(idPartido, idJugador, usuarioQueInvita);
+  }
+
+  ////////////////////
+
+  @Test
+  public void dadoQueUnPartidoTieneJugadoresCuandoSeCancelaDebeNotificarlos() {
+    // Given
+
+    Usuario organizador = new Usuario();
+    organizador.setId(1L);
+
+    Usuario usuario1 = new Usuario();
+    usuario1.setId(2L);
+
+    Usuario usuario2 = new Usuario();
+    usuario2.setId(3L);
+
+    Jugador jugador1 = new Jugador();
+    jugador1.setUsuario(usuario1);
+
+    Jugador jugador2 = new Jugador();
+    jugador2.setUsuario(usuario2);
+
+    Partido partido = new Partido();
+    partido.setId(10L);
+    partido.setOrganizador(organizador);
+    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+
+    InscripcionPartido inscripcion1 = new InscripcionPartido(partido, jugador1);
+
+    InscripcionPartido inscripcion2 = new InscripcionPartido(partido, jugador2);
+
+    partido.getInscripciones().add(inscripcion1);
+
+    partido.getInscripciones().add(inscripcion2);
+
+    when(repositorioPartidoMock.buscarPorId(10L)).thenReturn(partido);
+
+    // When
+
+    servicioPartido.cancelarPartido(10L, organizador);
+
+    // Then
+
+    assertThat(partido.getEstado(), equalTo(Partido.EstadoPartido.CANCELADO));
+
+    verify(servicioNotificacionMock).notificarCancelacion(usuario1, partido);
+
+    verify(servicioNotificacionMock).notificarCancelacion(usuario2, partido);
+  }
+
+  @Test
+  public void alCancelarUnPartidoSinJugadoresNoDebeEnviarNotificaciones() {
+    // Given
+
+    Usuario organizador = new Usuario();
+    organizador.setId(1L);
+
+    Partido partido = new Partido();
+    partido.setId(10L);
+    partido.setOrganizador(organizador);
+    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+
+    partido.setInscripciones(new ArrayList<>());
+
+    when(repositorioPartidoMock.buscarPorId(10L)).thenReturn(partido);
+
+    // When
+
+    servicioPartido.cancelarPartido(10L, organizador);
+
+    // Then
+
+    verify(servicioNotificacionMock, never())
+      .notificarCancelacion(any(Usuario.class), any(Partido.class));
   }
 }

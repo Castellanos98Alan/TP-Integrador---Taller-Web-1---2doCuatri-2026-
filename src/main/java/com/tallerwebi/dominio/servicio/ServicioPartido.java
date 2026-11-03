@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.Cancha;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.util.List;
 
@@ -32,4 +33,7 @@ public interface ServicioPartido {
   List<String> obtenerProvinciasDisponibles();
   List<String> obtenerLocalidadesDisponibles();
   List<Integer> obtenerCuposDisponibles();
+
+  void invitarJugador(Long idPartido, Long idJugador, Usuario usuarioQueInvita)
+    throws InvitacionAlPartidoException;
 }

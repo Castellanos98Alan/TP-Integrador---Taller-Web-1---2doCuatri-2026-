@@ -14,6 +14,7 @@ import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
 import com.tallerwebi.dominio.servicio.ServicioJugador;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
+import com.tallerwebi.dominio.servicio.ServicioSolicitudAmistad;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class PartidosControllerTest {
   private ServicioPartido servicioPartidoMock;
   private ServicioJugador servicioJugadorMock;
   private ServicioBalanceoEquipo servicioBalanceoEquipoMock;
+  private ServicioSolicitudAmistad servicioSolicitudAmistadMock;
   private HttpServletRequest requestMock;
   private HttpSession sessionMock;
   private Model modelMock;
@@ -39,8 +41,13 @@ public class PartidosControllerTest {
   public void init() {
     servicioPartidoMock = mock(ServicioPartido.class);
     servicioJugadorMock = mock(ServicioJugador.class);
-    partidosController = new PartidosController(servicioPartidoMock, servicioJugadorMock);
-
+    servicioSolicitudAmistadMock = mock(ServicioSolicitudAmistad.class);
+    partidosController =
+      new PartidosController(
+        servicioPartidoMock,
+        servicioJugadorMock,
+        servicioSolicitudAmistadMock
+      );
     requestMock = mock(HttpServletRequest.class);
     sessionMock = mock(HttpSession.class);
     modelMock = mock(Model.class);

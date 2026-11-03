@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.SolicitudAmistad;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.SolicitudAmistadInvalida;
 import com.tallerwebi.dominio.repositorio.RepositorioSolicitudAmistad;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,5 +76,24 @@ public class ServicioSolicitudAmistadImpl implements ServicioSolicitudAmistad {
   @Override
   public Boolean sonAmigos(Usuario usuarioLogueado, Usuario usuarioPerfil) {
     return repositorioSolicitudAmistad.sonAmigos(usuarioLogueado, usuarioPerfil);
+  }
+
+  @Override
+  public List<Usuario> obtenerAmigos(Usuario usuarioLogueado) {
+    List<SolicitudAmistad> amistades = repositorioSolicitudAmistad.buscarAmistadesAceptadas(
+      usuarioLogueado
+    );
+
+    List<Usuario> amigos = new ArrayList<>();
+
+    for (SolicitudAmistad amistad : amistades) {
+      if (amistad.getEmisor().getId().equals(usuarioLogueado.getId())) {
+        amigos.add(amistad.getReceptor());
+      } else {
+        amigos.add(amistad.getEmisor());
+      }
+    }
+
+    return amigos;
   }
 }

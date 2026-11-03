@@ -9,6 +9,7 @@ import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.servicio.ServicioEstadistica;
 import com.tallerwebi.dominio.servicio.ServicioEstadisticasImpl;
+import com.tallerwebi.dominio.servicio.ServicioNotificacion;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +22,22 @@ public class ServicioEstadisticaTest {
   private RepositorioEstadistica repositorioEstadisticaMock;
   private RepositorioPartido repositorioPartidoMock;
   private RepositorioJugador repositorioJugadorMock;
+  private ServicioNotificacion servicioNotificacionMock;
 
   @BeforeEach
   public void init() {
     this.repositorioEstadisticaMock = mock(RepositorioEstadistica.class);
     this.repositorioPartidoMock = mock(RepositorioPartido.class);
     this.repositorioJugadorMock = mock(RepositorioJugador.class);
+    this.repositorioJugadorMock = mock(RepositorioJugador.class);
+    this.servicioNotificacionMock = mock(ServicioNotificacion.class);
 
     this.servicioEstadistica =
       new ServicioEstadisticasImpl(
         this.repositorioEstadisticaMock,
         this.repositorioPartidoMock,
-        this.repositorioJugadorMock
+        this.repositorioJugadorMock,
+        this.servicioNotificacionMock
       );
   }
 
@@ -200,6 +205,7 @@ public class ServicioEstadisticaTest {
     Long idPartido = 1L;
     Partido partidoMock = mock(Partido.class);
     Jugador jugadorMock = mock(Jugador.class);
+    Usuario organizadorMock = mock(Usuario.class);
 
     DTOEstadisticaJugador dto = new DTOEstadisticaJugador(10L, 2, 1, 0); // idJugador, goles, amarillas, rojas
     List<DTOEstadisticaJugador> datosCargados = List.of(dto);
@@ -209,6 +215,7 @@ public class ServicioEstadisticaTest {
     when(repositorioJugadorMock.buscarPorUsuarioId(dto.getIdJugador())).thenReturn(jugadorMock);
     when(repositorioEstadisticaMock.buscarPorPartidoYJugador(partidoMock, jugadorMock))
       .thenReturn(null); // Simulamos que no existe todavía (creación)
+    when(partidoMock.getOrganizador()).thenReturn(organizadorMock);
 
     // 2. Ejecución (When)
     servicioEstadistica.guardarEstadisticasYEnviarARevision(idPartido, datosCargados);
@@ -224,5 +231,8 @@ public class ServicioEstadisticaTest {
     // Verificamos que se haya cambiado el estado del partido a EN_REVISION y se haya guardado/actualizado
     verify(partidoMock, times(1)).setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
     verify(repositorioPartidoMock, times(1)).guardar(partidoMock);
+
+    verify(servicioNotificacionMock, times(1))
+      .notificarFormularioCompletado(organizadorMock, partidoMock);
   }
 }

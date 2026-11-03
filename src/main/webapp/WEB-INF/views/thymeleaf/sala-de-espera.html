@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
@@ -24,21 +26,28 @@
             background-color: #003c2e;
             padding: 12px 35px;
         }
+
         .marca {
             color: white;
             font-size: 25px;
             font-weight: bold;
             text-decoration: none;
         }
-        .marca span { color: #50e3a4; }
+
+        .marca span {
+            color: #50e3a4;
+        }
+
         .nav-link {
             color: white !important;
             margin: 0 10px;
         }
+
         .nav-link.active {
             color: #ffe600 !important;
             border-bottom: 3px solid #ffe600;
         }
+
         .boton-crear {
             background-color: #ffe600;
             color: #18352c;
@@ -55,14 +64,16 @@
             border-radius: 20px;
             padding: 25px;
             margin-bottom: 25px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
         }
+
         .cancha-img {
             width: 100%;
             height: 180px;
             object-fit: cover;
             border-radius: 14px;
         }
+
         .badge-proximo {
             color: #50e3a4;
             font-weight: bold;
@@ -70,6 +81,7 @@
             font-size: 11px;
             text-transform: uppercase;
         }
+
         .info-pill {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -83,21 +95,24 @@
             border-radius: 18px;
             padding: 22px;
             border: none;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
             margin-bottom: 20px;
         }
+
         .equipo-header-verde {
             background-color: #e8f7f0;
             color: #003c2e;
             border-radius: 12px;
             padding: 10px 16px;
         }
+
         .equipo-header-amarillo {
             background-color: #fffde6;
             color: #5c4d00;
             border-radius: 12px;
             padding: 10px 16px;
         }
+
         .avatar-jugador {
             width: 42px;
             height: 42px;
@@ -105,6 +120,7 @@
             object-fit: cover;
             border: 2px solid #50e3a4;
         }
+
         .badge-posicion {
             background-color: #f0f4f2;
             color: #4a635a;
@@ -112,6 +128,7 @@
             padding: 4px 10px;
             border-radius: 8px;
         }
+
         .badge-puntos {
             background-color: #d1fae5;
             color: #065f46;
@@ -127,15 +144,17 @@
             border-radius: 14px;
             height: 180px;
             position: relative;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
+
         .linea-media {
             position: absolute;
             top: 50%;
             width: 100%;
             height: 2px;
-            background: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.3);
         }
+
         .circulo-central {
             position: absolute;
             top: 50%;
@@ -143,7 +162,7 @@
             transform: translate(-50%, -50%);
             width: 60px;
             height: 60px;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
         }
     </style>
@@ -171,21 +190,117 @@
                     aria-expanded="false">
                 <i class="fa-solid fa-bell"></i>
                 <span
-                        th:if="${solicitudesPendientes != null and !solicitudesPendientes.isEmpty()}"
-                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                        th:text="${solicitudesPendientes.size()}">
-                    0
-                </span>
+                        th:if="${cantidadNotificaciones != null
+                             and cantidadNotificaciones > 0}"
+                        class="position-absolute top-0 start-100
+                            translate-middle badge rounded-pill bg-danger"
+                        th:text="${cantidadNotificaciones}">
+                                             0
+                    </span>
             </button>
 
             <div class="dropdown-menu dropdown-menu-end p-3" style="width: 340px;">
-                <h6 class="fw-bold mb-3">Solicitudes de amistad</h6>
+                <h6 class="fw-bold mb-3">
+                    Notificaciones
+                </h6>
 
-                <div th:if="${solicitudesPendientes == null or solicitudesPendientes.isEmpty()}" class="text-muted">
-                    No tenés solicitudes pendientes.
+                <div
+                        th:each="notificacion : ${notificaciones}"
+                        class="border-bottom py-2">
+
+                    <div
+                            th:if="${notificacion.tipoDeNotificacion.name()
+                                    == 'INVITACION_PARTIDO'}">
+
+                        <strong>⚽ Invitación a partido</strong>
+
+                        <p
+                                class="mb-1"
+                                th:text="${notificacion.mensaje}">
+                        </p>
+
+                        <form th:action="@{/notificacion/marcar-leida}"
+                              method="post">
+
+                            <input type="hidden"
+                                   name="idNotificacion"
+                                   th:value="${notificacion.id}">
+
+                            <input type="hidden"
+                                   name="volverA"
+                                   th:value="'/partido/' + ${notificacion.partido.id} + '/sala-de-espera'">
+
+                            <button type="submit"
+                                    class="btn btn-sm btn-success mt-1">
+                                Ver partido
+                            </button>
+
+                        </form>
+
+                    </div>
+
+
+                    <div
+                            th:if="${notificacion.tipoDeNotificacion.name()
+                                    == 'PARTIDO_CANCELADO'}">
+
+                        <strong>❌ Partido cancelado</strong>
+
+                        <p
+                                class="mb-1"
+                                th:text="${notificacion.mensaje}">
+                        </p>
+
+                        <form
+                                th:action="@{/notificacion/marcar-leida}"
+                                method="post">
+
+                            <input
+                                    type="hidden"
+                                    name="idNotificacion"
+                                    th:value="${notificacion.id}">
+
+                            <input
+                                    type="hidden"
+                                    name="volverA"
+                                    th:value="${solicitud.id}">
+
+                            <button
+                                    type="submit"
+                                    class="btn btn-sm btn-outline-secondary mt-1">
+
+                                Marcar como leída
+                            </button>
+
+                        </form>
+
+                    </div>
+
+
+                    <div
+                            th:if="${notificacion.tipoDeNotificacion.name()
+                                    == 'FORMULARIO_COMPLETADO'}">
+
+                        <strong>📋 Formulario completado</strong>
+
+                        <p
+                                class="mb-1"
+                                th:text="${notificacion.mensaje}">
+                        </p>
+
+                    </div>
+
                 </div>
 
-                <div th:if="${solicitudesPendientes != null}" th:each="solicitud : ${solicitudesPendientes}" class="border-bottom py-2">
+                <div
+                        th:if="${cantidadNotificaciones == 0}"
+                        class="text-muted text-center py-2">
+
+                    No tenés notificaciones.
+                </div>
+
+                <div th:if="${solicitudesPendientes != null}" th:each="solicitud : ${solicitudesPendientes}"
+                     class="border-bottom py-2">
                     <div>
                         <strong th:text="${solicitud.emisor.nickname}">Usuario</strong>
                         <span>quiere agregarte como amigo.</span>
@@ -239,12 +354,15 @@
     <div class="hero-partido">
         <div class="row align-items-center">
             <div class="col-md-3 mb-3 mb-md-0">
-                <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80" class="cancha-img" alt="Cancha">
+                <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80"
+                     class="cancha-img" alt="Cancha">
             </div>
             <div class="col-md-9">
                 <span class="badge-proximo">PRÓXIMO PARTIDO - NIVEL: <span th:text="${partido.nivel}"></span></span>
 
-                <h2 class="fw-bold text-white mb-1" th:text="${partido.cancha != null ? partido.cancha.nombre : 'Cancha sin asignar'}">Nombre de Cancha</h2>
+                <h2 class="fw-bold text-white mb-1"
+                    th:text="${partido.cancha != null ? partido.cancha.nombre : 'Cancha sin asignar'}">Nombre de
+                    Cancha</h2>
 
                 <p class="text-white-50 mb-3 small">
                     <i class="fa-solid fa-location-dot text-warning me-1"></i>
@@ -257,7 +375,8 @@
                         <i class="fa-regular fa-calendar text-warning fs-5"></i>
                         <div>
                             <small class="d-block text-white-50" style="font-size: 10px;">FECHA</small>
-                            <strong style="font-size: 13px;" th:text="${partido.fecha != null ? #temporals.format(partido.fecha, 'dd/MM/yyyy') : 'A confirmar'}">Fecha</strong>
+                            <strong style="font-size: 13px;"
+                                    th:text="${partido.fecha != null ? #temporals.format(partido.fecha, 'dd/MM/yyyy') : 'A confirmar'}">Fecha</strong>
                         </div>
                     </div>
 
@@ -265,7 +384,8 @@
                         <i class="fa-regular fa-clock text-warning fs-5"></i>
                         <div>
                             <small class="d-block text-white-50" style="font-size: 10px;">HORARIO</small>
-                            <strong style="font-size: 13px;" th:text="${partido.fecha != null ? #temporals.format(partido.fecha, 'HH:mm') + ' hs' : '--:--'}">Hora</strong>
+                            <strong style="font-size: 13px;"
+                                    th:text="${partido.fecha != null ? #temporals.format(partido.fecha, 'HH:mm') + ' hs' : '--:--'}">Hora</strong>
                         </div>
                     </div>
 
@@ -281,8 +401,19 @@
                     </div>
 
                     <div class="ms-auto">
+
+                        <button type="button"
+                                class="btn btn-success mt-3"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalInvitarAmigos"
+                                th:if="${esParticipante}">
+                            <i class="fa-solid fa-user-plus"></i>
+                            Invitar amigos
+                        </button>
+
                         <form th:action="@{/partido/{id}/unirse(id=${partido.id})}" method="post">
-                            <button type="submit" class="btn btn-warning btn-lg fw-bold text-dark px-4 py-2" style="border-radius: 12px; background-color: #ffe600;">
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold text-dark px-4 py-2"
+                                    style="border-radius: 12px; background-color: #ffe600;">
                                 <i class="fa-solid fa-user-plus me-1"></i> ¡Unirme al Partido!
                             </button>
                         </form>
@@ -304,20 +435,26 @@
                             <small class="text-muted" style="font-size: 11px;">Lista oficial</small>
                         </div>
                     </div>
-                    <span class="badge bg-success px-3 py-2" th:text="${(partido.cantJugadores != null ? partido.cantJugadores : 0) + ' / ' + partido.cupoMaximo}"></span>
+                    <span class="badge bg-success px-3 py-2"
+                          th:text="${(partido.cantJugadores != null ? partido.cantJugadores : 0) + ' / ' + partido.cupoMaximo}"></span>
                 </div>
 
-                <div th:if="${partido.inscripciones == null || partido.inscripciones.isEmpty()}" class="text-center py-4 text-muted small">
+                <div th:if="${partido.inscripciones == null || partido.inscripciones.isEmpty()}"
+                     class="text-center py-4 text-muted small">
                     <i class="fa-solid fa-futbol display-6 d-block mb-2 text-black-50"></i>
                     Aún no hay jugadores confirmados. ¡Sumate!
                 </div>
 
-                <div th:each="ins : ${partido.inscripciones}" class="d-flex align-items-center justify-content-between p-2 mb-2 rounded" style="background-color: #f9fbfb;">
+                <div th:each="ins : ${partido.inscripciones}"
+                     class="d-flex align-items-center justify-content-between p-2 mb-2 rounded"
+                     style="background-color: #f9fbfb;">
                     <div class="d-flex align-items-center gap-2">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador" alt="Avatar">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador"
+                             alt="Avatar">
                         <div>
                             <!-- Muestra nickname si existe, sino el nombre del jugador -->
-                            <strong class="d-block text-dark" style="font-size: 14px;" th:text="${ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
+                            <strong class="d-block text-dark" style="font-size: 14px;"
+                                    th:text="${ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
                             <span class="badge-posicion">Confirmado</span>
                         </div>
                     </div>
@@ -359,21 +496,28 @@
                             <span class="badge bg-success">Local</span>
                         </div>
 
-                        <div th:each="ins : ${partido.inscripciones}" th:if="${ins.equipo != null and ins.equipo.id == partido.equipo1.id}" class="d-flex align-items-center justify-content-between p-2 mb-2 rounded" style="background-color: #f9fbfb;">
+                        <div th:each="ins : ${partido.inscripciones}"
+                             th:if="${ins.equipo != null and ins.equipo.id == partido.equipo1.id}"
+                             class="d-flex align-items-center justify-content-between p-2 mb-2 rounded"
+                             style="background-color: #f9fbfb;">
                             <div class="d-flex align-items-center gap-2">
-                                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador" alt="Avatar">
+                                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                                     class="avatar-jugador" alt="Avatar">
                                 <div>
                                     <!-- Muestra nickname si existe, sino el nombre del jugador -->
-                                    <strong class="d-block text-dark" style="font-size: 13px;" th:text="${ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
+                                    <strong class="d-block text-dark" style="font-size: 13px;"
+                                            th:text="${ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
                                     <div class="d-flex gap-1 mt-1">
                                         <span class="badge-posicion">Titular</span>
-                                        <span th:if="${ins.esCapitan}" class="badge bg-warning text-dark" style="font-size: 10px;">
+                                        <span th:if="${ins.esCapitan}" class="badge bg-warning text-dark"
+                                              style="font-size: 10px;">
                                             <i class="fa-solid fa-crown me-1"></i> Capitán
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                            <span class="badge-puntos" th:text="${ins.jugador.puntos != null ? ins.jugador.puntos + ' pts' : 'OK'}">90 pts</span>
+                            <span class="badge-puntos"
+                                  th:text="${ins.jugador.puntos != null ? ins.jugador.puntos + ' pts' : 'OK'}">90 pts</span>
                         </div>
                     </div>
 
@@ -384,21 +528,28 @@
                             <span class="badge bg-warning text-dark">Visitante</span>
                         </div>
 
-                        <div th:each="ins : ${partido.inscripciones}" th:if="${ins.equipo != null and ins.equipo.id == partido.equipo2.id}" class="d-flex align-items-center justify-content-between p-2 mb-2 rounded" style="background-color: #f9fbfb;">
+                        <div th:each="ins : ${partido.inscripciones}"
+                             th:if="${ins.equipo != null and ins.equipo.id == partido.equipo2.id}"
+                             class="d-flex align-items-center justify-content-between p-2 mb-2 rounded"
+                             style="background-color: #f9fbfb;">
                             <div class="d-flex align-items-center gap-2">
-                                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador" alt="Avatar">
+                                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                                     class="avatar-jugador" alt="Avatar">
                                 <div>
                                     <!-- Muestra nickname si existe, sino el nombre del jugador -->
-                                    <strong class="d-block text-dark" style="font-size: 13px;" th:text="${ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
+                                    <strong class="d-block text-dark" style="font-size: 13px;"
+                                            th:text="${ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
                                     <div class="d-flex gap-1 mt-1">
                                         <span class="badge-posicion">Titular</span>
-                                        <span th:if="${ins.esCapitan}" class="badge bg-warning text-dark" style="font-size: 10px;">
+                                        <span th:if="${ins.esCapitan}" class="badge bg-warning text-dark"
+                                              style="font-size: 10px;">
                                             <i class="fa-solid fa-crown me-1"></i> Capitán
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                            <span class="badge-puntos" th:text="${ins.jugador.puntos != null ? ins.jugador.puntos + ' pts' : 'OK'}">85 pts</span>
+                            <span class="badge-puntos"
+                                  th:text="${ins.jugador.puntos != null ? ins.jugador.puntos + ' pts' : 'OK'}">85 pts</span>
                         </div>
                     </div>
 
@@ -414,7 +565,8 @@
                     <i class="fa-solid fa-scale-balanced fs-4 text-success"></i>
                     <h6 class="fw-bold mb-0">Balance de equipos</h6>
                 </div>
-                <p class="text-muted small mb-3">Los equipos se balancean en base al nivel y estadísticas de cada jugador.</p>
+                <p class="text-muted small mb-3">Los equipos se balancean en base al nivel y estadísticas de cada
+                    jugador.</p>
 
                 <div class="cancha-tactica mb-3">
                     <div class="linea-media"></div>
@@ -427,10 +579,12 @@
             </div>
 
             <div class="card card-custom">
-                <h6 class="fw-bold mb-3"><i class="fa-solid fa-square-check text-success me-1"></i> Confirmación de Asistencia</h6>
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-square-check text-success me-1"></i> Confirmación de
+                    Asistencia</h6>
                 <div class="d-flex justify-content-between small text-muted mb-1">
                     <span>Ocupación de la sala</span>
-                    <strong th:text="${(partido.cantJugadores != null ? partido.cantJugadores : 0) + ' de ' + partido.cupoMaximo + ' confirmados'}">0 de 10</strong>
+                    <strong th:text="${(partido.cantJugadores != null ? partido.cantJugadores : 0) + ' de ' + partido.cupoMaximo + ' confirmados'}">0
+                        de 10</strong>
                 </div>
 
                 <!-- Barra de progreso dinámica calculada con Thymeleaf -->
@@ -440,6 +594,67 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="modal fade"
+     id="modalInvitarAmigos"
+     tabindex="-1"
+     aria-labelledby="tituloInvitarAmigos"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloInvitarAmigos">
+                    Invitar amigos
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <p>Seleccioná un amigo para invitar al partido.</p>
+
+                <div th:if="${amigos == null or amigos.isEmpty()}">
+                    Todavía no tenés amigos para invitar.
+                </div>
+
+                <div th:each="amigo : ${amigos}"
+                     class="d-flex justify-content-between
+                            align-items-center border-bottom py-3">
+
+                    <strong th:text="${amigo.nickname}">
+                        Nombre del amigo
+                    </strong>
+
+                    <form th:action="@{'/partido/' + ${partido.id} + '/invitar'}"
+                          method="post">
+
+                        <input type="hidden"
+                               name="idJugador"
+                               th:value="${amigo.id}">
+
+                        <button type="submit"
+                                class="btn btn-success btn-sm">
+                            Invitar
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
         </div>
 
     </div>
