@@ -105,6 +105,16 @@
             object-fit: cover;
             border: 2px solid #50e3a4;
         }
+
+        .avatar-sin-foto {
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               background-color: #006747;
+               color: white;
+               font-size: 20px;
+        }
+
         .badge-posicion {
             background-color: #f0f4f2;
             color: #4a635a;
@@ -340,7 +350,15 @@
 
                 <div th:each="ins : ${partido.inscripciones}" class="d-flex align-items-center justify-content-between p-2 mb-2 rounded" style="background-color: #f9fbfb;">
                     <div class="d-flex align-items-center gap-2">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador" alt="Avatar">
+                        <img th:if="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
+                             th:src="@{'/' + ${ins.jugador.foto}}"
+                             th:style="'object-position:' + ${ins.jugador.fotoPosicionX} + '% ' + ${ins.jugador.fotoPosicionY} + '%;'"
+                             class="avatar-jugador"
+                             alt="Foto de perfil">
+                        <div th:unless="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
+                             class="avatar-jugador avatar-sin-foto">
+                            ⚽
+                        </div>
                         <div>
                             <!-- Muestra nickname si existe, sino el nombre del jugador -->
                             <strong class="d-block text-dark" style="font-size: 14px;" th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
@@ -387,7 +405,16 @@
 
                         <div th:each="ins : ${partido.inscripciones}" th:if="${ins.equipo != null and ins.equipo.id == partido.equipo1.id}" class="d-flex align-items-center justify-content-between p-2 mb-2 rounded" style="background-color: #f9fbfb;">
                             <div class="d-flex align-items-center gap-2">
-                                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador" alt="Avatar">
+                                <img th:if="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
+                                     th:src="@{'/' + ${ins.jugador.foto}}"
+                                     th:style="'object-position:' + ${ins.jugador.fotoPosicionX} + '% ' + ${ins.jugador.fotoPosicionY} + '%;'"
+                                     class="avatar-jugador"
+                                     alt="Foto de perfil">
+
+                                <div th:unless="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
+                                     class="avatar-jugador avatar-sin-foto">
+                                    ⚽
+                                </div>
                                 <div>
                                     <!-- Muestra nickname si existe, sino el nombre del jugador -->
                                     <strong class="d-block text-dark" style="font-size: 13px;" th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
@@ -412,7 +439,16 @@
 
                         <div th:each="ins : ${partido.inscripciones}" th:if="${ins.equipo != null and ins.equipo.id == partido.equipo2.id}" class="d-flex align-items-center justify-content-between p-2 mb-2 rounded" style="background-color: #f9fbfb;">
                             <div class="d-flex align-items-center gap-2">
-                                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador" alt="Avatar">
+                                <img th:if="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
+                                     th:src="@{'/' + ${ins.jugador.foto}}"
+                                     th:style="'object-position:' + ${ins.jugador.fotoPosicionX} + '% ' + ${ins.jugador.fotoPosicionY} + '%;'"
+                                     class="avatar-jugador"
+                                     alt="Foto de perfil">
+
+                                <div th:unless="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
+                                     class="avatar-jugador avatar-sin-foto">
+                                    ⚽
+                                </div>
                                 <div>
                                     <!-- Muestra nickname si existe, sino el nombre del jugador -->
                                     <strong class="d-block text-dark" style="font-size: 13px;" th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
