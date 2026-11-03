@@ -14,6 +14,12 @@ public class Cancha {
   private String provincia;
   private String localidad;
 
+  @Column(name = "latitud")
+  private Double latitud;
+
+  @Column(name = "longitud")
+  private Double longitud;
+
   public Cancha() {}
 
   public Cancha(Long id, String nombre, String provincia, String localidad) {
@@ -54,5 +60,21 @@ public class Cancha {
 
   public void setLocalidad(String localidadNueva) {
     this.localidad = localidadNueva;
+  }
+
+  public Double getLatitud() {
+    return latitud;
+  }
+
+  public void setLatitud(Double latitud) {
+    this.latitud = latitud;
+  }
+
+  public Double getLongitud() {
+    return longitud;
+  }
+
+  public void setLongitud(Double longitud) {
+    this.longitud = longitud;
   }
 }
