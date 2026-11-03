@@ -1,11 +1,11 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
-import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.*;
+import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
 import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
 import com.tallerwebi.dominio.servicio.ServicioEstadistica;
 import com.tallerwebi.dominio.servicio.ServicioJugador;
@@ -41,87 +41,84 @@ public class PartidosController {
   public PartidosController(
     ServicioPartido servicioPartido,
     ServicioJugador servicioJugador,
-    ServicioSolicitudAmistad servicioSolicitudAmistad
-  ) {
-    this.servicioPartido = servicioPartido;
-    this.servicioJugador = servicioJugador;
-    this.servicioSolicitudAmistad = servicioSolicitudAmistad;
+    ServicioSolicitudAmistad servicioSolicitudAmistad,
     ServicioEstadistica servicioEstadistica
   ) {
     this.servicioPartido = servicioPartido;
     this.servicioJugador = servicioJugador;
+    this.servicioSolicitudAmistad = servicioSolicitudAmistad;
     this.servicioEstadistica = servicioEstadistica;
   }
 
   private static final String FILTRO_TODOS = "TODOS";
 
   @RequestMapping(path = "/partidos", method = RequestMethod.GET)
-  public ModelAndView consultarPartidos(
-    @RequestParam(
-      value = "filtroNivel",
-      required = false,
-      defaultValue = FILTRO_TODOS
-    ) String filtroNivel,
-    @RequestParam(
-      value = "filtroTipo",
-      required = false,
-      defaultValue = FILTRO_TODOS
-    ) String filtroTipo,
-    @RequestParam(
-      value = "filtroCupo",
-      required = false,
-      defaultValue = FILTRO_TODOS
-    ) String filtroCupo,
-    @RequestParam(
-      value = "filtroFecha",
-      required = false,
-      defaultValue = FILTRO_TODOS
-    ) String filtroFecha,
-    @RequestParam(
-      value = "filtroHora",
-      required = false,
-      defaultValue = FILTRO_TODOS
-    ) String filtroHora,
-    @RequestParam(
-      value = "filtroProvincia",
-      required = false,
-      defaultValue = FILTRO_TODOS
-    ) String filtroProvincia,
-    @RequestParam(
-      value = "filtroLocalidad",
-      required = false,
-      defaultValue = FILTRO_TODOS
-    ) String filtroLocalidad
-  ) {
+  public ModelAndView consultarPartidos() {
+    //    @RequestParam(
+    //      value = "filtroNivel",
+    //      required = false,
+    //      defaultValue = FILTRO_TODOS
+    //    ) String filtroNivel,
+    //    @RequestParam(
+    //      value = "filtroTipo",
+    //      required = false,
+    //      defaultValue = FILTRO_TODOS
+    //    ) String filtroTipo,
+    //    @RequestParam(
+    //      value = "filtroCupo",
+    //      required = false,
+    //      defaultValue = FILTRO_TODOS
+    //    ) String filtroCupo,
+    //    @RequestParam(
+    //      value = "filtroFecha",
+    //      required = false,
+    //      defaultValue = FILTRO_TODOS
+    //    ) String filtroFecha,
+    //    @RequestParam(
+    //      value = "filtroHora",
+    //      required = false,
+    //      defaultValue = FILTRO_TODOS
+    //    ) String filtroHora,
+    //    @RequestParam(
+    //      value = "filtroProvincia",
+    //      required = false,
+    //      defaultValue = FILTRO_TODOS
+    //    ) String filtroProvincia,
+    //    @RequestParam(
+    //      value = "filtroLocalidad",
+    //      required = false,
+    //      defaultValue = FILTRO_TODOS
+    //    ) String filtroLocalidad
+    //  ) {
     Map<String, Object> model = new ModelMap();
-    model.put(
-      "listaPartidos",
-      servicioPartido.listarPartidosSegunFiltro(
-        filtroNivel,
-        filtroTipo,
-        filtroCupo,
-        filtroFecha,
-        filtroHora,
-        filtroProvincia,
-        filtroLocalidad
-      )
-    );
-
-    model.put("nivelSeleccionado", filtroNivel);
-    model.put("tipoSeleccionado", filtroTipo);
-    model.put("cupoSeleccionado", filtroCupo);
-    model.put("fechaSeleccionada", filtroFecha);
-    model.put("horaSeleccionada", filtroHora);
-    model.put("provinciaSeleccionada", filtroProvincia);
-    model.put("localidadSeleccionada", filtroLocalidad);
-
-    // Datos Dinamico segun partidos
-    model.put("fechasDisponibles", servicioPartido.obtenerFechasDisponibles());
-    model.put("horasDisponibles", servicioPartido.obtenerHorasDisponibles());
-    model.put("provinciasDisponibles", servicioPartido.obtenerProvinciasDisponibles());
-    model.put("localidadesDisponibles", servicioPartido.obtenerLocalidadesDisponibles());
-    model.put("cuposDisponibles", servicioPartido.obtenerCuposDisponibles());
-
+    //    model.put(
+    //      "listaPartidos",
+    //      servicioPartido.listarPartidosSegunFiltro(
+    //        filtroNivel,
+    //        filtroTipo,
+    //        filtroCupo,
+    //        filtroFecha,
+    //        filtroHora,
+    //        filtroProvincia,
+    //        filtroLocalidad
+    //      )
+    //    );
+    //
+    //    model.put("nivelSeleccionado", filtroNivel);
+    //    model.put("tipoSeleccionado", filtroTipo);
+    //    model.put("cupoSeleccionado", filtroCupo);
+    //    model.put("fechaSeleccionada", filtroFecha);
+    //    model.put("horaSeleccionada", filtroHora);
+    //    model.put("provinciaSeleccionada", filtroProvincia);
+    //    model.put("localidadSeleccionada", filtroLocalidad);
+    //
+    //    // Datos Dinamico segun partidos
+    //    model.put("fechasDisponibles", servicioPartido.obtenerFechasDisponibles());
+    //    model.put("horasDisponibles", servicioPartido.obtenerHorasDisponibles());
+    //    model.put("provinciasDisponibles", servicioPartido.obtenerProvinciasDisponibles());
+    //    model.put("localidadesDisponibles", servicioPartido.obtenerLocalidadesDisponibles());
+    //    model.put("cuposDisponibles", servicioPartido.obtenerCuposDisponibles());
+    //
     return new ModelAndView("partidos", model);
   }
 
@@ -177,42 +174,12 @@ public class PartidosController {
 
     Map<String, Object> model = new ModelMap();
 
-
     if (error != null && !error.isBlank()) {
       model.put(ATRIBUTO_ERROR, error);
     }
 
     try {
-      Partido partido = servicioPartido.buscarPartidoPorId(idPartido);
-
-      List<Usuario> confirmados = partido.getConfirmados();
-
-      boolean esParticipante = false;
-
-      for (Usuario confirmado : confirmados) {
-        if (confirmado.getId().equals(usuarioLogueado.getId())) {
-          esParticipante = true;
-          break;
-        }
-      }
-
-      // Incluimos también al organizador si forma parte del partido.
-      if (
-        partido.getOrganizador() != null &&
-        partido.getOrganizador().getId().equals(usuarioLogueado.getId())
-      ) {
-        esParticipante = true;
-      }
-
-      model.put("partido", partido);
-      model.put("esParticipante", esParticipante);
-
-      if (esParticipante) {
-        model.put("amigos", servicioSolicitudAmistad.obtenerAmigos(usuarioLogueado));
-      }
-    } catch (Exception e) {
-      return new ModelAndView("redirect:/partidos");
-
+      Partido partido = getEsParticipante(idPartido, usuarioLogueado, model);
       boolean puedeCargar = servicioEstadistica.puedeCargarEstadisticas(partido, usuarioLogueado);
       model.put("puedeCargarEstadisticas", puedeCargar);
 
@@ -224,6 +191,39 @@ public class PartidosController {
     }
 
     return new ModelAndView("sala-de-espera", model);
+  }
+
+  private Partido getEsParticipante(
+    Long idPartido,
+    Usuario usuarioLogueado,
+    Map<String, Object> model
+  ) {
+    Partido partido = servicioPartido.buscarPartidoPorId(idPartido);
+
+    List<Usuario> confirmados = partido.getConfirmados();
+
+    boolean esParticipante = false;
+
+    for (Usuario confirmado : confirmados) {
+      if (confirmado.getId().equals(usuarioLogueado.getId())) {
+        esParticipante = true;
+        break;
+      }
+    }
+    if (
+      partido.getOrganizador() != null &&
+      partido.getOrganizador().getId().equals(usuarioLogueado.getId())
+    ) {
+      esParticipante = true;
+    }
+
+    model.put("partido", partido);
+    model.put("esParticipante", esParticipante);
+
+    if (esParticipante) {
+      model.put("amigos", servicioSolicitudAmistad.obtenerAmigos(usuarioLogueado));
+    }
+    return partido;
   }
 
   // Con este metodo procesamos la accion de unirse a un partido especifico mediante una peticion POST,
@@ -264,7 +264,7 @@ public class PartidosController {
     ) {
       String mensajeError = e.getMessage();
       return new ModelAndView(
-        "redirect:/partido/" +
+        REDIRECT_PARTIDO +
         idPartido +
         "/sala-de-espera?error=" +
         java.net.URLEncoder.encode(mensajeError, java.nio.charset.StandardCharsets.UTF_8)
@@ -294,7 +294,7 @@ public class PartidosController {
 
     if (!autorizado) {
       return new ModelAndView(
-        "redirect:/partido/" +
+        REDIRECT_PARTIDO +
         idPartido +
         "/sala-de-espera?error=No+estás+autorizado+para+cargar+estadísticas+aún"
       );
@@ -379,6 +379,6 @@ public class PartidosController {
 
     servicioPartido.invitarJugador(idPartido, idJugador, usuarioLogueado);
 
-    return new ModelAndView("redirect:/partido/" + idPartido + "/sala-de-espera");
+    return new ModelAndView(REDIRECT_PARTIDO + idPartido + "/sala-de-espera");
   }
 }

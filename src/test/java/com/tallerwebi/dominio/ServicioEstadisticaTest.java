@@ -34,14 +34,12 @@ public class ServicioEstadisticaTest {
     this.repositorioJugadorMock = mock(RepositorioJugador.class);
     this.servicioNotificacionMock = mock(ServicioNotificacion.class);
 
-
     servicioEstadistica =
       new ServicioEstadisticasImpl(
         this.repositorioEstadisticaMock,
         this.repositorioPartidoMock,
         this.repositorioJugadorMock,
         this.servicioNotificacionMock
-
       );
   }
 
@@ -215,9 +213,9 @@ public class ServicioEstadisticaTest {
 
     when(repositorioPartidoMock.buscarPorId(idPartido)).thenReturn(partidoMock);
     when(repositorioJugadorMock.buscarPorId(dto.getIdJugador())).thenReturn(jugadorMock);
-    when(repositorioEstadisticaMock.buscarPorPartidoYJugador(partidoMock, jugadorMock)).thenReturn(null); // Simulamos que no existe todavía (creación)
+    when(repositorioEstadisticaMock.buscarPorPartidoYJugador(partidoMock, jugadorMock))
+      .thenReturn(null); // Simulamos que no existe todavía (creación)
     when(partidoMock.getOrganizador()).thenReturn(organizadorMock);
-
 
     servicioEstadistica.guardarEstadisticasYEnviarARevision(idPartido, datosCargados);
 
