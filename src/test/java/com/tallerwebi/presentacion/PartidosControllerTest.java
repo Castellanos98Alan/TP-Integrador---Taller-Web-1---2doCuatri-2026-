@@ -16,6 +16,7 @@ import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
 import com.tallerwebi.dominio.servicio.ServicioEstadistica;
 import com.tallerwebi.dominio.servicio.ServicioJugador;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
+import com.tallerwebi.dominio.servicio.ServicioPartidoFiltro;
 import com.tallerwebi.dominio.servicio.ServicioSolicitudAmistad;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -32,6 +33,7 @@ public class PartidosControllerTest {
 
   private PartidosController partidosController;
   private ServicioPartido servicioPartidoMock;
+  private ServicioPartidoFiltro servicioPartidoFiltroMock;
   private ServicioJugador servicioJugadorMock;
   private ServicioBalanceoEquipo servicioBalanceoEquipoMock;
   private ServicioSolicitudAmistad servicioSolicitudAmistadMock;
@@ -43,6 +45,7 @@ public class PartidosControllerTest {
   @BeforeEach
   public void init() {
     servicioPartidoMock = mock(ServicioPartido.class);
+    servicioPartidoFiltroMock = mock(ServicioPartidoFiltro.class);
     servicioJugadorMock = mock(ServicioJugador.class);
     servicioSolicitudAmistadMock = mock(ServicioSolicitudAmistad.class);
     servicioEstadisticaMock = mock(ServicioEstadistica.class);
@@ -50,6 +53,7 @@ public class PartidosControllerTest {
     partidosController =
       new PartidosController(
         servicioPartidoMock,
+        servicioPartidoFiltroMock,
         servicioJugadorMock,
         servicioSolicitudAmistadMock,
         servicioEstadisticaMock
@@ -62,67 +66,67 @@ public class PartidosControllerTest {
 
   public static final String FILTRO_TODOS = "TODOS";
 
-  //  @Test
-  //  public void deberiaRetornarLaVistaPartidosYElModeloConLaListaDePartidos() {
-  //    List<Partido> listaMock = new ArrayList<>();
-  //    when(
-  //      servicioPartidoMock.listarPartidosSegunFiltro(
-  //        FILTRO_TODOS,
-  //        FILTRO_TODOS,
-  //        FILTRO_TODOS,
-  //        FILTRO_TODOS,
-  //        FILTRO_TODOS,
-  //        FILTRO_TODOS,
-  //        FILTRO_TODOS
-  //      )
-  //    )
-  //      .thenReturn(listaMock);
-  //
-  //    // Ejecución
-  //    ModelAndView mav = whenUsuarioConsultaPartidos(
-  //      FILTRO_TODOS,
-  //      FILTRO_TODOS,
-  //      FILTRO_TODOS,
-  //      FILTRO_TODOS,
-  //      FILTRO_TODOS,
-  //      FILTRO_TODOS,
-  //      FILTRO_TODOS
-  //    );
-  //
-  //    // Validación
-  //    thenLaVistaEs("partidos", mav);
-  //    thenModeloKeyEs(listaMock, mav);
-  //  }
-  //
-  //  @Test
-  //  public void queElControladorCargueLasProvinciasYLocalidadesAlMostrarLaVista() {
-  //    // Preparación
-  //    when(servicioPartidoMock.obtenerProvinciasDisponibles())
-  //      .thenReturn(Arrays.asList("Buenos Aires"));
-  //    when(servicioPartidoMock.obtenerLocalidadesDisponibles())
-  //      .thenReturn(Arrays.asList("La Matanza"));
-  //
-  //    // Ejecución (Ajustá los parámetros según la firma actual de tu método en el controlador)
-  //    ModelAndView mav = whenUsuarioConsultaPartidos(
-  //      FILTRO_TODOS,
-  //      FILTRO_TODOS,
-  //      FILTRO_TODOS,
-  //      FILTRO_TODOS,
-  //      FILTRO_TODOS,
-  //      "Buenos Aires",
-  //      "La Matanza"
-  //    );
-  //
-  //    // Validación
-  //    ModelMap modelo = mav.getModelMap();
-  //    assertThat(modelo.get("provinciasDisponibles"), notNullValue());
-  //    assertThat(modelo.get("localidadesDisponibles"), notNullValue());
-  //    assertThat(modelo.get("provinciaSeleccionada"), equalTo("Buenos Aires"));
-  //    assertThat(modelo.get("localidadSeleccionada"), equalTo("La Matanza"));
-  //
-  //    verify(servicioPartidoMock, times(1)).obtenerProvinciasDisponibles();
-  //    verify(servicioPartidoMock, times(1)).obtenerLocalidadesDisponibles();
-  //  }
+  @Test
+  public void deberiaRetornarLaVistaPartidosYElModeloConLaListaDePartidos() {
+    List<Partido> listaMock = new ArrayList<>();
+    when(
+      servicioPartidoFiltroMock.listarPartidosSegunFiltro(
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS,
+        FILTRO_TODOS
+      )
+    )
+      .thenReturn(listaMock);
+
+    // Ejecución
+    ModelAndView mav = whenUsuarioConsultaPartidos(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS
+    );
+
+    // Validación
+    thenLaVistaEs("partidos", mav);
+    thenModeloKeyEs(listaMock, mav);
+  }
+
+  @Test
+  public void queElControladorCargueLasProvinciasYLocalidadesAlMostrarLaVista() {
+    // Preparación
+    when(servicioPartidoFiltroMock.obtenerProvinciasDisponibles())
+      .thenReturn(Arrays.asList("Buenos Aires"));
+    when(servicioPartidoFiltroMock.obtenerLocalidadesDisponibles())
+      .thenReturn(Arrays.asList("La Matanza"));
+
+    // Ejecución (Ajustá los parámetros según la firma actual de tu método en el controlador)
+    ModelAndView mav = whenUsuarioConsultaPartidos(
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      FILTRO_TODOS,
+      "Buenos Aires",
+      "La Matanza"
+    );
+
+    // Validación
+    ModelMap modelo = mav.getModelMap();
+    assertThat(modelo.get("provinciasDisponibles"), notNullValue());
+    assertThat(modelo.get("localidadesDisponibles"), notNullValue());
+    assertThat(modelo.get("provinciaSeleccionada"), equalTo("Buenos Aires"));
+    assertThat(modelo.get("localidadSeleccionada"), equalTo("La Matanza"));
+
+    verify(servicioPartidoFiltroMock, times(1)).obtenerProvinciasDisponibles();
+    verify(servicioPartidoFiltroMock, times(1)).obtenerLocalidadesDisponibles();
+  }
 
   @Test
   public void queAlCancelarUnPartidoExitosamenteRedirijaALaVistaDePartidos() {
@@ -226,23 +230,24 @@ public class PartidosControllerTest {
   private void thenModeloKeyEs(List<Partido> listaMock, ModelAndView mav) {
     assertThat(mav.getModel().get("listaPartidos"), equalTo(listaMock));
   }
-  //  private ModelAndView whenUsuarioConsultaPartidos(
-  //    String filtroNivel,
-  //    String filtroTipo,
-  //    String cupoMaximo,
-  //    String fecha,
-  //    String filtroHora,
-  //    String filtroPartido,
-  //    String filtroLocalidad
-  //  ) {
-  //    return partidosController.consultarPartidos(
-  //      filtroNivel,
-  //      filtroTipo,
-  //      cupoMaximo,
-  //      fecha,
-  //      filtroHora,
-  //      filtroPartido,
-  //      filtroLocalidad
-  //    );
-  //  }
+
+  private ModelAndView whenUsuarioConsultaPartidos(
+    String filtroNivel,
+    String filtroTipo,
+    String cupoMaximo,
+    String fecha,
+    String filtroHora,
+    String filtroPartido,
+    String filtroLocalidad
+  ) {
+    return partidosController.consultarPartidos(
+      filtroNivel,
+      filtroTipo,
+      cupoMaximo,
+      fecha,
+      filtroHora,
+      filtroPartido,
+      filtroLocalidad
+    );
+  }
 }

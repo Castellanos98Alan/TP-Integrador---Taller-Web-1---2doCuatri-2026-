@@ -18,22 +18,6 @@ public interface ServicioPartido {
   List<Cancha> listarCanchas(); // NUEVO
   List<String> listarLocalidades(); // NUEVO
 
-  //  List<Partido> listarPartidosSegunFiltro(
-  //    String filtroNivel,
-  //    String filtroTipo,
-  //    String cupoMaximo,
-  //    String fecha,
-  //    String filtroHora,
-  //    String filtroPartido,
-  //    String filtroLocalidad
-  //  );
-
-  //  List<String> obtenerFechasDisponibles();
-  //  List<String> obtenerHorasDisponibles();
-  //  List<String> obtenerProvinciasDisponibles();
-  //  List<String> obtenerLocalidadesDisponibles();
-  //  List<Integer> obtenerCuposDisponibles();
-
   void invitarJugador(Long idPartido, Long idJugador, Usuario usuarioQueInvita)
     throws InvitacionAlPartidoException;
   List<Partido> buscarPartidosPorJugador(Long idJugador);

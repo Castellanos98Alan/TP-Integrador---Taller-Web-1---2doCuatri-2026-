@@ -427,19 +427,15 @@
                         </div>
                     </div>
 
-                    <div class="ms-auto">
-
+                    <div class="ms-auto d-flex flex-wrap gap-2 align-items-center">
                         <button type="button"
-                                class="btn btn-success mt-3"
+                                class="btn btn-success"
                                 data-bs-toggle="modal"
                                 data-bs-target="#modalInvitarAmigos"
                                 th:if="${esParticipante}">
-                            <i class="fa-solid fa-user-plus"></i>
-                            Invitar amigos
+                            <i class="fa-solid fa-user-plus"></i> Invitar amigos
                         </button>
 
-                    <div class="ms-auto d-flex gap-2">
-                        <!-- BOTÓN UNIRSE AL PARTIDO -->
                         <form th:action="@{/partido/{id}/unirse(id=${partido.id})}" method="post">
                             <button type="submit" class="btn btn-warning btn-lg fw-bold text-dark px-4 py-2"
                                     style="border-radius: 12px; background-color: #ffe600;">
@@ -447,9 +443,10 @@
                             </button>
                         </form>
 
-                        <!-- BOTÓN CARGAR ESTADÍSTICAS (Visible únicamente para el organizador 1 hora después) -->
                         <div th:if="${puedeCargarEstadisticas}">
-                            <a th:href="@{/partido/{id}/cargar-estadisticas(id=${partido.id})}" class="btn btn-success btn-lg fw-bold px-4 py-2 text-white" style="border-radius: 12px; background-color: #059669;">
+                            <a th:href="@{/partido/{id}/cargar-estadisticas(id=${partido.id})}"
+                               class="btn btn-success btn-lg fw-bold px-4 py-2 text-white"
+                               style="border-radius: 12px; background-color: #059669;">
                                 <i class="fa-solid fa-clipboard-user me-1"></i> Cargar Estadísticas
                             </a>
                         </div>
@@ -485,24 +482,15 @@
                      class="d-flex align-items-center justify-content-between p-2 mb-2 rounded"
                      style="background-color: #f9fbfb;">
                     <div class="d-flex align-items-center gap-2">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador"
-                             alt="Avatar">
-                        <div>
-                            <!-- Muestra nickname si existe, sino el nombre del jugador -->
-                            <strong class="d-block text-dark" style="font-size: 14px;"
-                                    th:text="${ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
                         <img th:if="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
                              th:src="@{'/' + ${ins.jugador.foto}}"
                              th:style="'object-position:' + ${ins.jugador.fotoPosicionX} + '% ' + ${ins.jugador.fotoPosicionY} + '%;'"
-                             class="avatar-jugador"
-                             alt="Foto de perfil">
+                             class="avatar-jugador" alt="Foto de perfil">
                         <div th:unless="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
-                             class="avatar-jugador avatar-sin-foto">
-                            ⚽
-                        </div>
+                             class="avatar-jugador avatar-sin-foto">⚽</div>
                         <div>
-                            <!-- Muestra nickname si existe, sino el nombre del jugador -->
-                            <strong class="d-block text-dark" style="font-size: 14px;" th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
+                            <strong class="d-block text-dark" style="font-size: 14px;"
+                                    th:text="${ins.jugador.usuario != null and ins.jugador.usuario.nickname != null and !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
                             <span class="badge-posicion">Confirmado</span>
                         </div>
                     </div>

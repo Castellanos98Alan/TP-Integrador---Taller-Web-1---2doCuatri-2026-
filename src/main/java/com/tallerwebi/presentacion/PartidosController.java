@@ -1,15 +1,12 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
-import com.tallerwebi.dominio.Jugador;
-import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.*;
-import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
 import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
 import com.tallerwebi.dominio.servicio.ServicioEstadistica;
 import com.tallerwebi.dominio.servicio.ServicioJugador;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
+import com.tallerwebi.dominio.servicio.ServicioPartidoFiltro;
 import com.tallerwebi.dominio.servicio.ServicioSolicitudAmistad;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -30,6 +27,7 @@ public class PartidosController {
   private static final String USUARIO_SESION = "USUARIO";
 
   private ServicioPartido servicioPartido;
+  private ServicioPartidoFiltro servicioPartidoFiltro;
   private ServicioJugador servicioJugador;
   private ServicioSolicitudAmistad servicioSolicitudAmistad;
   private ServicioEstadistica servicioEstadistica;
@@ -40,11 +38,13 @@ public class PartidosController {
   @Autowired
   public PartidosController(
     ServicioPartido servicioPartido,
+    ServicioPartidoFiltro servicioPartidoFiltro,
     ServicioJugador servicioJugador,
     ServicioSolicitudAmistad servicioSolicitudAmistad,
     ServicioEstadistica servicioEstadistica
   ) {
     this.servicioPartido = servicioPartido;
+    this.servicioPartidoFiltro = servicioPartidoFiltro;
     this.servicioJugador = servicioJugador;
     this.servicioSolicitudAmistad = servicioSolicitudAmistad;
     this.servicioEstadistica = servicioEstadistica;
@@ -53,72 +53,72 @@ public class PartidosController {
   private static final String FILTRO_TODOS = "TODOS";
 
   @RequestMapping(path = "/partidos", method = RequestMethod.GET)
-  public ModelAndView consultarPartidos() {
-    //    @RequestParam(
-    //      value = "filtroNivel",
-    //      required = false,
-    //      defaultValue = FILTRO_TODOS
-    //    ) String filtroNivel,
-    //    @RequestParam(
-    //      value = "filtroTipo",
-    //      required = false,
-    //      defaultValue = FILTRO_TODOS
-    //    ) String filtroTipo,
-    //    @RequestParam(
-    //      value = "filtroCupo",
-    //      required = false,
-    //      defaultValue = FILTRO_TODOS
-    //    ) String filtroCupo,
-    //    @RequestParam(
-    //      value = "filtroFecha",
-    //      required = false,
-    //      defaultValue = FILTRO_TODOS
-    //    ) String filtroFecha,
-    //    @RequestParam(
-    //      value = "filtroHora",
-    //      required = false,
-    //      defaultValue = FILTRO_TODOS
-    //    ) String filtroHora,
-    //    @RequestParam(
-    //      value = "filtroProvincia",
-    //      required = false,
-    //      defaultValue = FILTRO_TODOS
-    //    ) String filtroProvincia,
-    //    @RequestParam(
-    //      value = "filtroLocalidad",
-    //      required = false,
-    //      defaultValue = FILTRO_TODOS
-    //    ) String filtroLocalidad
-    //  ) {
+  public ModelAndView consultarPartidos(
+    @RequestParam(
+      value = "filtroNivel",
+      required = false,
+      defaultValue = FILTRO_TODOS
+    ) String filtroNivel,
+    @RequestParam(
+      value = "filtroTipo",
+      required = false,
+      defaultValue = FILTRO_TODOS
+    ) String filtroTipo,
+    @RequestParam(
+      value = "filtroCupo",
+      required = false,
+      defaultValue = FILTRO_TODOS
+    ) String filtroCupo,
+    @RequestParam(
+      value = "filtroFecha",
+      required = false,
+      defaultValue = FILTRO_TODOS
+    ) String filtroFecha,
+    @RequestParam(
+      value = "filtroHora",
+      required = false,
+      defaultValue = FILTRO_TODOS
+    ) String filtroHora,
+    @RequestParam(
+      value = "filtroProvincia",
+      required = false,
+      defaultValue = FILTRO_TODOS
+    ) String filtroProvincia,
+    @RequestParam(
+      value = "filtroLocalidad",
+      required = false,
+      defaultValue = FILTRO_TODOS
+    ) String filtroLocalidad
+  ) {
     Map<String, Object> model = new ModelMap();
-    //    model.put(
-    //      "listaPartidos",
-    //      servicioPartido.listarPartidosSegunFiltro(
-    //        filtroNivel,
-    //        filtroTipo,
-    //        filtroCupo,
-    //        filtroFecha,
-    //        filtroHora,
-    //        filtroProvincia,
-    //        filtroLocalidad
-    //      )
-    //    );
-    //
-    //    model.put("nivelSeleccionado", filtroNivel);
-    //    model.put("tipoSeleccionado", filtroTipo);
-    //    model.put("cupoSeleccionado", filtroCupo);
-    //    model.put("fechaSeleccionada", filtroFecha);
-    //    model.put("horaSeleccionada", filtroHora);
-    //    model.put("provinciaSeleccionada", filtroProvincia);
-    //    model.put("localidadSeleccionada", filtroLocalidad);
-    //
-    //    // Datos Dinamico segun partidos
-    //    model.put("fechasDisponibles", servicioPartido.obtenerFechasDisponibles());
-    //    model.put("horasDisponibles", servicioPartido.obtenerHorasDisponibles());
-    //    model.put("provinciasDisponibles", servicioPartido.obtenerProvinciasDisponibles());
-    //    model.put("localidadesDisponibles", servicioPartido.obtenerLocalidadesDisponibles());
-    //    model.put("cuposDisponibles", servicioPartido.obtenerCuposDisponibles());
-    //
+    model.put(
+      "listaPartidos",
+      servicioPartidoFiltro.listarPartidosSegunFiltro(
+        filtroNivel,
+        filtroTipo,
+        filtroCupo,
+        filtroFecha,
+        filtroHora,
+        filtroProvincia,
+        filtroLocalidad
+      )
+    );
+
+    model.put("nivelSeleccionado", filtroNivel);
+    model.put("tipoSeleccionado", filtroTipo);
+    model.put("cupoSeleccionado", filtroCupo);
+    model.put("fechaSeleccionada", filtroFecha);
+    model.put("horaSeleccionada", filtroHora);
+    model.put("provinciaSeleccionada", filtroProvincia);
+    model.put("localidadSeleccionada", filtroLocalidad);
+
+    // Datos Dinamico segun partidos
+    model.put("fechasDisponibles", servicioPartidoFiltro.obtenerFechasDisponibles());
+    model.put("horasDisponibles", servicioPartidoFiltro.obtenerHorasDisponibles());
+    model.put("provinciasDisponibles", servicioPartidoFiltro.obtenerProvinciasDisponibles());
+    model.put("localidadesDisponibles", servicioPartidoFiltro.obtenerLocalidadesDisponibles());
+    model.put("cuposDisponibles", servicioPartidoFiltro.obtenerCuposDisponibles());
+
     return new ModelAndView("partidos", model);
   }
 
