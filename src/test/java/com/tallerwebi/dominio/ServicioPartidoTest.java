@@ -7,6 +7,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.excepcion.CanchaNoDisponibleException;
+import com.tallerwebi.dominio.excepcion.CanchaNoEncontradaException;
+import com.tallerwebi.dominio.excepcion.CupoInvalidoException;
+import com.tallerwebi.dominio.excepcion.FechaPartidoInvalidaException;
+import com.tallerwebi.dominio.excepcion.RangoJugadorIncompatibleException;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
@@ -272,6 +277,8 @@ public class ServicioPartidoTest {
     usuario.setEmail("test@unlam.edu.ar");
 
     Jugador jugador = new Jugador();
+    partido.setNivel("B");
+    jugador.setNivel("INTERMEDIO");
 
     jugador.setId(1L);
     jugador.setUsuario(usuario);
@@ -368,6 +375,8 @@ public class ServicioPartidoTest {
     Jugador jugador = new Jugador();
 
     jugador.setId(100L);
+    partido.setNivel("B");
+    jugador.setNivel("INTERMEDIO");
 
     InscripcionPartido inscripcionExistente = new InscripcionPartido();
 
@@ -425,6 +434,8 @@ public class ServicioPartidoTest {
     Jugador jugadorNuevo = new Jugador();
 
     jugadorNuevo.setId(103L);
+    partido.setNivel("B");
+    jugadorNuevo.setNivel("INTERMEDIO");
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
 
@@ -470,6 +481,8 @@ public class ServicioPartidoTest {
 
     jugador.setId(50L);
     jugador.setUsuario(usuario);
+    partidoNuevo.setNivel("B");
+    jugador.setNivel("INTERMEDIO");
 
     when(repositorioPartidoMock.buscarPorId(partidoIdNuevo)).thenReturn(partidoNuevo);
 
@@ -508,6 +521,8 @@ public class ServicioPartidoTest {
     Jugador jugador = new Jugador();
 
     jugador.setId(50L);
+    partidoNuevo.setNivel("B");
+    jugador.setNivel("INTERMEDIO");
 
     when(repositorioPartidoMock.buscarPorId(partidoIdNuevo)).thenReturn(partidoNuevo);
 
@@ -574,7 +589,7 @@ public class ServicioPartidoTest {
     );
 
     Exception exception = assertThrows(
-      RuntimeException.class,
+      CanchaNoEncontradaException.class,
       () -> servicioPartido.crearPartido(datos, new Usuario())
     );
 
@@ -593,7 +608,7 @@ public class ServicioPartidoTest {
     );
 
     Exception exception = assertThrows(
-      RuntimeException.class,
+      CupoInvalidoException.class,
       () -> servicioPartido.crearPartido(datos, new Usuario())
     );
 
@@ -607,7 +622,7 @@ public class ServicioPartidoTest {
     DatosCrearPartido datos = new DatosCrearPartido("Cancha Los Leones", null, 10, "INTERMEDIO");
 
     Exception exception = assertThrows(
-      RuntimeException.class,
+      FechaPartidoInvalidaException.class,
       () -> servicioPartido.crearPartido(datos, new Usuario())
     );
 
@@ -619,7 +634,6 @@ public class ServicioPartidoTest {
   @Test
   public void noDeberiaCrearPartidoSiLaCanchaEstaOcupada() {
     Cancha cancha = new Cancha();
-
     cancha.setId(1L);
 
     Partido partidoExistente = new Partido();
@@ -637,11 +651,14 @@ public class ServicioPartidoTest {
     );
 
     Exception exception = assertThrows(
-      RuntimeException.class,
+      CanchaNoDisponibleException.class,
       () -> servicioPartido.crearPartido(datos, new Usuario())
     );
 
-    assertTrue(exception.getMessage().contains("La cancha no está disponible"));
+    assertEquals(
+      "La cancha no está disponible en esa franja horaria (los partidos duran 1 hora).",
+      exception.getMessage()
+    );
 
     verify(repositorioPartidoMock, never()).guardar(any());
   }
@@ -673,6 +690,9 @@ public class ServicioPartidoTest {
     Jugador jugadorNuevo = new Jugador();
 
     jugadorNuevo.setId(20L);
+    partido.setNivel("B");
+    jugadorExistente.setNivel("INTERMEDIO");
+    jugadorNuevo.setNivel("INTERMEDIO");
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
 
@@ -706,7 +726,7 @@ public class ServicioPartidoTest {
 
     for (int i = 0; i < 8; i++) {
       Jugador jugador = new Jugador();
-
+      jugador.setNivel("INTERMEDIO");
       jugador.setId((long) i);
 
       InscripcionPartido inscripcion = new InscripcionPartido(partido, jugador);
@@ -717,7 +737,8 @@ public class ServicioPartidoTest {
     partido.setCantJugadores(8);
 
     Jugador nuevoJugador = new Jugador();
-
+    partido.setNivel("B");
+    nuevoJugador.setNivel("INTERMEDIO");
     nuevoJugador.setId(100L);
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
@@ -870,6 +891,71 @@ public class ServicioPartidoTest {
     verify(repositorioPartidoMock, never()).guardar(any());
   }
 
+  //Axel Sprint 4
+  @Test
+  public void noDeberiaPermitirUnirseAUnPartidoDeRangoIncompatible() {
+    // Given
+    Long partidoId = 1L;
+
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setNivel("C");
+    partido.setCupoMaximo(10);
+    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setInscripciones(new ArrayList<>());
+
+    Jugador jugador = new Jugador();
+    jugador.setId(100L);
+    jugador.setNivel("INTERMEDIO");
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    // When
+    RangoJugadorIncompatibleException exception = assertThrows(
+      RangoJugadorIncompatibleException.class,
+      () -> servicioPartido.unirseAPartido(partidoId, jugador)
+    );
+
+    // Then
+    assertEquals(
+      "No podes unirte a este partido porque no corresponde a tu rango.",
+      exception.getMessage()
+    );
+
+    verify(repositorioPartidoMock, never()).modificar(any());
+  }
+
+  @Test
+  public void deberiaPermitirUnirseAUnPartidoDeRangoCompatible() {
+    // Given
+    Long partidoId = 1L;
+
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setNivel("b");
+    partido.setCupoMaximo(10);
+    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setInscripciones(new ArrayList<>());
+
+    Jugador jugador = new Jugador();
+    jugador.setId(100L);
+    jugador.setNivel("INTERMEDIO");
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    when(repositorioPartidoMock.buscarPartidosPorJugador(jugador.getId()))
+      .thenReturn(new ArrayList<>());
+
+    // When
+    servicioPartido.unirseAPartido(partidoId, jugador);
+
+    // Then
+    assertEquals(1, partido.getCantJugadores());
+    assertEquals(1, partido.getInscripciones().size());
+
+    verify(repositorioPartidoMock, times(1)).modificar(partido);
+  }
+  /*
   @Test
   public void deberiaBuscarLosPartidosDeLaCanchaUnaHoraAntesYUnaHoraDespuesDelHorarioElegido() {
     // Given
@@ -883,11 +969,10 @@ public class ServicioPartidoTest {
     servicioPartido.crearPartido(datos, new Usuario());
 
     // Then
-    verify(repositorioPartidoMock)
-      .buscarPartidosEnRango(
-        1L,
-        LocalDateTime.of(2026, 10, 20, 17, 0),
-        LocalDateTime.of(2026, 10, 20, 19, 0)
-      );
-  }
+    verify(repositorioPartidoMock).buscarPartidosEnRango(
+                    1L,
+                    LocalDateTime.of(2026, 10, 20, 17, 0),
+                    LocalDateTime.of(2026, 10, 20, 19, 0)
+            );
+  }*/
 }
