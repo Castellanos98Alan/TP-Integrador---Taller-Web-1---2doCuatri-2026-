@@ -21,7 +21,6 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
   private RepositorioPartido repositorioPartido;
   private RepositorioJugador repositorioJugador;
 
-
   @Autowired
   private HttpServletRequest request;
 

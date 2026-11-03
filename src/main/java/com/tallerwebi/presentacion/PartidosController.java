@@ -216,6 +216,7 @@ public class PartidosController {
       | EstadoPartidoInvalido
       | JugadorInscripto
       | DiferenciaHoraria
+      | RangoJugadorIncompatibleException
       | PartidoNoEncontrado e
     ) {
       String mensajeError = e.getMessage();

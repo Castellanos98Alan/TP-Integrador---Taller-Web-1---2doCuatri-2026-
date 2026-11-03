@@ -40,9 +40,7 @@ public class EstadisticaControllerTest {
       )
       .andExpect(status().is3xxRedirection())
       .andExpect(
-        redirectedUrl(
-          "/partido/1/sala-de-espera?exito=Estadisticas+guardadas+correctamente"
-        )
+        redirectedUrl("/partido/1/sala-de-espera?exito=Estadisticas+guardadas+correctamente")
       );
   }
 
