@@ -32,4 +32,5 @@ public interface ServicioPartido {
   List<String> obtenerProvinciasDisponibles();
   List<String> obtenerLocalidadesDisponibles();
   List<Integer> obtenerCuposDisponibles();
+  List<Partido> buscarPartidosPorJugador(Long idJugador);
 }

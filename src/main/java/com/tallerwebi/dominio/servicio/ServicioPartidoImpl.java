@@ -389,4 +389,9 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
     return new ArrayList<>(cuposUnicos);
   }
+
+  @Override
+  public List<Partido> buscarPartidosPorJugador(Long idJugador) {
+    return repositorioPartido.buscarPartidosPorJugador(idJugador);
+  }
 }

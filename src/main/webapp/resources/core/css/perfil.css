@@ -622,90 +622,34 @@ a {
 }
 
 
+/* ==========================================================
+   GRILLA DE PANELES (7 columnas, alineada con las estadísticas)
+   ========================================================== */
+
+.perfil-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.perfil-grid > * {
+    min-width: 0;
+}
+
+.pg-evolucion  { grid-column: 1 / span 3; }
+.pg-ranking    { grid-column: 4 / span 2; }
+.pg-sobre-mi   { grid-column: 6 / span 2; }
+.pg-fairplay   { grid-column: 1 / span 3; }
+.pg-partidos   { grid-column: 4 / span 4; }
+
+
 /* Gráfico de evolución (vacío) */
 
 .grafico svg {
     display: block;
     width: 100%;
     height: auto;
-}
-
-
-/* Comparativa con el grupo */
-
-.leyenda {
-    margin-left: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    font-size: 11px;
-    color: #536762;
-}
-
-.punto {
-    display: inline-block;
-    width: 9px;
-    height: 9px;
-    margin-right: 5px;
-    border-radius: 50%;
-}
-
-.punto-tu {
-    background-color: #22a765;
-}
-
-.punto-grupo {
-    background-color: #c9d3cf;
-}
-
-.barra-bloque {
-    margin-bottom: 16px;
-}
-
-.barra-bloque:last-child {
-    margin-bottom: 0;
-}
-
-.barra-titulo {
-    margin-bottom: 6px;
-    font-size: 13px;
-}
-
-.barra-linea {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-
-.barra-pista {
-    flex: 1;
-    height: 10px;
-    border-radius: 5px;
-    background-color: #e4ebe8;
-    overflow: hidden;
-}
-
-.barra-relleno {
-    width: 0;
-    height: 100%;
-    border-radius: 5px;
-}
-
-.barra-tu {
-    background-color: #22a765;
-}
-
-.barra-grupo {
-    background-color: #c9d3cf;
-}
-
-.barra-valor {
-    width: 28px;
-    font-size: 12px;
-    font-weight: bold;
-    text-align: right;
-    color: #536762;
 }
 
 
@@ -854,6 +798,69 @@ a {
 }
 
 
+/* Fair Play: tarjetas de fútbol ilustradas (roja = expulsiones, amarilla = amonestaciones) */
+
+.tarjetas-fairplay {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.tarjetas-fairplay .fair-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-height: 125px;
+    padding: 18px;
+}
+
+.tarjeta-futbol {
+    position: relative;
+    width: 48px;
+    height: 68px;
+    border-radius: 7px;
+    transform: rotate(-7deg);
+    flex-shrink: 0;
+    box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.tarjeta-futbol::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 8px;
+    height: 56px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.28);
+}
+
+.tarjeta-futbol.roja {
+    background: linear-gradient(145deg, #ff5b5b, #c91f35);
+}
+
+.tarjeta-futbol.amarilla {
+    background: linear-gradient(145deg, #ffe878, #e5b900);
+}
+
+.fair-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.fair-card-info .stat-valor {
+    font-size: 28px;
+    font-weight: 700;
+    color: #173b31;
+}
+
+.fair-card-info small {
+    color: #71827c;
+    font-size: 12px;
+}
+
+
 /* Últimos partidos */
 
 .tabla-scroll {
@@ -871,6 +878,18 @@ a {
     font-size: 11px;
     font-weight: bold;
     letter-spacing: 0.5px;
+}
+
+.tabla-partido-fila {
+    min-width: 460px;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1.3fr 0.5fr 0.5fr 0.8fr;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 10px;
+    border-bottom: 1px solid #e3ece8;
+    font-size: 13px;
+    color: #17332b;
 }
 
 .actividad-vacia {
@@ -986,50 +1005,73 @@ a {
     color: #004d38;
 }
 
-.dato-cuenta {
-    padding: 10px 0;
-    border-bottom: 1px solid #e3ebe8;
+
+/* Sobre mí (compacto) */
+
+.panel-sobre-mi {
+    display: flex;
+    flex-direction: column;
+}
+
+.sobre-mi-cuerpo {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 16px 16px 16px 44px;
+    border: 1px solid #e1e9e5;
+    border-left: 4px solid #22a765;
+    border-radius: 12px;
+    background-color: white;
+}
+
+.sobre-mi-comillas {
+    position: absolute;
+    top: 17px;
+    left: 16px;
+    font-size: 18px;
+    color: #bfe6d2;
+}
+
+.sobre-mi-cuerpo .biografia {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.sobre-mi-vacio {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 20px 14px;
+    border: 1px dashed #d8e2de;
+    border-radius: 12px;
+    background-color: white;
+    text-align: center;
+}
+
+.sobre-mi-vacio i {
+    font-size: 22px;
+    color: #9fd8bf;
+}
+
+.sobre-mi-vacio p {
+    margin: 0;
+    color: #536762;
     font-size: 13px;
 }
 
-.datos-cuenta .dato-cuenta:first-child {
-    padding-top: 0;
-}
-
-.dato-cuenta:last-child {
-    padding-bottom: 0;
-    border-bottom: none;
-}
-
-.dato-label {
-    display: block;
-    margin-bottom: 3px;
-    color: #536762;
-    font-size: 12px;
-}
-
-.dato-cuenta p {
-    margin: 0;
-    font-weight: bold;
-    color: #17332b;
-    overflow-wrap: anywhere;
-}
-
-.estado-cuenta {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 6px;
-    color: white;
-    font-size: 12px;
+.sobre-mi-vacio a {
+    color: #006747;
+    font-size: 13px;
     font-weight: bold;
 }
 
-.estado-activo {
-    background-color: #22a765;
-}
-
-.estado-inactivo {
-    background-color: #e83c43;
+.sobre-mi-vacio a:hover {
+    color: #004d38;
 }
 
 
@@ -1436,6 +1478,39 @@ button.btn-cancelar {
     }
 }
 
+@media (max-width: 1199px) {
+
+    .perfil-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pg-evolucion,
+    .pg-fairplay,
+    .pg-partidos {
+        grid-column: 1 / -1;
+    }
+
+    .pg-ranking {
+        grid-column: 1;
+    }
+
+    .pg-sobre-mi {
+        grid-column: 2;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .perfil-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pg-ranking,
+    .pg-sobre-mi {
+        grid-column: 1 / -1;
+    }
+}
+
 @media (max-width: 900px) {
 
     .hero-ranking h1 {
@@ -1506,4 +1581,11 @@ button.btn-cancelar {
         flex: 1;
         text-align: center;
     }
+
+    /* Fair Play: las tarjetas se apilan en vertical en celulares */
+
+    .tarjetas-fairplay {
+        grid-template-columns: 1fr;
+    }
+
 }

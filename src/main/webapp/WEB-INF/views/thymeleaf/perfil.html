@@ -13,7 +13,77 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <link rel="stylesheet" th:href="@{/css/perfil.css}">
+    <link rel="stylesheet" th:href="@{/css/perfil.css(v=20261103)}">
+    <!-- Estilos del Fair Play (copia de perfil.css; borrar este bloque cuando perfil.css se sirva actualizado) -->
+    <style>
+    /* Fair Play: tarjetas de fútbol ilustradas (roja = expulsiones, amarilla = amonestaciones) */
+
+    .tarjetas-fairplay {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .tarjetas-fairplay .fair-card {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        min-height: 125px;
+        padding: 18px;
+    }
+
+    .tarjeta-futbol {
+        position: relative;
+        width: 48px;
+        height: 68px;
+        border-radius: 7px;
+        transform: rotate(-7deg);
+        flex-shrink: 0;
+        box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .tarjeta-futbol::after {
+        content: "";
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 8px;
+        height: 56px;
+        border-radius: 4px;
+        background-color: rgba(255, 255, 255, 0.28);
+    }
+
+    .tarjeta-futbol.roja {
+        background: linear-gradient(145deg, #ff5b5b, #c91f35);
+    }
+
+    .tarjeta-futbol.amarilla {
+        background: linear-gradient(145deg, #ffe878, #e5b900);
+    }
+
+    .fair-card-info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        min-width: 0;
+    }
+
+    .fair-card-info .stat-valor {
+        font-size: 28px;
+        font-weight: 700;
+        color: #173b31;
+    }
+
+    .fair-card-info small {
+        color: #71827c;
+        font-size: 12px;
+    }
+
+    @media (max-width: 600px) {
+        .tarjetas-fairplay {
+            grid-template-columns: 1fr;
+        }
+    }
+    </style>
 </head>
 
 
@@ -168,10 +238,20 @@
     </div>
 
 
-    <!-- CREAR PARTIDO -->
-    <a class="boton-crear" th:href="@{/crearPartido}">
-        + Crear partido
-    </a>
+    <div class="navbar-acciones">
+
+        <!-- CREAR PARTIDO -->
+        <a class="boton-crear" th:href="@{/crearPartido}">
+            + Crear partido
+        </a>
+
+        <!-- CERRAR SESIÓN (solo en MI perfil) -->
+        <a class="boton-logout" th:if="${esMiPerfil}" th:href="@{/login}"
+           title="Cerrar sesión" aria-label="Cerrar sesión">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </a>
+
+    </div>
 
     </div>
 
@@ -368,28 +448,12 @@
 
     <div class="hero-tabs">
 
-        <a class="hero-tab activo" href="#resumen">
-            <i class="fa-solid fa-chart-simple"></i>Resumen
-        </a>
-
-        <a class="hero-tab" href="#rendimiento">
-            <i class="fa-solid fa-chart-line"></i>Rendimiento
-        </a>
-
-        <a class="hero-tab" href="#rangos">
-            <i class="fa-solid fa-ranking-star"></i>Ranking
-        </a>
-
         <a class="hero-tab" href="#fairplay">
             <i class="fa-solid fa-shield-halved"></i>Fair Play
         </a>
 
         <a class="hero-tab" href="#partidos">
             <i class="fa-solid fa-calendar-days"></i>Partidos
-        </a>
-
-        <a class="hero-tab" href="#cuenta">
-            <i class="fa-solid fa-gear"></i>Mi cuenta
         </a>
 
     </div>
@@ -405,6 +469,20 @@
          th:if="${puntos == 0}">
         <i class="fa-solid fa-circle-info"></i>
         Todavía no sumaste puntos. ¡Jugá partidos para subir de rango!
+    </div>
+
+    <!-- AVISOS DE AMISTAD -->
+
+    <div th:if="${mensajeAmistad != null}"
+         class="alerta-amistad exito">
+        <i class="fa-solid fa-circle-check"></i>
+        <span th:text="${mensajeAmistad}"></span>
+    </div>
+
+    <div th:if="${errorAmistad != null}"
+         class="alerta-amistad error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span th:text="${errorAmistad}"></span>
     </div>
 
     <!-- ESTADÍSTICAS -->
@@ -513,11 +591,11 @@
 
     <!-- RENDIMIENTO / COMPARATIVA / RANKING -->
 
-    <div class="row g-3 mb-3" id="rendimiento">
+    <div class="perfil-grid">
 
         <!-- Evolución -->
 
-        <div class="col-lg-5">
+        <div class="pg-evolucion">
 
             <div class="panel">
 
@@ -528,47 +606,47 @@
 
                 <div class="grafico">
 
-                    <svg viewBox="0 0 520 230" role="img"
+                    <svg viewBox="0 0 520 180" role="img"
                          aria-label="Gráfico de evolución sin datos">
 
                         <g stroke="#dfe7e3" stroke-width="1">
                             <line x1="34" y1="20" x2="510" y2="20"/>
-                            <line x1="34" y1="56" x2="510" y2="56"/>
-                            <line x1="34" y1="92" x2="510" y2="92"/>
-                            <line x1="34" y1="128" x2="510" y2="128"/>
-                            <line x1="34" y1="164" x2="510" y2="164"/>
-                            <line x1="34" y1="200" x2="510" y2="200"/>
+                            <line x1="34" y1="46" x2="510" y2="46"/>
+                            <line x1="34" y1="72" x2="510" y2="72"/>
+                            <line x1="34" y1="98" x2="510" y2="98"/>
+                            <line x1="34" y1="124" x2="510" y2="124"/>
+                            <line x1="34" y1="150" x2="510" y2="150"/>
                         </g>
 
-                        <g fill="#7b8d86" font-size="12" text-anchor="end">
+                        <g fill="#7b8d86" font-size="11" text-anchor="end">
                             <text x="26" y="24">10</text>
-                            <text x="26" y="60">8</text>
-                            <text x="26" y="96">6</text>
-                            <text x="26" y="132">4</text>
-                            <text x="26" y="168">2</text>
-                            <text x="26" y="204">0</text>
+                            <text x="26" y="50">8</text>
+                            <text x="26" y="76">6</text>
+                            <text x="26" y="102">4</text>
+                            <text x="26" y="128">2</text>
+                            <text x="26" y="154">0</text>
                         </g>
 
-                        <g fill="#7b8d86" font-size="12" text-anchor="middle">
-                            <text x="56" y="222">Ene</text>
-                            <text x="97" y="222">Feb</text>
-                            <text x="138" y="222">Mar</text>
-                            <text x="179" y="222">Abr</text>
-                            <text x="220" y="222">May</text>
-                            <text x="261" y="222">Jun</text>
-                            <text x="302" y="222">Jul</text>
-                            <text x="343" y="222">Ago</text>
-                            <text x="384" y="222">Sep</text>
-                            <text x="425" y="222">Oct</text>
-                            <text x="466" y="222">Nov</text>
+                        <g fill="#7b8d86" font-size="11" text-anchor="middle">
+                            <text x="56" y="172">Ene</text>
+                            <text x="97" y="172">Feb</text>
+                            <text x="138" y="172">Mar</text>
+                            <text x="179" y="172">Abr</text>
+                            <text x="220" y="172">May</text>
+                            <text x="261" y="172">Jun</text>
+                            <text x="302" y="172">Jul</text>
+                            <text x="343" y="172">Ago</text>
+                            <text x="384" y="172">Sep</text>
+                            <text x="425" y="172">Oct</text>
+                            <text x="466" y="172">Nov</text>
                         </g>
 
-                        <line x1="34" y1="200" x2="510" y2="200"
+                        <line x1="34" y1="150" x2="510" y2="150"
                               stroke="#9fb3aa" stroke-width="2"
                               stroke-dasharray="6 6"/>
 
-                        <text x="272" y="112" text-anchor="middle"
-                              fill="#536762" font-size="14" font-weight="bold">
+                        <text x="272" y="90" text-anchor="middle"
+                              fill="#536762" font-size="13" font-weight="bold">
                             Sin datos todavía
                         </text>
 
@@ -586,78 +664,9 @@
         </div>
 
 
-        <!-- Frente al promedio -->
-
-        <div class="col-lg-4">
-
-            <div class="panel">
-
-                <div class="panel-encabezado">
-                    <span class="panel-icono"><i class="fa-solid fa-user-group"></i></span>
-                    <h5>Frente al promedio del grupo</h5>
-
-                    <div class="leyenda">
-                        <span><i class="punto punto-tu"></i>Tú</span>
-                        <span><i class="punto punto-grupo"></i>Promedio grupo</span>
-                    </div>
-                </div>
-
-                <div class="barra-bloque">
-                    <div class="barra-titulo">Goles por partido</div>
-                    <div class="barra-linea">
-                        <div class="barra-pista"><div class="barra-relleno barra-tu"></div></div>
-                        <span class="barra-valor">&mdash;</span>
-                    </div>
-                    <div class="barra-linea">
-                        <div class="barra-pista"><div class="barra-relleno barra-grupo"></div></div>
-                        <span class="barra-valor">&mdash;</span>
-                    </div>
-                </div>
-
-                <div class="barra-bloque">
-                    <div class="barra-titulo">Asistencias por partido</div>
-                    <div class="barra-linea">
-                        <div class="barra-pista"><div class="barra-relleno barra-tu"></div></div>
-                        <span class="barra-valor">&mdash;</span>
-                    </div>
-                    <div class="barra-linea">
-                        <div class="barra-pista"><div class="barra-relleno barra-grupo"></div></div>
-                        <span class="barra-valor">&mdash;</span>
-                    </div>
-                </div>
-
-                <div class="barra-bloque">
-                    <div class="barra-titulo">Win rate</div>
-                    <div class="barra-linea">
-                        <div class="barra-pista"><div class="barra-relleno barra-tu"></div></div>
-                        <span class="barra-valor">&mdash;</span>
-                    </div>
-                    <div class="barra-linea">
-                        <div class="barra-pista"><div class="barra-relleno barra-grupo"></div></div>
-                        <span class="barra-valor">&mdash;</span>
-                    </div>
-                </div>
-
-                <div class="barra-bloque">
-                    <div class="barra-titulo">Calificación promedio</div>
-                    <div class="barra-linea">
-                        <div class="barra-pista"><div class="barra-relleno barra-tu"></div></div>
-                        <span class="barra-valor">&mdash;</span>
-                    </div>
-                    <div class="barra-linea">
-                        <div class="barra-pista"><div class="barra-relleno barra-grupo"></div></div>
-                        <span class="barra-valor">&mdash;</span>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-
         <!-- Ranking por puntos -->
 
-        <div class="col-lg-3" id="rangos">
+        <div class="pg-ranking">
 
             <div class="panel">
 
@@ -749,16 +758,39 @@
 
         </div>
 
-    </div>
+        <!-- Sobre mí -->
 
+        <div class="pg-sobre-mi">
 
-    <!-- FAIR PLAY / ÚLTIMOS PARTIDOS -->
+            <div class="panel panel-sobre-mi">
 
-    <div class="row g-3 mb-3">
+                <div class="panel-encabezado">
+                    <span class="panel-icono"><i class="fa-solid fa-user"></i></span>
+                    <h5>Sobre mí</h5>
+                    <a class="panel-link" th:if="${esMiPerfil}" th:href="@{/editar-perfil}">Editar</a>
+                </div>
+
+                <div class="sobre-mi-cuerpo"
+                     th:if="${biografia != null and !biografia.isEmpty()}">
+                    <i class="fa-solid fa-quote-left sobre-mi-comillas"></i>
+                    <p class="biografia" th:text="${biografia}"></p>
+                </div>
+
+                <div class="sobre-mi-vacio"
+                     th:unless="${biografia != null and !biografia.isEmpty()}">
+                    <i class="fa-solid fa-feather-pointed"></i>
+                    <p th:if="${esMiPerfil}">Todavía no agregaste una biografía.</p>
+                    <a th:if="${esMiPerfil}" th:href="@{/editar-perfil}">Completá tu perfil &rarr;</a>
+                    <p th:unless="${esMiPerfil}">Este jugador todavía no escribió su biografía.</p>
+                </div>
+
+            </div>
+
+        </div>
 
         <!-- Fair play -->
 
-        <div class="col-lg-5" id="fairplay">
+        <div class="pg-fairplay" id="fairplay">
 
             <div class="panel">
 
@@ -767,39 +799,33 @@
                     <h5>Fair Play / Sanciones</h5>
                 </div>
 
-                <div class="fair-grid">
+                <div class="fair-grid tarjetas-fairplay">
 
-                    <div class="fair-card">
-                        <div class="stat-icono rojo"><i class="fa-solid fa-hand"></i></div>
-                        <span class="stat-label">Faltas cometidas</span>
-                        <span class="stat-valor">&mdash;</span>
+                    <div class="fair-card tarjeta-roja">
+
+                        <div class="tarjeta-futbol roja"></div>
+
+                        <div class="fair-card-info">
+                            <span class="stat-label">Tarjetas rojas</span>
+                            <span class="stat-valor" th:text="${rojas != null ? rojas : 0}">0</span>
+                            <small>Expulsiones</small>
+                        </div>
+
                     </div>
 
-                    <div class="fair-card">
-                        <div class="stat-icono"><i class="fa-solid fa-coins"></i></div>
-                        <span class="stat-label">Multas</span>
-                        <span class="stat-valor">&mdash;</span>
-                    </div>
+                    <div class="fair-card tarjeta-amarilla">
 
-                    <div class="fair-card">
-                        <div class="stat-icono rojo"><i class="fa-solid fa-arrow-down"></i></div>
-                        <span class="stat-label">Puntos descontados</span>
-                        <span class="stat-valor">&mdash;</span>
-                    </div>
+                        <div class="tarjeta-futbol amarilla"></div>
 
-                    <div class="fair-card">
-                        <div class="stat-icono"><i class="fa-solid fa-scale-balanced"></i></div>
-                        <span class="stat-label">Estado de penitencia</span>
-                        <span class="stat-valor">&mdash;</span>
+                        <div class="fair-card-info">
+                            <span class="stat-label">Tarjetas amarillas</span>
+                            <span class="stat-valor" th:text="${amarillas != null ? amarillas : 0}">0</span>
+                            <small>Amonestaciones</small>
+                        </div>
+
                     </div>
 
                 </div>
-
-                <div class="franja-info">
-                    <i class="fa-solid fa-circle-check"></i>
-                    Acá vas a ver tu comportamiento dentro de la cancha.
-                </div>
-
             </div>
 
         </div>
@@ -807,7 +833,7 @@
 
         <!-- Últimos partidos -->
 
-        <div class="col-lg-7" id="partidos">
+        <div class="pg-partidos" id="partidos">
 
             <div class="panel">
 
@@ -820,17 +846,28 @@
                 </div>
 
                 <div class="tabla-scroll">
+
                     <div class="tabla-partidos-cabecera">
                         <span>FECHA</span>
-                        <span>PARTIDO</span>
-                        <span>RESULTADO</span>
-                        <span>G</span>
-                        <span>A</span>
-                        <span>CALIF.</span>
+                        <span>GOLES</span>
+                        <span>ASIST.</span>
+                        <span>AMAR.</span>
+                        <span>ROJAS</span>
+                        <span>PUNTAJE</span>
                     </div>
+
+                    <div class="tabla-partido-fila" th:each="partido : ${historialPartidos}">
+                        <span th:text="${#temporals.format(partido['fecha'], 'dd/MM/yyyy')}"></span>
+                        <span th:text="${partido['goles']}"></span>
+                        <span th:text="${partido['asistencias']}"></span>
+                        <span th:text="${partido['amarillas']}"></span>
+                        <span th:text="${partido['rojas']}"></span>
+                        <span th:text="${partido['puntaje']}"></span>
+                    </div>
+
                 </div>
 
-                <div class="actividad-vacia">
+                <div class="actividad-vacia" th:if="${#lists.isEmpty(historialPartidos)}">
                     <div class="actividad-icono">
                         <i class="fa-solid fa-futbol"></i>
                     </div>
@@ -842,95 +879,6 @@
 
         </div>
 
-    </div>
-
-
-    <!-- SOBRE MÍ / CUENTA -->
-
-    <div class="row g-3" id="cuenta">
-
-        <div class="col-lg-7">
-
-            <div class="panel">
-
-                <div class="panel-encabezado">
-                    <span class="panel-icono"><i class="fa-solid fa-user"></i></span>
-                    <h5>Sobre mí</h5>
-                </div>
-
-                <div class="tarjeta mb-0">
-
-                    <p class="biografia"
-                       th:if="${biografia != null and !biografia.isEmpty()}"
-                       th:text="${biografia}">
-                    </p>
-
-                    <div class="vacio"
-                         th:if="${biografia == null or biografia.isEmpty()}">
-                        <p>Todavía no agregaste una biografía.</p>
-                        <a th:href="@{/editar-perfil}">Completá tu perfil &rarr;</a>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div th:if="${mensajeAmistad != null}"
-             class="alerta-amistad exito">
-            <i class="fa-solid fa-circle-check"></i>
-            <span th:text="${mensajeAmistad}"></span>
-        </div>
-
-        <div th:if="${errorAmistad != null}"
-             class="alerta-amistad error">
-            <i class="fa-solid fa-circle-exclamation"></i>
-            <span th:text="${errorAmistad}"></span>
-        </div>
-
-
-        <div class="col-lg-5">
-
-            <div class="panel">
-
-                <div class="panel-encabezado">
-                    <span class="panel-icono"><i class="fa-solid fa-gear"></i></span>
-                    <h5>Información de la cuenta</h5>
-                </div>
-
-                <div class="tarjeta mb-0">
-
-                    <div class="datos-cuenta">
-
-                        <div class="dato-cuenta">
-                            <span class="dato-label">Correo electrónico</span>
-                            <p th:text="${email}">correo@ejemplo.com</p>
-                        </div>
-
-                        <div class="dato-cuenta">
-                            <span class="dato-label">Tipo de usuario</span>
-                            <p th:text="${rol}">Jugador</p>
-                        </div>
-
-                        <div class="dato-cuenta">
-                            <span class="dato-label">Estado de la cuenta</span>
-                            <p>
-                                <span class="estado-cuenta"
-                                      th:classappend="${activo == true ? ' estado-activo' : ' estado-inactivo'}"
-                                      th:text="${activo == true ? 'Activo' : 'Inactivo'}">
-                                    Activo
-                                </span>
-                            </p>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
 
     </div>
 

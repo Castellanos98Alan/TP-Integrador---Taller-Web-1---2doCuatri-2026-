@@ -853,19 +853,19 @@ public class ServicioPartidoTest {
     cancha.setId(1L);
     when(repositorioCanchaMock.buscarPorNombre("Cancha Los Leones")).thenReturn(cancha);
     when(repositorioPartidoMock.buscarPartidosEnRango(1L, fecha.minusHours(1), fecha.plusHours(1)))
-            .thenReturn(List.of(new Partido()));
+      .thenReturn(List.of(new Partido()));
     DatosCrearPartido datos = new DatosCrearPartido("Cancha Los Leones", fecha, 10, "B");
 
     // When
     Exception exception = assertThrows(
-            RuntimeException.class,
-            () -> servicioPartido.crearPartido(datos, new Usuario())
+      RuntimeException.class,
+      () -> servicioPartido.crearPartido(datos, new Usuario())
     );
 
     // Then
     assertEquals(
-            "La cancha no está disponible en esa franja horaria (los partidos duran 1 hora).",
-            exception.getMessage()
+      "La cancha no está disponible en esa franja horaria (los partidos duran 1 hora).",
+      exception.getMessage()
     );
     verify(repositorioPartidoMock, never()).guardar(any());
   }
@@ -884,10 +884,10 @@ public class ServicioPartidoTest {
 
     // Then
     verify(repositorioPartidoMock)
-            .buscarPartidosEnRango(
-                    1L,
-                    LocalDateTime.of(2026, 10, 20, 17, 0),
-                    LocalDateTime.of(2026, 10, 20, 19, 0)
-            );
+      .buscarPartidosEnRango(
+        1L,
+        LocalDateTime.of(2026, 10, 20, 17, 0),
+        LocalDateTime.of(2026, 10, 20, 19, 0)
+      );
   }
 }

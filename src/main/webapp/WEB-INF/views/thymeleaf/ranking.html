@@ -362,12 +362,21 @@
             background-color: #006747;
             color: white;
             border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
 
             display: flex;
             align-items: center;
             justify-content: center;
 
             font-weight: bold;
+        }
+
+        .avatar-tabla img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .puntos-tabla {
@@ -996,8 +1005,19 @@
                         </div>
 
 
-                        <div class="avatar">
-                            ⚽
+                        <div class="avatar" style="overflow: hidden;">
+
+                            <img th:if="${ranking[1].foto != null and !ranking[1].foto.isEmpty()}"
+                                 th:src="@{'/' + ${ranking[1].foto}}"
+                                 th:style="'width:100%; height:100%; object-fit:cover; object-position:' +
+                   ${ranking[1].fotoPosicionX} + '% ' +
+                   ${ranking[1].fotoPosicionY} + '%;'"
+                                 alt="Foto de perfil">
+
+                            <span th:unless="${ranking[1].foto != null and !ranking[1].foto.isEmpty()}">
+        ⚽
+    </span>
+
                         </div>
 
 
@@ -1045,8 +1065,19 @@
                         </div>
 
 
-                        <div class="avatar">
-                            ⚽
+                        <div class="avatar" style="overflow: hidden;">
+
+                            <img th:if="${ranking[0].foto != null and !ranking[0].foto.isEmpty()}"
+                                 th:src="@{'/' + ${ranking[0].foto}}"
+                                 th:style="'width:100%; height:100%; object-fit:cover; object-position:' +
+                   ${ranking[0].fotoPosicionX} + '% ' +
+                   ${ranking[0].fotoPosicionY} + '%;'"
+                                 alt="Foto de perfil">
+
+                            <span th:unless="${ranking[0].foto != null and !ranking[0].foto.isEmpty()}">
+        ⚽
+    </span>
+
                         </div>
 
 
@@ -1094,8 +1125,19 @@
                         </div>
 
 
-                        <div class="avatar">
-                            ⚽
+                        <div class="avatar" style="overflow: hidden;">
+
+                            <img th:if="${ranking[2].foto != null and !ranking[2].foto.isEmpty()}"
+                                 th:src="@{'/' + ${ranking[2].foto}}"
+                                 th:style="'width:100%; height:100%; object-fit:cover; object-position:' +
+                   ${ranking[2].fotoPosicionX} + '% ' +
+                   ${ranking[2].fotoPosicionY} + '%;'"
+                                 alt="Foto de perfil">
+
+                            <span th:unless="${ranking[2].foto != null and !ranking[2].foto.isEmpty()}">
+        ⚽
+    </span>
+
                         </div>
 
 
@@ -1199,9 +1241,21 @@
 
                                 <div class="jugador-tabla">
 
-                                    <div class="avatar-tabla">
-                                        ⚽
+                                    <div class="avatar-tabla" style="overflow: hidden;">
+
+                                        <img th:if="${jugador.foto != null and !jugador.foto.isEmpty()}"
+                                             th:src="@{'/' + ${jugador.foto}}"
+                                             th:style="'width:100%; height:100%; object-fit:cover; object-position:' +
+                   ${jugador.fotoPosicionX} + '% ' +
+                   ${jugador.fotoPosicionY} + '%;'"
+                                             alt="Foto de perfil">
+
+                                        <span th:unless="${jugador.foto != null and !jugador.foto.isEmpty()}">
+        ⚽
+    </span>
+
                                     </div>
+
 
                                     <a th:if="${jugador.usuario != null}"
                                        th:href="@{/perfil/{id}(id=${jugador.usuario.id})}"
