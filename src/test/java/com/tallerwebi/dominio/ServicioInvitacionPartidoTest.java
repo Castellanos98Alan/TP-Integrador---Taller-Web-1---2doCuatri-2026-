@@ -53,8 +53,6 @@ public class ServicioInvitacionPartidoTest {
     Long idPartido = 1L;
     Long idAmigo = 2L;
 
-
-
     Usuario juan = givenDadoQueTengoUnUsuario(1L);
     Usuario pedro = givenDadoQueTengoUnUsuario(idAmigo);
 
@@ -325,8 +323,7 @@ public class ServicioInvitacionPartidoTest {
 
   @Test
   public void dadoQueUnAmigoYaFueInvitadoNoDebeRecibirOtraInvitacion()
-          throws InvitacionAlPartidoException {
-
+    throws InvitacionAlPartidoException {
     // Given
 
     Long idPartido = 1L;
@@ -340,46 +337,27 @@ public class ServicioInvitacionPartidoTest {
 
     givenDadoQueTengoUnJugadorConfirmado(partido, juan);
 
-    when(repositorioPartidoMock.buscarPorId(idPartido))
-            .thenReturn(partido);
+    when(repositorioPartidoMock.buscarPorId(idPartido)).thenReturn(partido);
 
-    when(repositorioUsuarioMock.buscarPorId(idAmigo))
-            .thenReturn(pedro);
+    when(repositorioUsuarioMock.buscarPorId(idAmigo)).thenReturn(pedro);
 
-    when(servicioSolicitudAmistadMock.sonAmigos(juan, pedro))
-            .thenReturn(true);
+    when(servicioSolicitudAmistadMock.sonAmigos(juan, pedro)).thenReturn(true);
 
-    when(servicioNotificacionMock.existeInvitacionParaPartido(
-            idAmigo,
-            idPartido
-    )).thenReturn(true);
+    when(servicioNotificacionMock.existeInvitacionParaPartido(idAmigo, idPartido)).thenReturn(true);
 
     // When
 
     try {
-
-      servicioInvitacionPartido.invitarJugador(
-              idPartido,
-              idAmigo,
-              juan
-      );
+      servicioInvitacionPartido.invitarJugador(idPartido, idAmigo, juan);
 
       fail("Se esperaba una InvitacionAlPartidoException");
-
     } catch (InvitacionAlPartidoException e) {
-
-      assertThat(
-              e.getMessage(),
-              equalTo("Este amigo ya fue invitado a este partido")
-      );
+      assertThat(e.getMessage(), equalTo("Este amigo ya fue invitado a este partido"));
     }
 
     // Then
 
     verify(servicioNotificacionMock, never())
-            .notificarInvitacion(
-                    any(Usuario.class),
-                    any(Partido.class)
-            );
+      .notificarInvitacion(any(Usuario.class), any(Partido.class));
   }
 }

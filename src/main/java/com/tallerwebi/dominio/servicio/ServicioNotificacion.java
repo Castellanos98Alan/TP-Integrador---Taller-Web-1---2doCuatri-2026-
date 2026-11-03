@@ -18,8 +18,5 @@ public interface ServicioNotificacion {
 
   List<Notificacion> obtenerNotificacionesNoLeidas(Long idUsuario);
 
-  boolean existeInvitacionParaPartido(
-          Long idUsuario,
-          Long idPartido
-  );
+  boolean existeInvitacionParaPartido(Long idUsuario, Long idPartido);
 }

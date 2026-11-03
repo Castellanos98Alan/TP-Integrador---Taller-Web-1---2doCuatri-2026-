@@ -41,13 +41,8 @@ public class ServicioInvitacionPartidoImpl implements ServicioInvitacionPartido 
     validarAmistad(usuarioQueInvita, amigo);
     validarJugadorNoInscripto(partido, amigo);
 
-    if (servicioNotificacion.existeInvitacionParaPartido(
-            amigo.getId(),
-            partido.getId())) {
-
-      throw new InvitacionAlPartidoException(
-              "Este amigo ya fue invitado a este partido"
-      );
+    if (servicioNotificacion.existeInvitacionParaPartido(amigo.getId(), partido.getId())) {
+      throw new InvitacionAlPartidoException("Este amigo ya fue invitado a este partido");
     }
 
     servicioNotificacion.notificarInvitacion(amigo, partido);

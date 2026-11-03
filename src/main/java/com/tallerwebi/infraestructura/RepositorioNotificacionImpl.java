@@ -60,26 +60,20 @@ public class RepositorioNotificacionImpl implements RepositorioNotificacion {
   }
 
   @Override
-  public boolean existeInvitacionParaPartido(
-          Long idUsuario,
-          Long idPartido) {
-
+  public boolean existeInvitacionParaPartido(Long idUsuario, Long idPartido) {
     String query =
-            "SELECT COUNT(n) FROM Notificacion n " +
-                    "WHERE n.usuario.id = :idUsuario " +
-                    "AND n.partido.id = :idPartido " +
-                    "AND n.tipoDeNotificacion = :tipo";
+      "SELECT COUNT(n) FROM Notificacion n " +
+      "WHERE n.usuario.id = :idUsuario " +
+      "AND n.partido.id = :idPartido " +
+      "AND n.tipoDeNotificacion = :tipo";
 
     Long cantidad = sessionFactory
-            .getCurrentSession()
-            .createQuery(query, Long.class)
-            .setParameter("idUsuario", idUsuario)
-            .setParameter("idPartido", idPartido)
-            .setParameter(
-                    "tipo",
-                    TipoDeNotificacion.INVITACION_PARTIDO
-            )
-            .uniqueResult();
+      .getCurrentSession()
+      .createQuery(query, Long.class)
+      .setParameter("idUsuario", idUsuario)
+      .setParameter("idPartido", idPartido)
+      .setParameter("tipo", TipoDeNotificacion.INVITACION_PARTIDO)
+      .uniqueResult();
 
     return cantidad != null && cantidad > 0;
   }

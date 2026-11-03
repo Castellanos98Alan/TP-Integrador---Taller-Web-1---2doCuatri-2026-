@@ -12,8 +12,5 @@ public interface RepositorioNotificacion {
 
   List<Notificacion> buscarNoLeidasPorUsuario(Long idUsuario);
 
-  boolean existeInvitacionParaPartido(
-          Long idUsuario,
-          Long idPartido
-  );
+  boolean existeInvitacionParaPartido(Long idUsuario, Long idPartido);
 }

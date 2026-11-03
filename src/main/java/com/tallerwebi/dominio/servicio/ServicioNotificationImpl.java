@@ -94,13 +94,7 @@ public class ServicioNotificationImpl implements ServicioNotificacion {
   }
 
   @Override
-  public boolean existeInvitacionParaPartido(
-          Long idUsuario,
-          Long idPartido) {
-
-    return repositorioNotificacion.existeInvitacionParaPartido(
-            idUsuario,
-            idPartido
-    );
+  public boolean existeInvitacionParaPartido(Long idUsuario, Long idPartido) {
+    return repositorioNotificacion.existeInvitacionParaPartido(idUsuario, idPartido);
   }
 }
