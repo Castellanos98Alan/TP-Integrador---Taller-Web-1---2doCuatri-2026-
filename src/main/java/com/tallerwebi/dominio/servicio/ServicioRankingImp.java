@@ -26,24 +26,6 @@ public class ServicioRankingImp implements ServicioRanking {
     return repositorioJugador.buscarRanking();
   }
 
-  @Transactional
-  @Override
-  public List<Jugador> obtenerRankingFiltradoPorNivel(String nivel) {
-    return repositorioJugador.buscarRankingPorNivel(nivel);
-  }
-
-  @Transactional
-  @Override
-  public List<Jugador> obtenerRankingFiltradoPorPosicion(String posicion) {
-    return repositorioJugador.buscarRankingPorPosicion(posicion);
-  }
-
-  @Transactional
-  @Override
-  public List<Jugador> obtenerRankingFiltradoPorNivelYPosicion(String nivel, String posicion) {
-    return repositorioJugador.buscarRankingPorPosicionYNivel(nivel, posicion);
-  }
-
   @Override
   public String calcularNivel(Integer puntos) {
     if (puntos < LIMITE_D) {
@@ -67,5 +49,17 @@ public class ServicioRankingImp implements ServicioRanking {
     }
 
     return "SS";
+  }
+
+  @Transactional
+  @Override
+  public List<Jugador> obtenerRankingFiltrado(
+    String nivel,
+    String posicion,
+    String rango,
+    String vista,
+    Long usuarioId
+  ) {
+    return repositorioJugador.buscarRankingFiltrado(nivel, posicion, rango, vista, usuarioId);
   }
 }

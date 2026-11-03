@@ -1,11 +1,16 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.Jugador;
+import com.tallerwebi.dominio.Partido;
+import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
 import com.tallerwebi.dominio.servicio.ServicioEstadistica;
 import com.tallerwebi.dominio.servicio.ServicioJugador;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
+import com.tallerwebi.dominio.servicio.ServicioSolicitudAmistad;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
@@ -22,8 +27,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class PartidosController {
 
+  private static final String USUARIO_SESION = "USUARIO";
+
   private ServicioPartido servicioPartido;
   private ServicioJugador servicioJugador;
+  private ServicioSolicitudAmistad servicioSolicitudAmistad;
   private ServicioEstadistica servicioEstadistica;
   private static final String ATRIBUTO_ERROR = "error";
   private static final String SESION_USUARIO = "USUARIO";
@@ -33,6 +41,11 @@ public class PartidosController {
   public PartidosController(
     ServicioPartido servicioPartido,
     ServicioJugador servicioJugador,
+    ServicioSolicitudAmistad servicioSolicitudAmistad
+  ) {
+    this.servicioPartido = servicioPartido;
+    this.servicioJugador = servicioJugador;
+    this.servicioSolicitudAmistad = servicioSolicitudAmistad;
     ServicioEstadistica servicioEstadistica
   ) {
     this.servicioPartido = servicioPartido;
@@ -118,7 +131,7 @@ public class PartidosController {
     Model model,
     HttpServletRequest request
   ) {
-    Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute(SESION_USUARIO);
+    Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute(USUARIO_SESION);
 
     if (usuarioLogueado == null) {
       return new ModelAndView("redirect:/login");
@@ -155,13 +168,15 @@ public class PartidosController {
     HttpServletRequest request
   ) {
     HttpSession session = request.getSession();
-    Usuario usuarioLogueado = (Usuario) session.getAttribute(SESION_USUARIO);
+
+    Usuario usuarioLogueado = (Usuario) session.getAttribute(USUARIO_SESION);
 
     if (usuarioLogueado == null) {
-      return new ModelAndView("redirect:/login?error=Debes+iniciar+sesion+para+unirte");
+      return new ModelAndView("redirect:/login");
     }
 
     Map<String, Object> model = new ModelMap();
+
 
     if (error != null && !error.isBlank()) {
       model.put(ATRIBUTO_ERROR, error);
@@ -169,7 +184,34 @@ public class PartidosController {
 
     try {
       Partido partido = servicioPartido.buscarPartidoPorId(idPartido);
+
+      List<Usuario> confirmados = partido.getConfirmados();
+
+      boolean esParticipante = false;
+
+      for (Usuario confirmado : confirmados) {
+        if (confirmado.getId().equals(usuarioLogueado.getId())) {
+          esParticipante = true;
+          break;
+        }
+      }
+
+      // Incluimos también al organizador si forma parte del partido.
+      if (
+        partido.getOrganizador() != null &&
+        partido.getOrganizador().getId().equals(usuarioLogueado.getId())
+      ) {
+        esParticipante = true;
+      }
+
       model.put("partido", partido);
+      model.put("esParticipante", esParticipante);
+
+      if (esParticipante) {
+        model.put("amigos", servicioSolicitudAmistad.obtenerAmigos(usuarioLogueado));
+      }
+    } catch (Exception e) {
+      return new ModelAndView("redirect:/partidos");
 
       boolean puedeCargar = servicioEstadistica.puedeCargarEstadisticas(partido, usuarioLogueado);
       model.put("puedeCargarEstadisticas", puedeCargar);
@@ -200,7 +242,8 @@ public class PartidosController {
     HttpServletRequest request
   ) {
     HttpSession session = request.getSession();
-    Usuario usuarioLogueado = (Usuario) session.getAttribute(SESION_USUARIO);
+
+    Usuario usuarioLogueado = (Usuario) session.getAttribute(USUARIO_SESION);
 
     if (usuarioLogueado == null) {
       return new ModelAndView("redirect:/login?error=Debes+iniciar+sesion+para+unirte");
@@ -320,5 +363,22 @@ public class PartidosController {
       return null;
     }
     return (Usuario) request.getSession().getAttribute("USUARIO");
+  }
+
+  @RequestMapping(path = "/partido/{id}/invitar", method = RequestMethod.POST)
+  public ModelAndView invitarAmigo(
+    @PathVariable("id") Long idPartido,
+    @RequestParam("idJugador") Long idJugador,
+    HttpServletRequest request
+  ) throws InvitacionAlPartidoException {
+    Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute(USUARIO_SESION);
+
+    if (usuarioLogueado == null) {
+      return new ModelAndView("redirect:/login");
+    }
+
+    servicioPartido.invitarJugador(idPartido, idJugador, usuarioLogueado);
+
+    return new ModelAndView("redirect:/partido/" + idPartido + "/sala-de-espera");
   }
 }

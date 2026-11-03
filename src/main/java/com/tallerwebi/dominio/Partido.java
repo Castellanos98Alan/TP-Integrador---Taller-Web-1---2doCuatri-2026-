@@ -89,7 +89,7 @@ public class Partido {
   private List<Estadistica> estadisticas;
 
   public Partido() {
-    this.estado = EstadoPartido.ACTIVO;
+    this.estado = EstadoPartido.PENDIENTE;
   }
 
   public Partido(String nivel, Boolean esPrivado, LocalDateTime fecha) {

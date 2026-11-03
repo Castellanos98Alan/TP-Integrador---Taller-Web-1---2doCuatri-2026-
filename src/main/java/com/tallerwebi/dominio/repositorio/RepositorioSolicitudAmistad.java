@@ -18,4 +18,6 @@ public interface RepositorioSolicitudAmistad {
   boolean existeSolicitudPendienteEntre(Usuario emisor, Usuario receptor);
 
   Boolean sonAmigos(Usuario usuario1, Usuario usuario2);
+
+  List<SolicitudAmistad> buscarAmistadesAceptadas(Usuario usuario);
 }

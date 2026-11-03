@@ -181,6 +181,103 @@ public class ServicioSolicitudAmistadTest {
     verify(repositorioSolicitudAmistadMock, never()).modificar(any(SolicitudAmistad.class));
   }
 
+  @Test
+  public void dadoQueTengoDosAmigosDebeRetornarLosDosUsuarios() {
+    // Given
+
+    Usuario juan = givenDadoQueTengounUsuario("juan@gmail.com", true);
+    juan.setId(1L);
+    Usuario pedro = givenDadoQueTengounUsuario("pedro@gmail.com", true);
+    pedro.setId(2L);
+    Usuario lucas = givenDadoQueTengounUsuario("lucas@gmail.com", true);
+    lucas.setId(3L);
+
+    SolicitudAmistad solicitud1 = givenDadoqueTengoUnaSolicitudDeAmistad(
+      juan,
+      pedro,
+      SolicitudAmistad.EstadoSolicitud.ACEPTADA
+    );
+
+    SolicitudAmistad solicitud2 = givenDadoqueTengoUnaSolicitudDeAmistad(
+      juan,
+      lucas,
+      SolicitudAmistad.EstadoSolicitud.ACEPTADA
+    );
+
+    List<SolicitudAmistad> solicitudes = new ArrayList<>();
+
+    solicitudes.add(solicitud1);
+    solicitudes.add(solicitud2);
+
+    when(repositorioSolicitudAmistadMock.buscarAmistadesAceptadas(juan)).thenReturn(solicitudes);
+
+    // When
+
+    List<Usuario> amigos = servicioSolicitudAmistad.obtenerAmigos(juan);
+
+    // Then
+
+    assertThat(amigos.size(), equalTo(2));
+    assertThat(amigos.get(0), equalTo(pedro));
+    assertThat(amigos.get(1), equalTo(lucas));
+
+    verify(repositorioSolicitudAmistadMock, times(1)).buscarAmistadesAceptadas(juan);
+  }
+
+  @Test
+  public void dadoQueRecibiUnaSolicitudAceptadaDebeRetornarAlEmisorComoAmigo() {
+    // Given
+
+    Usuario juan = givenDadoQueTengounUsuario("juan@gmail.com", true);
+    juan.setId(1L);
+    Usuario pedro = givenDadoQueTengounUsuario("pedro@gmail.com", true);
+    pedro.setId(2L);
+
+    SolicitudAmistad solicitud = givenDadoqueTengoUnaSolicitudDeAmistad(
+      pedro,
+      juan,
+      SolicitudAmistad.EstadoSolicitud.ACEPTADA
+    );
+
+    List<SolicitudAmistad> solicitudes = new ArrayList<>();
+
+    solicitudes.add(solicitud);
+
+    when(repositorioSolicitudAmistadMock.buscarAmistadesAceptadas(juan)).thenReturn(solicitudes);
+
+    // When
+
+    List<Usuario> amigos = servicioSolicitudAmistad.obtenerAmigos(juan);
+
+    // Then
+
+    assertThat(amigos.size(), equalTo(1));
+    assertThat(amigos.get(0), equalTo(pedro));
+
+    verify(repositorioSolicitudAmistadMock, times(1)).buscarAmistadesAceptadas(juan);
+  }
+
+  @Test
+  public void dadoQueNoTengoAmigosDebeRetornarUnaListaVacia() {
+    // Given
+
+    Usuario juan = givenDadoQueTengounUsuario("juan@gmail.com", true);
+
+    List<SolicitudAmistad> solicitudes = new ArrayList<>();
+
+    when(repositorioSolicitudAmistadMock.buscarAmistadesAceptadas(juan)).thenReturn(solicitudes);
+
+    // When
+
+    List<Usuario> amigos = servicioSolicitudAmistad.obtenerAmigos(juan);
+
+    // Then
+
+    assertThat(amigos.size(), equalTo(0));
+
+    verify(repositorioSolicitudAmistadMock, times(1)).buscarAmistadesAceptadas(juan);
+  }
+
   private Usuario givenDadoQueTengounUsuario(String email, boolean estaActivo) {
     Usuario usuario = new Usuario(email, estaActivo);
 
