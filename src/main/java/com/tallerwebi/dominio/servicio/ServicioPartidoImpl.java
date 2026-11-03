@@ -1,12 +1,12 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.Cancha;
-import com.tallerwebi.dominio.Equipo;
 import com.tallerwebi.dominio.InscripcionPartido;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Partido.EstadoPartido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
 import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.excepcion.CanchaNoDisponibleException;
 import com.tallerwebi.dominio.excepcion.CanchaNoEncontradaException;
@@ -31,6 +31,9 @@ public class ServicioPartidoImpl implements ServicioPartido {
   private final RepositorioCancha repositorioCancha;
   private final RepositorioUsuario repositorioUsuario;
   private ServicioJugador servicioJugador;
+  private ServicioNotificacion servicioNotificacion;
+  private ServicioSolicitudAmistad servicioSolicitudAmistad;
+  private ServicioInvitacionPartido servicioInvitacionPartido;
   private final ServicioBalanceoEquipo servicioBalanceoEquipo;
   private static final int HORAS_MINIMAS_ENTRE_PARTIDOS = 3;
 
@@ -40,13 +43,19 @@ public class ServicioPartidoImpl implements ServicioPartido {
     RepositorioCancha repositorioCancha,
     RepositorioUsuario repositorioUsuario,
     ServicioJugador servicioJugador,
-    ServicioBalanceoEquipo servicioBalanceoEquipo
+    ServicioBalanceoEquipo servicioBalanceoEquipo,
+    ServicioNotificacion servicioNotificacion,
+    ServicioSolicitudAmistad servicioSolicitudAmistad,
+    ServicioInvitacionPartido servicioInvitacionPartido
   ) {
     this.repositorioCancha = repositorioCancha;
     this.repositorioPartido = repositorioPartido;
     this.repositorioUsuario = repositorioUsuario;
     this.servicioJugador = servicioJugador;
     this.servicioBalanceoEquipo = servicioBalanceoEquipo;
+    this.servicioNotificacion = servicioNotificacion;
+    this.servicioSolicitudAmistad = servicioSolicitudAmistad;
+    this.servicioInvitacionPartido = servicioInvitacionPartido;
   }
 
   //cambiar los runtime a por excepcion por ser
@@ -129,6 +138,12 @@ public class ServicioPartidoImpl implements ServicioPartido {
 
     partido.cancelarPartido();
     repositorioPartido.modificar(partido);
+
+    List<Usuario> jugadores = partido.getConfirmados();
+
+    for (Usuario jugador : jugadores) {
+      servicioNotificacion.notificarCancelacion(jugador, partido);
+    }
   }
 
   //Utilice el Transactional para que no se me cierre la sesion al momento de ejecutar el metodo,
@@ -448,6 +463,9 @@ public class ServicioPartidoImpl implements ServicioPartido {
   }
 
   @Override
+  public void invitarJugador(Long idPartido, Long idJugador, Usuario usuarioQueInvita)
+    throws InvitacionAlPartidoException {
+    servicioInvitacionPartido.invitarJugador(idPartido, idJugador, usuarioQueInvita);
   public List<Partido> buscarPartidosPorJugador(Long idJugador) {
     return repositorioPartido.buscarPartidosPorJugador(idJugador);
   }

@@ -143,6 +143,100 @@ public class RepositorioSolicitudAmistadTest {
     assertThat(solicitudEncontrada.getEstado(), equalTo(SolicitudAmistad.EstadoSolicitud.ACEPTADA));
   }
 
+  @Transactional
+  @Rollback
+  @Test
+  public void dadoQueTengoDosAmigosAceptadosDebeRetornarLasDosAmistades() {
+    // Given
+
+    Usuario juan = givenDadoQueTengoUnUsuario("juan@gmail.com", true);
+    Usuario pedro = givenDadoQueTengoUnUsuario("pedro@gmail.com", true);
+    Usuario lucas = givenDadoQueTengoUnUsuario("lucas@gmail.com", true);
+
+    givenDadoQueTengoUnaSolicitudDeAmistad(juan, pedro, SolicitudAmistad.EstadoSolicitud.ACEPTADA);
+
+    givenDadoQueTengoUnaSolicitudDeAmistad(juan, lucas, SolicitudAmistad.EstadoSolicitud.ACEPTADA);
+
+    // When
+
+    List<SolicitudAmistad> amistades = repositorioSolicitudAmistad.buscarAmistadesAceptadas(juan);
+
+    // Then
+
+    assertThat(amistades.size(), equalTo(2));
+  }
+
+  @Transactional
+  @Rollback
+  @Test
+  public void dadoQueTengoSolicitudesDeDistintosEstadosDebeRetornarSoloLasAceptadas() {
+    // Given
+
+    Usuario juan = givenDadoQueTengoUnUsuario("juan@gmail.com", true);
+    Usuario pedro = givenDadoQueTengoUnUsuario("pedro@gmail.com", true);
+    Usuario lucas = givenDadoQueTengoUnUsuario("lucas@gmail.com", true);
+    Usuario martin = givenDadoQueTengoUnUsuario("martin@gmail.com", true);
+
+    givenDadoQueTengoUnaSolicitudDeAmistad(juan, pedro, SolicitudAmistad.EstadoSolicitud.ACEPTADA);
+
+    givenDadoQueTengoUnaSolicitudDeAmistad(juan, lucas, SolicitudAmistad.EstadoSolicitud.PENDIENTE);
+
+    givenDadoQueTengoUnaSolicitudDeAmistad(
+      juan,
+      martin,
+      SolicitudAmistad.EstadoSolicitud.RECHAZADA
+    );
+
+    // When
+
+    List<SolicitudAmistad> amistades = repositorioSolicitudAmistad.buscarAmistadesAceptadas(juan);
+
+    // Then
+
+    assertThat(amistades.size(), equalTo(1));
+
+    assertThat(amistades.get(0).getReceptor(), equalTo(pedro));
+  }
+
+  @Transactional
+  @Rollback
+  @Test
+  public void dadoQueRecibiUnaSolicitudAceptadaDebeRetornarAlEmisorComoAmigo() {
+    // Given
+
+    Usuario juan = givenDadoQueTengoUnUsuario("juan@gmail.com", true);
+    Usuario pedro = givenDadoQueTengoUnUsuario("pedro@gmail.com", true);
+
+    givenDadoQueTengoUnaSolicitudDeAmistad(pedro, juan, SolicitudAmistad.EstadoSolicitud.ACEPTADA);
+
+    // When
+
+    List<SolicitudAmistad> amistades = repositorioSolicitudAmistad.buscarAmistadesAceptadas(juan);
+
+    // Then
+
+    assertThat(amistades.size(), equalTo(1));
+
+    assertThat(amistades.get(0).getEmisor(), equalTo(pedro));
+  }
+
+  @Transactional
+  @Rollback
+  @Test
+  public void dadoQueUnUsuarioNoTieneAmigosDebeRetornarUnaListaVacia() {
+    // Given
+
+    Usuario juan = givenDadoQueTengoUnUsuario("juan@gmail.com", true);
+
+    // When
+
+    List<SolicitudAmistad> amistades = repositorioSolicitudAmistad.buscarAmistadesAceptadas(juan);
+
+    // Then
+
+    assertThat(amistades.size(), equalTo(0));
+  }
+
   private SolicitudAmistad givenDadoQueTengoUnaSolicitudDeAmistad(
     Usuario emisor,
     Usuario receptor,

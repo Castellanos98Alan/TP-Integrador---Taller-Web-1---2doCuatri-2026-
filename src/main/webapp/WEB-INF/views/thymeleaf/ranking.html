@@ -76,7 +76,6 @@
         }
 
 
-
         /* =========================
            HERO
            ========================= */
@@ -86,13 +85,12 @@
             padding: 45px;
             color: white;
 
-            background:
-                    linear-gradient(
-                            90deg,
-                            rgba(0, 67, 50, 0.98),
-                            rgba(0, 67, 50, 0.78),
-                            rgba(0, 67, 50, 0.55)
-                    );
+            background: linear-gradient(
+                    90deg,
+                    rgba(0, 67, 50, 0.98),
+                    rgba(0, 67, 50, 0.78),
+                    rgba(0, 67, 50, 0.55)
+            );
         }
 
         .hero-ranking small {
@@ -505,7 +503,7 @@
            RESPONSIVE
            ========================= */
 
-        @media(max-width: 900px) {
+        @media (max-width: 900px) {
 
             .tabs-ranking,
             .filtros {
@@ -522,7 +520,7 @@
 
         }
 
-        @media(max-width: 600px) {
+        @media (max-width: 600px) {
 
             .tabs-ranking,
             .filtros {
@@ -577,15 +575,13 @@
                     <i class="fa-solid fa-bell"></i>
 
                     <span
-                            th:if="${solicitudesPendientes != null
-                        and !solicitudesPendientes.isEmpty()}"
+                            th:if="${cantidadNotificaciones != null
+                             and cantidadNotificaciones > 0}"
                             class="position-absolute top-0 start-100
-                       translate-middle badge rounded-pill bg-danger"
-                            th:text="${solicitudesPendientes.size()}">
-
-            0
-
-        </span>
+                            translate-middle badge rounded-pill bg-danger"
+                            th:text="${cantidadNotificaciones}">
+                                             0
+                    </span>
 
                 </button>
 
@@ -595,17 +591,103 @@
                         style="width: 340px;">
 
                     <h6 class="fw-bold mb-3">
-                        Solicitudes de amistad
+                        Notificaciones
                     </h6>
+
+                    <div
+                            th:each="notificacion : ${notificaciones}"
+                            class="border-bottom py-2">
+
+                        <div
+                                th:if="${notificacion.tipoDeNotificacion.name()
+                                    == 'INVITACION_PARTIDO'}">
+
+                            <strong>⚽ Invitación a partido</strong>
+
+                            <p
+                                    class="mb-1"
+                                    th:text="${notificacion.mensaje}">
+                            </p>
+
+                            <form th:action="@{/notificacion/marcar-leida}"
+                                  method="post">
+
+                                <input type="hidden"
+                                       name="idNotificacion"
+                                       th:value="${notificacion.id}">
+
+                                <input type="hidden"
+                                       name="volverA"
+                                       th:value="'/partido/' + ${notificacion.partido.id} + '/sala-de-espera'">
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-success mt-1">
+                                    Ver partido
+                                </button>
+
+                            </form>
+
+                        </div>
+
+
+                        <div
+                                th:if="${notificacion.tipoDeNotificacion.name()
+                                    == 'PARTIDO_CANCELADO'}">
+
+                            <strong>❌ Partido cancelado</strong>
+
+                            <p
+                                    class="mb-1"
+                                    th:text="${notificacion.mensaje}">
+                            </p>
+
+                            <form
+                                    th:action="@{/notificacion/marcar-leida}"
+                                    method="post">
+
+                                <input
+                                        type="hidden"
+                                        name="idNotificacion"
+                                        th:value="${notificacion.id}">
+
+                                <input
+                                        type="hidden"
+                                        name="volverA"
+                                        value="/ranking">
+
+                                <button
+                                        type="submit"
+                                        class="btn btn-sm btn-outline-secondary mt-1">
+
+                                    Marcar como leída
+                                </button>
+
+                            </form>
+
+                        </div>
+
+
+                        <div
+                                th:if="${notificacion.tipoDeNotificacion.name()
+                                    == 'FORMULARIO_COMPLETADO'}">
+
+                            <strong>📋 Formulario completado</strong>
+
+                            <p
+                                    class="mb-1"
+                                    th:text="${notificacion.mensaje}">
+                            </p>
+
+                        </div>
+
+                    </div>
 
 
                     <div
-                            th:if="${solicitudesPendientes == null
-                        or solicitudesPendientes.isEmpty()}"
-                            class="text-muted">
+                            th:if="${cantidadNotificaciones == 0}"
+                            class="text-muted text-center py-2">
 
-                        No tenés solicitudes pendientes.
-
+                        No tenés notificaciones.
                     </div>
 
 
@@ -646,7 +728,6 @@
                             </form>
 
 
-
                             <form th:action="@{/amistad/rechazar}" method="post">
 
                                 <input type="hidden"
@@ -672,18 +753,17 @@
                 </div>
 
             </div>
-    </div>
+        </div>
 
 
-    <!-- CREAR PARTIDO -->
-    <a class="boton-crear" th:href="@{/crearPartido}">
-        + Crear partido
-    </a>
+        <!-- CREAR PARTIDO -->
+        <a class="boton-crear" th:href="@{/crearPartido}">
+            + Crear partido
+        </a>
 
     </div>
 
 </nav>
-
 
 
 <!-- =========================
@@ -752,7 +832,6 @@
     </div>
 
 </section>
-
 
 
 <!-- =========================
@@ -835,7 +914,6 @@
             </div>
 
 
-
             <!-- =========================
                  FILTROS
                  ========================= -->
@@ -894,7 +972,6 @@
                     </div>
 
 
-
                     <!-- POSICIÓN -->
 
                     <div class="filtro">
@@ -934,23 +1011,38 @@
                     </div>
 
 
-
                     <!-- RANGO -->
 
                     <div class="filtro">
 
                         <span>Rango</span>
 
-                        <select disabled>
+                        <select name="rango"
+                                onchange="this.form.submit()">
 
-                            <option>
+                            <option value=""
+                                    th:selected="${rangoSeleccionado == null or rangoSeleccionado == ''}">
                                 Todos los rangos
+                            </option>
+
+                            <option value="principiante"
+                                    th:selected="${rangoSeleccionado == 'principiante'}">
+                                Principiante (C - D)
+                            </option>
+
+                            <option value="intermedio"
+                                    th:selected="${rangoSeleccionado == 'intermedio'}">
+                                Intermedio (B - A)
+                            </option>
+
+                            <option value="avanzado"
+                                    th:selected="${rangoSeleccionado == 'avanzado'}">
+                                Avanzado (S - SS)
                             </option>
 
                         </select>
 
                     </div>
-
 
 
                     <!-- VISTA -->
@@ -959,13 +1051,18 @@
 
                         <span>Vista</span>
 
-                        <select disabled>
+                        <select name="vista"
+                                onchange="this.form.submit()">
 
-                            <option>
+                            <option value="general"
+                                    th:selected="${vistaSeleccionada == null
+                         or vistaSeleccionada == ''
+                         or vistaSeleccionada == 'general'}">
                                 General
                             </option>
 
-                            <option>
+                            <option value="amigos"
+                                    th:selected="${vistaSeleccionada == 'amigos'}">
                                 Amigos
                             </option>
 
@@ -976,7 +1073,6 @@
                 </div>
 
             </form>
-
 
 
             <!-- =========================
@@ -1052,7 +1148,6 @@
                     </div>
 
 
-
                     <!-- PRIMERO -->
 
                     <div class="podio-card primero"
@@ -1110,7 +1205,6 @@
                         </div>
 
                     </div>
-
 
 
                     <!-- TERCERO -->
@@ -1174,7 +1268,6 @@
                 </div>
 
 
-
                 <!-- =========================
                      TABLA DEL RANKING
                      ========================= -->
@@ -1234,7 +1327,6 @@
                             </td>
 
 
-
                             <!-- JUGADOR -->
 
                             <td>
@@ -1276,7 +1368,6 @@
                             </td>
 
 
-
                             <!-- POSICIÓN DE JUEGO -->
 
                             <td>
@@ -1291,7 +1382,6 @@
                             </td>
 
 
-
                             <!-- PUNTOS -->
 
                             <td class="puntos-tabla"
@@ -1300,7 +1390,6 @@
                                 0
 
                             </td>
-
 
 
                             <!-- RANGO -->
@@ -1371,7 +1460,6 @@
             </div>
 
 
-
             <!-- =========================
                  SIN JUGADORES
                  ========================= -->
@@ -1390,7 +1478,6 @@
             </div>
 
         </div>
-
 
 
         <!-- =========================
@@ -1464,7 +1551,6 @@
             </div>
 
 
-
             <!-- =========================
                  RANGOS
                  ========================= -->
@@ -1478,7 +1564,6 @@
                     Rangos de puntos
 
                 </h5>
-
 
 
                 <!-- D -->
@@ -1500,7 +1585,6 @@
                 </div>
 
 
-
                 <!-- C -->
 
                 <div class="rango">
@@ -1518,7 +1602,6 @@
                     </span>
 
                 </div>
-
 
 
                 <!-- B -->
@@ -1540,7 +1623,6 @@
                 </div>
 
 
-
                 <!-- A -->
 
                 <div class="rango">
@@ -1560,7 +1642,6 @@
                 </div>
 
 
-
                 <!-- S -->
 
                 <div class="rango">
@@ -1578,7 +1659,6 @@
                     </span>
 
                 </div>
-
 
 
                 <!-- SS -->

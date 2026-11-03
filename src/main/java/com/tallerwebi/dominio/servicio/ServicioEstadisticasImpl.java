@@ -20,6 +20,7 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
   private RepositorioEstadistica repositorioEstadisticas;
   private RepositorioPartido repositorioPartido;
   private RepositorioJugador repositorioJugador;
+  private ServicioNotificacion servicioNotificacion;
 
 
   @Autowired
@@ -28,11 +29,13 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
   public ServicioEstadisticasImpl(
     RepositorioEstadistica repositorioEstadistica,
     RepositorioPartido repositorioPartido,
-    RepositorioJugador repositorioJugador
+    RepositorioJugador repositorioJugador,
+    ServicioNotificacion servicioNotificacion
   ) {
     this.repositorioEstadisticas = repositorioEstadistica;
     this.repositorioPartido = repositorioPartido;
     this.repositorioJugador = repositorioJugador;
+    this.servicioNotificacion = servicioNotificacion;
   }
 
   @Override
@@ -99,6 +102,8 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
 
     partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
     repositorioPartido.guardar(partido);
+
+    servicioNotificacion.notificarFormularioCompletado(partido.getOrganizador(), partido);
   }
 
   private void guardarOActualizarEstadisticas(

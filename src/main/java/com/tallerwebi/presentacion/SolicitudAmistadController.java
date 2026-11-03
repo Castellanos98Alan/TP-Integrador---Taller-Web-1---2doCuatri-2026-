@@ -1,11 +1,17 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.Notificacion;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.SolicitudAmistadInvalida;
 import com.tallerwebi.dominio.servicio.ServicioLogin;
+import com.tallerwebi.dominio.servicio.ServicioNotificacion;
 import com.tallerwebi.dominio.servicio.ServicioSolicitudAmistad;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,13 +23,16 @@ public class SolicitudAmistadController {
 
   private final ServicioSolicitudAmistad servicioSolicitudAmistad;
   private final ServicioLogin servicioLogin;
+  private final ServicioNotificacion servicioNotificacion;
 
   public SolicitudAmistadController(
     ServicioSolicitudAmistad servicioSolicitudAmistad,
-    ServicioLogin servicioLogin
+    ServicioLogin servicioLogin,
+    ServicioNotificacion servicioNotificacion
   ) {
     this.servicioSolicitudAmistad = servicioSolicitudAmistad;
     this.servicioLogin = servicioLogin;
+    this.servicioNotificacion = servicioNotificacion;
   }
 
   // ACEPTAR LA SOLUCITUD
@@ -68,5 +77,20 @@ public class SolicitudAmistadController {
     } catch (SolicitudAmistadInvalida e) {
       return new ModelAndView("redirect:/perfil/" + idUsuario + "?errorAmistad=true");
     }
+  }
+
+  // VARIAS NOTIFICACIONES
+
+  @RequestMapping(path = "/notificaciones", method = RequestMethod.GET)
+  public ModelAndView verNotificaciones(HttpSession session) {
+    Usuario usuario = (Usuario) session.getAttribute("USUARIO");
+
+    List<Notificacion> notificaciones = servicioNotificacion.obtenerNotificaciones(usuario.getId());
+
+    Map<String, Object> modelo = new ModelMap();
+
+    modelo.put("notificaciones", notificaciones);
+
+    return new ModelAndView("notificaciones", modelo);
   }
 }
