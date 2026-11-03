@@ -243,6 +243,28 @@
                         Editar perfil
                     </a>
 
+                    <div th:if="${mensajeAmistad != null}"
+                         class="alert alert-success">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span th:text="${mensajeAmistad}"></span>
+                    </div>
+
+                    <div th:if="${errorAmistad != null}"
+                         class="alert alert-danger">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span th:text="${errorAmistad}"></span>
+                    </div>
+
+
+                    <form th:if="${!esMiPerfil and sonAmigos != true}"
+                          th:action="@{/amistad/enviar}"
+                          method="post">
+
+                        <!-- botón agregar amigo -->
+
+                    </form>
+
+
                     <!-- Agregar amigo -->
                     <form th:if="${!esMiPerfil and !sonAmigos}"
                           th:action="@{/amistad/enviar}"
