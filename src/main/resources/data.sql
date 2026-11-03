@@ -1,4 +1,4 @@
--- Inserta el usuario de prueba solo si no existe previamente
+-- Inserta el usuario ADMIN de prueba
 INSERT INTO Usuario (id, email, password, rol, activo)
 SELECT null, 'test@unlam.edu.ar', 'test', 'ADMIN', true
     WHERE NOT EXISTS (
@@ -22,22 +22,29 @@ VALUES(null, 'Cancha La Quinta', 'Ramos Mejia', -34.6440, -58.5630);
 
 INSERT INTO Cancha(id, nombre, localidad, latitud, longitud)
 VALUES(null, 'Cancha El Fortin', 'Ramos Mejia', -34.6460, -58.5600);
+-- Inserta las canchas
+INSERT INTO Cancha(id, nombre, localidad) VALUES(null, 'Cancha Los Leones', 'San Justo');
+INSERT INTO Cancha(id, nombre, localidad) VALUES(null, 'Cancha 5', 'San Justo');
+INSERT INTO Cancha(id, nombre, localidad) VALUES(null, 'Cancha El Potrero', 'Laferrere');
+INSERT INTO Cancha(id, nombre, localidad) VALUES(null, 'Cancha Los Pibes', 'Laferrere');
+INSERT INTO Cancha(id, nombre, localidad) VALUES(null, 'Cancha La Quinta', 'Ramos Mejia');
+INSERT INTO Cancha(id, nombre, localidad) VALUES(null, 'Cancha El Fortin', 'Ramos Mejia');
 
-INSERT INTO Jugador(nombre, posicion1, posicion2, puntos, nivel)
-VALUES('Alan', 'Delantero', 'Arquero', 40, "B");
+-- Inserta los jugadores vinculándolos a sus respectivos usuarios
+INSERT INTO Jugador(nombre, posicion1, posicion2, puntos, nivel, usuario_id)
+VALUES('Alan', 'Delantero', 'Arquero', 40, 'B', (SELECT id FROM Usuario WHERE email = 'alan@unlam.edu.ar' LIMIT 1));
 
-INSERT INTO Jugador(nombre, posicion1, posicion2,  puntos, nivel)
-VALUES('Axel', 'Delantero', 'Arquero', 50, "A");
+INSERT INTO Jugador(nombre, posicion1, posicion2, puntos, nivel, usuario_id)
+VALUES('Axel', 'Delantero', 'Arquero', 50, 'A', (SELECT id FROM Usuario WHERE email = 'axel@unlam.edu.ar' LIMIT 1));
 
-INSERT INTO Jugador(nombre, posicion1, posicion2,  puntos, nivel)
-VALUES('Santi', 'Defensor', 'Mediocampista', 70, "A");
+INSERT INTO Jugador(nombre, posicion1, posicion2, puntos, nivel, usuario_id)
+VALUES('Santi', 'Defensor', 'Mediocampista', 70, 'A', (SELECT id FROM Usuario WHERE email = 'santi@unlam.edu.ar' LIMIT 1));
 
-INSERT INTO Jugador(nombre, posicion1, posicion2, puntos, nivel)
-VALUES('JuanPa', 'Arquero', 'Defensor', 20, "C");
+INSERT INTO Jugador(nombre, posicion1, posicion2, puntos, nivel, usuario_id)
+VALUES('JuanPa', 'Arquero', 'Defensor', 20, 'C', (SELECT id FROM Usuario WHERE email = 'juanpa@unlam.edu.ar' LIMIT 1));
 
-INSERT INTO Jugador(nombre, posicion1, posicion2,  puntos, nivel)
-VALUES('Tomas', 'Defensor', 'Arquero', 0, "D");
-
+INSERT INTO Jugador(nombre, posicion1, posicion2, puntos, nivel, usuario_id)
+VALUES('Tomas', 'Defensor', 'Arquero', 0, 'D', (SELECT id FROM Usuario WHERE email = 'tomas@unlam.edu.ar' LIMIT 1));
 
 -- Crear un jugador exclusivo para el usuario de prueba
 INSERT INTO Jugador (

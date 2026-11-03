@@ -427,6 +427,15 @@
                         </div>
                     </div>
 
+                    <div class="ms-auto d-flex gap-2">
+                        <!-- Botón Cancelar (solo organizador) -->
+                        <form th:if="${session.USUARIO != null and partido.organizador != null and partido.organizador.id == session.USUARIO.id}"
+                            th:action="@{/partido/cancelar/{id}(id=${partido.id})}" method="post">
+                            <button type="submit" class="btn btn-danger btn-lg fw-bold px-4 py-2" style="border-radius: 12px;">
+                                <i class="fa-solid fa-ban me-1"></i> Cancelar Partido
+                            </button>
+                        </form>
+
                     <div class="ms-auto d-flex flex-wrap gap-2 align-items-center">
                         <button type="button"
                                 class="btn btn-success"
@@ -489,12 +498,29 @@
                         <div th:unless="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
                              class="avatar-jugador avatar-sin-foto">⚽</div>
                         <div>
+                            <!-- Enlace al perfil -->
+                            <a th:href="@{/perfil(id=${ins.jugador.usuario.id})}" class="text-decoration-none">
+                                <strong class="d-block text-dark text-decoration-underline" style="font-size: 14px;" 
+                                        th:text="${ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
+                            </a>
+
                             <strong class="d-block text-dark" style="font-size: 14px;"
                                     th:text="${ins.jugador.usuario != null and ins.jugador.usuario.nickname != null and !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
+
                             <span class="badge-posicion">Confirmado</span>
                         </div>
                     </div>
-                    <span class="badge-puntos">OK</span>
+                    
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge-puntos">OK</span>
+                        <!-- Botón de Expulsar (solo organizador, y no a sí mismo) -->
+                        <form th:if="${session.USUARIO != null and partido.organizador.id == session.USUARIO.id and ins.jugador.usuario.id != session.USUARIO.id}"
+                            th:action="@{/partido/{id}/expulsar/{idJugador}(id=${partido.id}, idJugador=${ins.jugador.id})}" method="post" class="m-0">
+                            <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Expulsar jugador">
+                                <i class="fa-solid fa-user-minus"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -638,6 +664,20 @@
                     <span>Ocupación de la sala</span>
                     <strong th:text="${(partido.cantJugadores != null ? partido.cantJugadores : 0) + ' de ' + partido.cupoMaximo + ' confirmados'}">0
                         de 10</strong>
+                </div>
+
+                <!-- Mostrar solo si el usuario está inscripto y el partido NO es activo/finalizado -->
+                <div class="card card-custom mt-3" 
+                    th:if="${session.USUARIO != null and partido.inscripciones != null and partido.inscripciones.![jugador.usuario.id].contains(session.USUARIO.id) and partido.estado.name() != 'ACTIVO' and partido.estado.name() != 'FINALIZADO'}">
+                    <div>
+                        <h6 class="fw-bold mb-2 text-danger"><i class="fa-solid fa-door-open me-1"></i> Abandonar Sala</h6>
+                        <p class="text-muted small mb-3">Si ya no podés asistir, liberá tu cupo para otro jugador.</p>
+                        <form th:action="@{/partido/{id}/abandonar(id=${partido.id})}" method="post">
+                            <button type="submit" class="btn btn-outline-danger btn-sm w-100 fw-bold">
+                                Abandonar Partido
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Barra de progreso dinámica calculada con Thymeleaf -->

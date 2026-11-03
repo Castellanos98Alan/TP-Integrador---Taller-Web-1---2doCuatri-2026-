@@ -85,6 +85,8 @@ public class RepositorioPartidoTest {
     partido02.setFecha(fechaFalsa2);
     partido02.setDistanciaKm(3);
 
+    partido01.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido02.setEstado(Partido.EstadoPartido.ABIERTO);
     repositorioPartido.guardar(partido01);
     repositorioPartido.guardar(partido02);
 
@@ -131,6 +133,7 @@ public class RepositorioPartidoTest {
     partido.setNivel(nivel);
     partido.setCupoMaximo(cupo);
     partido.setFecha(LocalDateTime.of(2026, 10, 20, 18, 0));
+    partido.setEstado(Partido.EstadoPartido.ABIERTO);
     return partido;
   }
 
@@ -169,16 +172,19 @@ public class RepositorioPartidoTest {
     Partido partidoCoincide = new Partido();
     partidoCoincide.setNivel("PRINCIPIANTE");
     partidoCoincide.setCancha(canchaBuenosAires);
+    partidoCoincide.setEstado(Partido.EstadoPartido.ABIERTO);
     repositorioPartido.guardar(partidoCoincide);
 
     Partido partidoOtraProvincia = new Partido();
     partidoOtraProvincia.setNivel("PRINCIPIANTE");
     partidoOtraProvincia.setCancha(canchaCordoba);
+    partidoOtraProvincia.setEstado(Partido.EstadoPartido.ABIERTO);
     repositorioPartido.guardar(partidoOtraProvincia);
 
     Partido partidoOtroNivel = new Partido();
     partidoOtroNivel.setNivel("AVANZADO");
     partidoOtroNivel.setCancha(canchaBuenosAires);
+    partidoOtroNivel.setEstado(Partido.EstadoPartido.ABIERTO);
     repositorioPartido.guardar(partidoOtroNivel);
 
     // 2. Act (Ejecución)
@@ -217,16 +223,19 @@ public class RepositorioPartidoTest {
     Partido partidoCoincide = new Partido();
     partidoCoincide.setNivel("PRINCIPIANTE");
     partidoCoincide.setCancha(canchaLaMatanza);
+    partidoCoincide.setEstado(Partido.EstadoPartido.ABIERTO);
     repositorioPartido.guardar(partidoCoincide);
 
     Partido partidoOtraProvincia = new Partido();
     partidoOtraProvincia.setNivel("PRINCIPIANTE");
     partidoOtraProvincia.setCancha(canchaCordoba);
+    partidoOtraProvincia.setEstado(Partido.EstadoPartido.ABIERTO);
     repositorioPartido.guardar(partidoOtraProvincia);
 
     Partido partidoOtroNivel = new Partido();
     partidoOtroNivel.setNivel("AVANZADO");
     partidoOtroNivel.setCancha(canchaLaMatanza);
+    partidoOtroNivel.setEstado(Partido.EstadoPartido.ABIERTO);
     repositorioPartido.guardar(partidoOtroNivel);
 
     // 2. Act (Ejecución)
@@ -259,11 +268,13 @@ public class RepositorioPartidoTest {
     partidoPrivado10.setEsPrivado(true);
     partidoPrivado10.setCupoMaximo(10);
     partidoPrivado10.setCancha(cancha);
+    partidoPrivado10.setEstado(Partido.EstadoPartido.ABIERTO);
 
     Partido partidoPublico22 = new Partido();
     partidoPublico22.setEsPrivado(false);
     partidoPublico22.setCupoMaximo(22);
     partidoPublico22.setCancha(cancha);
+    partidoPublico22.setEstado(Partido.EstadoPartido.ABIERTO);
 
     repositorioPartido.guardar(partidoPrivado10);
     repositorioPartido.guardar(partidoPublico22);
@@ -298,12 +309,14 @@ public class RepositorioPartidoTest {
     LocalDateTime fechaExacta = LocalDateTime.of(2026, 10, 2, 14, 30);
     partidoEspecifico.setFecha(fechaExacta);
     partidoEspecifico.setCancha(cancha);
+    partidoEspecifico.setEstado(Partido.EstadoPartido.ABIERTO);
 
     Partido partidoDistinto = new Partido();
     partidoDistinto.setEsPrivado(true);
     LocalDateTime fechaDistinta = LocalDateTime.of(2026, 11, 5, 20, 00);
     partidoDistinto.setFecha(fechaDistinta);
     partidoDistinto.setCancha(cancha);
+    partidoDistinto.setEstado(Partido.EstadoPartido.ABIERTO);
 
     repositorioPartido.guardar(partidoEspecifico);
     repositorioPartido.guardar(partidoDistinto);

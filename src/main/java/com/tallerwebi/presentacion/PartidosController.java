@@ -32,7 +32,6 @@ public class PartidosController {
   private ServicioSolicitudAmistad servicioSolicitudAmistad;
   private ServicioEstadistica servicioEstadistica;
   private static final String ATRIBUTO_ERROR = "error";
-  private static final String SESION_USUARIO = "USUARIO";
   private static final String REDIRECT_PARTIDO = "redirect:/partido/";
 
   @Autowired
@@ -51,6 +50,9 @@ public class PartidosController {
   }
 
   private static final String FILTRO_TODOS = "TODOS";
+  private static final String ATRIBUTO_ERROR = "error";
+  private static final String REDIRECT_PARTIDO = "redirect:/partido/";
+  private static final String SALA_ESPERA = "/sala-de-espera";
 
   @RequestMapping(path = "/partidos", method = RequestMethod.GET)
   public ModelAndView consultarPartidos(
@@ -128,6 +130,7 @@ public class PartidosController {
     Model model,
     HttpServletRequest request
   ) {
+
     Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute(USUARIO_SESION);
 
     if (usuarioLogueado == null) {
@@ -138,7 +141,7 @@ public class PartidosController {
       servicioPartido.cancelarPartido(idPartido, usuarioLogueado);
       model.addAttribute("exito", "El partido se canceló correctamente.");
     } catch (Exception e) {
-      model.addAttribute("error", e.getMessage());
+      model.addAttribute(ATRIBUTO_ERROR, e.getMessage());
     }
 
     return new ModelAndView(REDIRECT_PARTIDO);
@@ -167,6 +170,7 @@ public class PartidosController {
     HttpSession session = request.getSession();
 
     Usuario usuarioLogueado = (Usuario) session.getAttribute(USUARIO_SESION);
+
 
     if (usuarioLogueado == null) {
       return new ModelAndView("redirect:/login");
@@ -227,49 +231,87 @@ public class PartidosController {
   }
 
   // Con este metodo procesamos la accion de unirse a un partido especifico mediante una peticion POST,
-  //utilizando el ID de partido que mandamos por la URL.
-  // Utilizamos el HttpServletRequest para poder almacenar la sesion de ese momento, esto para poder traer al usuario logueado
-  //de esa sesion. Validamos si el usuario logueado existe, si no existe entonces retorna un ModelAndView que contiene la vista de login
-  //para que el usuario se loguee.
-  //Si el usuario existe, entonces se utiliza un try catch para manejar excepciones por si el partido no existe.
-  // Dentro del try utilizamos el metodo de servicioPartido para unirse al partido, donde mandamos el id del partido y
-  //el usuario logueado.
-  //Si se cumplen las validaciones entonces retorna un ModelAndView con la vista de sala de espera mandando el id del partido
-  //en la URL.
-  @RequestMapping(path = "/partido/{id}/unirse", method = RequestMethod.POST)
-  public ModelAndView unirseAlPartido(
+//utilizando el ID de partido que mandamos por la URL.
+// Utilizamos el HttpServletRequest para poder almacenar la sesion de ese momento, esto para poder traer al usuario logueado
+//de esa sesion. Validamos si el usuario logueado existe, si no existe entonces retorna un ModelAndView que contiene la vista de login
+//para que el usuario se loguee.
+//Si el usuario existe, entonces se utiliza un try catch para manejar excepciones por si el partido no existe.
+// Dentro del try utilizamos el metodo de servicioPartido para unirse al partido, donde mandamos el id del partido y
+//el usuario logueado.
+//Si se cumplen las validaciones entonces retorna un ModelAndView con la vista de sala de espera mandando el id del partido
+//en la URL.
+@RequestMapping(path = "/partido/{id}/unirse", method = RequestMethod.POST)
+public ModelAndView unirseAlPartido(
+  @PathVariable("id") Long idPartido,
+  HttpServletRequest request
+) {
+  HttpSession session = request.getSession();
+
+  Usuario usuarioLogueado = (Usuario) session.getAttribute(USUARIO_SESION);
+
+  if (usuarioLogueado == null) {
+    return new ModelAndView("redirect:/login?error=Debes+iniciar+sesion+para+unirte");
+  }
+
+  try {
+    Jugador jugadorLogueado = servicioJugador.buscarPorUsuarioId(usuarioLogueado.getId());
+    servicioPartido.unirseAPartido(idPartido, jugadorLogueado);
+
+    return new ModelAndView(REDIRECT_PARTIDO + idPartido + "/sala-de-espera");
+  } catch (
+    CupoMaximoAlcanzado
+    | EstadoPartidoInvalido
+    | JugadorInscripto
+    | DiferenciaHoraria
+    | RangoJugadorIncompatibleException
+    | PartidoNoEncontrado e
+  ) {
+    String mensajeError = e.getMessage();
+    return new ModelAndView(
+      REDIRECT_PARTIDO +
+      idPartido +
+      "/sala-de-espera?error=" +
+      java.net.URLEncoder.encode(mensajeError, java.nio.charset.StandardCharsets.UTF_8)
+    );
+  }
+}
+
+  @PostMapping("/partido/{id}/abandonar")
+  public ModelAndView abandonarPartido(
     @PathVariable("id") Long idPartido,
     HttpServletRequest request
   ) {
-    HttpSession session = request.getSession();
-
-    Usuario usuarioLogueado = (Usuario) session.getAttribute(USUARIO_SESION);
-
-    if (usuarioLogueado == null) {
-      return new ModelAndView("redirect:/login?error=Debes+iniciar+sesion+para+unirte");
-    }
+    Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute(ATRIBUTO_USUARIO);
+    if (usuarioLogueado == null) return new ModelAndView("redirect:/login");
 
     try {
       Jugador jugadorLogueado = servicioJugador.buscarPorUsuarioId(usuarioLogueado.getId());
-      servicioPartido.unirseAPartido(idPartido, jugadorLogueado);
-
-      return new ModelAndView(REDIRECT_PARTIDO + idPartido + "/sala-de-espera");
-    } catch (
-      CupoMaximoAlcanzado
-      | EstadoPartidoInvalido
-      | JugadorInscripto
-      | DiferenciaHoraria
-      | RangoJugadorIncompatibleException
-      | PartidoNoEncontrado e
-    ) {
-      String mensajeError = e.getMessage();
-      return new ModelAndView(
-        REDIRECT_PARTIDO +
-        idPartido +
-        "/sala-de-espera?error=" +
-        java.net.URLEncoder.encode(mensajeError, java.nio.charset.StandardCharsets.UTF_8)
-      );
+      servicioPartido.abandonarPartido(idPartido, jugadorLogueado);
+      return new ModelAndView("redirect:/partidos");
+    } catch (Exception e) {
+      Map<String, Object> model = new ModelMap();
+      model.put(ATRIBUTO_ERROR, e.getMessage());
+      return new ModelAndView(REDIRECT_PARTIDO + idPartido + SALA_ESPERA, model);
     }
+  }
+
+  @PostMapping("/partido/{id}/expulsar/{idJugador}")
+  public ModelAndView expulsarJugador(
+    @PathVariable("id") Long idPartido,
+    @PathVariable("idJugador") Long idJugador,
+    HttpServletRequest request
+  ) {
+    Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute(USUARIO_SESION);
+    if (usuarioLogueado == null) return new ModelAndView("redirect:/login");
+
+    try {
+      servicioPartido.expulsarJugador(idPartido, idJugador, usuarioLogueado);
+      return new ModelAndView(REDIRECT_PARTIDO + idPartido + SALA_ESPERA);
+    } catch (Exception e) {
+      // Ahora enviamos el error al ModelMap para que aparezca en la URL
+      Map<String, Object> model = new ModelMap();
+      model.put(ATRIBUTO_ERROR, e.getMessage());
+      return new ModelAndView(REDIRECT_PARTIDO + idPartido + SALA_ESPERA, model);
   }
 
   @GetMapping("/partido/{id}/cargar-estadisticas")
