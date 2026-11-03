@@ -9,7 +9,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
+    <!-- Leaflet CSS -->
+    <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
     <style>
         * {
             box-sizing: border-box;
@@ -250,6 +254,14 @@
                 font-size: 32px;
             }
         }
+        /* MAPA DE CANCHAS */
+        #mapaCanchas {
+            width: 100%;
+            height: 380px;
+            border-radius: 12px;
+            border: 1px solid #d8e2de;
+            z-index: 1;
+        }
     </style>
 </head>
 
@@ -308,11 +320,13 @@
                                 <label for="localidad" class="form-label">
                                     <i class="fa-solid fa-map-location-dot me-1"></i> Localidad
                                 </label>
+
                                 <select id="localidad" class="form-select" th:field="*{localidad}" required>
                                     <option value="">Seleccioná una localidad</option>
                                     <option th:each="loc : ${localidades}"
                                             th:value="${loc}"
-                                            th:text="${loc}"></option>
+                                            th:text="${loc}">
+                                    </option>
                                 </select>
                             </div>
 
@@ -320,14 +334,33 @@
                                 <label for="cancha" class="form-label">
                                     <i class="fa-solid fa-location-dot me-1"></i> Cancha
                                 </label>
+
                                 <select id="cancha" class="form-select" th:field="*{cancha}" required>
                                     <option value="">Seleccioná una cancha</option>
+
                                     <option th:each="c : ${canchas}"
                                             th:value="${c.nombre}"
                                             th:text="${c.nombre}"
-                                            th:attr="data-localidad=${c.localidad}"></option>
+                                            th:attr="data-localidad=${c.localidad},
+                 data-latitud=${c.latitud},
+                 data-longitud=${c.longitud}">
+                                    </option>
                                 </select>
                             </div>
+                        </div>
+
+                        <!-- MAPA DE CANCHAS -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fa-solid fa-map-location-dot me-1"></i>
+                                Ubicación de las canchas
+                            </label>
+
+                            <p class="text-muted small">
+                                Seleccioná una localidad y hacé clic en un marcador para elegir una cancha.
+                            </p>
+
+                            <div id="mapaCanchas"></div>
                         </div>
 
                         <!-- Fecha y Cupo -->
@@ -454,35 +487,185 @@
     </div>
 </div>
 
+<!-- Leaflet JS: debe cargarse antes de utilizar L.map() -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
-    // Fecha y hora mínima (bloquea fechas pasadas)
+    // ==========================================
+    // 1. FECHA Y HORA MÍNIMA
+    // ==========================================
+
     const campoFecha = document.getElementById("fechaHora");
     const ahora = new Date();
+
     ahora.setMinutes(ahora.getMinutes() - ahora.getTimezoneOffset());
     campoFecha.min = ahora.toISOString().slice(0, 16);
 
-    // Canchas según localidad elegida
+
+    // ==========================================
+    // 2. SELECTORES DE LOCALIDAD Y CANCHA
+    // ==========================================
+
     const selectLocalidad = document.getElementById("localidad");
     const selectCancha = document.getElementById("cancha");
 
-    function mostrarCanchasDeLaLocalidad() {
+
+    // ==========================================
+    // 3. INICIALIZAR EL MAPA
+    // ==========================================
+
+    const mapa = L.map("mapaCanchas").setView([-34.70, -58.57], 11);
+
+    // Cargar los mapas de OpenStreetMap
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(mapa);
+
+    // Grupo donde vamos a guardar los marcadores
+    const grupoMarcadores = L.featureGroup().addTo(mapa);
+    const marcadoresPorCancha = new Map();
+    let marcadorDestacado = null;
+
+    // ==========================================
+    // 4. ACTUALIZAR LOS MARCADORES
+    // ==========================================
+
+    function actualizarMapa() {
+        grupoMarcadores.clearLayers();
+        marcadoresPorCancha.clear();
+
         for (const opcion of selectCancha.options) {
+
+            if (opcion.value === "") continue;
+
+            const correspondeLocalidad =
+                !selectLocalidad.value ||
+                opcion.dataset.localidad === selectLocalidad.value;
+
+            if (!correspondeLocalidad) continue;
+
+            const latitud = parseFloat(opcion.dataset.latitud);
+            const longitud = parseFloat(opcion.dataset.longitud);
+
+            if (Number.isNaN(latitud) || Number.isNaN(longitud)) continue;
+
+            const marcador = L.marker([latitud, longitud])
+                .addTo(grupoMarcadores);
+
+            marcador.bindPopup(
+                "<strong>" + opcion.textContent + "</strong><br>" +
+                opcion.dataset.localidad
+            );
+
+            // Guardamos el marcador asociado a su cancha.
+            marcadoresPorCancha.set(opcion.value, marcador);
+
+            marcador.on("click", function () {
+
+                // Seleccionamos la cancha elegida.
+                selectCancha.value = opcion.value;
+
+                // Seleccionamos automáticamente su localidad.
+                selectLocalidad.value = opcion.dataset.localidad;
+
+                // Actualizamos los selectores y el mapa.
+                mostrarCanchasDeLaLocalidad();
+                filtrarLocalidadPorCancha();
+
+                // Centramos el mapa en la cancha elegida.
+                enfocarCanchaSeleccionada();
+            });
+        }
+
+        if (grupoMarcadores.getLayers().length > 0) {
+            mapa.fitBounds(grupoMarcadores.getBounds(), {
+                padding: [30, 30],
+                maxZoom: 14
+            });
+        } else {
+            mapa.setView([-34.70, -58.57], 11);
+        }
+
+        enfocarCanchaSeleccionada();
+    }
+    function enfocarCanchaSeleccionada() {
+
+        // Primero eliminamos el destaque anterior.
+        if (marcadorDestacado) {
+            mapa.removeLayer(marcadorDestacado);
+            marcadorDestacado = null;
+        }
+
+        const canchaSeleccionada = selectCancha.value;
+
+        if (!canchaSeleccionada) return;
+
+        const marcador = marcadoresPorCancha.get(canchaSeleccionada);
+
+        if (!marcador) return;
+
+        // Centramos el mapa en la cancha seleccionada.
+        mapa.setView(marcador.getLatLng(), 15);
+
+        // Mostramos el nombre y la localidad.
+        marcador.openPopup();
+
+        // Destacamos visualmente el marcador seleccionado.
+        marcador.setZIndexOffset(1000);
+
+        // Dibujamos un círculo alrededor de la cancha seleccionada.
+        marcadorDestacado = L.circleMarker(marcador.getLatLng(), {
+            radius: 20,
+            color: "#2563eb",
+            weight: 3,
+            fillColor: "#3b82f6",
+            fillOpacity: 0.15
+        }).addTo(mapa);
+    }
+
+    // ==========================================
+    // 5. FILTRAR CANCHAS POR LOCALIDAD
+    // ==========================================
+
+    function mostrarCanchasDeLaLocalidad() {
+
+        for (const opcion of selectCancha.options) {
+
             if (opcion.value !== "") {
-                const esDeLaLocalidad = opcion.dataset.localidad === selectLocalidad.value;
+
+                const esDeLaLocalidad =
+                    !selectLocalidad.value ||
+                    opcion.dataset.localidad === selectLocalidad.value;
+
                 opcion.hidden = !esDeLaLocalidad;
                 opcion.disabled = !esDeLaLocalidad;
             }
         }
+
+        // Actualizar también los marcadores del mapa
+        actualizarMapa();
     }
 
     selectLocalidad.addEventListener("change", function () {
+
+
+        // Limpiar la cancha seleccionada al cambiar de localidad
         selectCancha.value = "";
+
         mostrarCanchasDeLaLocalidad();
     });
+    selectCancha.addEventListener("change", function () {
+        enfocarCanchaSeleccionada();
+    });
 
+    // Ejecutar al cargar la página
     mostrarCanchasDeLaLocalidad();
 
-    // Generar y mostrar código al elegir "Privado"
+
+    // ==========================================
+    // 6. GENERAR Y MOSTRAR CÓDIGO PRIVADO
+    // ==========================================
+
     const selectEsPrivado = document.getElementById("esPrivado");
     const contenedorCodigo = document.getElementById("contenedorCodigo");
     const inputCodigo = document.getElementById("codigoDeAcceso");
@@ -492,12 +675,17 @@
     }
 
     function toggleCodigoPrivado() {
+
         if (selectEsPrivado.value === "true") {
+
             if (!inputCodigo.value) {
                 inputCodigo.value = generarCodigoAleatorio();
             }
+
             contenedorCodigo.style.display = "block";
+
         } else {
+
             contenedorCodigo.style.display = "none";
             inputCodigo.value = "";
         }
@@ -509,7 +697,9 @@
     }
 
     selectEsPrivado.addEventListener("change", toggleCodigoPrivado);
+
     toggleCodigoPrivado();
+
 </script>
 
 <!-- Bootstrap 5 JS -->

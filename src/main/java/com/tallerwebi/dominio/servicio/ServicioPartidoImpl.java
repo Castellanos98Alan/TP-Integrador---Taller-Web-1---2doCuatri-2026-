@@ -7,6 +7,11 @@ import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Partido.EstadoPartido;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.excepcion.CanchaNoDisponibleException;
+import com.tallerwebi.dominio.excepcion.CanchaNoEncontradaException;
+import com.tallerwebi.dominio.excepcion.CupoInvalidoException;
+import com.tallerwebi.dominio.excepcion.FechaPartidoInvalidaException;
+import com.tallerwebi.dominio.excepcion.RangoJugadorIncompatibleException;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
@@ -43,24 +48,27 @@ public class ServicioPartidoImpl implements ServicioPartido {
     this.servicioBalanceoEquipo = servicioBalanceoEquipo;
   }
 
-  //spint 2
+  //cambiar los runtime a por excepcion por ser
   @Override
   public void crearPartido(DatosCrearPartido datos, Usuario creador) {
     if (datos.getCupo() == null || datos.getCupo() <= 0) {
-      throw new RuntimeException("El cupo debe ser mayor a cero.");
+      throw new CupoInvalidoException("El cupo debe ser mayor a cero.");
     }
+
     if (datos.getFechaHora() == null) {
-      throw new RuntimeException("Debe ingresar una fecha y hora.");
+      throw new FechaPartidoInvalidaException("Debe ingresar una fecha y hora.");
     }
 
     Cancha cancha = repositorioCancha.buscarPorNombre(datos.getCancha());
+
     if (cancha == null) {
-      throw new RuntimeException("La cancha ingresada no existe.");
+      throw new CanchaNoEncontradaException("La cancha ingresada no existe.");
     }
 
-    validarCanchaDisponible(cancha, datos.getFechaHora()); // NUEVO
+    validarCanchaDisponible(cancha, datos.getFechaHora());
 
     Partido partido = new Partido();
+
     partido.setCancha(cancha);
     partido.setFecha(datos.getFechaHora());
     partido.setCupoMaximo(datos.getCupo());
@@ -75,11 +83,6 @@ public class ServicioPartidoImpl implements ServicioPartido {
     repositorioPartido.guardar(partido);
   }
 
-  //Sprint3/4
-  // Valida la disponibilidad de la cancha considerando una duración estimada de 1 hora por partido.
-  // Se define una ventana de tiempo: 1 hora hacia atrás (minusHours(1)) y 1 hora hacia adelante (plusHours(1)).
-  // Si la consulta al repositorio devuelve al menos un partido activo en esa ventana, significa que el nuevo
-  // partido chocaría en horario, por lo que se lanza una excepción de negocio impidiendo su creación.
   private void validarCanchaDisponible(Cancha cancha, LocalDateTime fechaHora) {
     LocalDateTime inicioVentana = fechaHora.minusHours(1);
     LocalDateTime finVentana = fechaHora.plusHours(1);
@@ -91,7 +94,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
     );
 
     if (!partidosEnLaCancha.isEmpty()) {
-      throw new RuntimeException(
+      throw new CanchaNoDisponibleException(
         "La cancha no está disponible en esa franja horaria (los partidos duran 1 hora)."
       );
     }
@@ -150,6 +153,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
 
     validarEstadoDelPartido(partido);
+    validarRangoJugador(partido, usuarioLogueadoJugador); // Axel sprint 4
     validarCuposYDisponibilidad(partido, usuarioLogueadoJugador);
     validarHorarioParaInscripcion(partido, usuarioLogueadoJugador);
 
@@ -169,6 +173,58 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
 
     repositorioPartido.modificar(partido);
+  }
+
+  // Axel sprint 4
+  private void validarRangoJugador(Partido partido, Jugador jugador) {
+    String categoriaJugador = obtenerCategoriaRango(jugador.getNivel());
+    String categoriaPartido = obtenerCategoriaRango(partido.getNivel());
+
+    if (categoriaJugador == null || categoriaPartido == null) {
+      throw new RangoJugadorIncompatibleException(
+        "El rango del jugador o del partido no es válido."
+      );
+    }
+
+    if (!categoriaJugador.equals(categoriaPartido)) {
+      throw new RangoJugadorIncompatibleException(
+        "No podes unirte a este partido porque no corresponde a tu rango."
+      );
+    }
+  }
+
+  private String obtenerCategoriaRango(String nivel) {
+    if (nivel == null) {
+      return null;
+    }
+
+    String rango = nivel.trim().toUpperCase(Locale.ROOT);
+
+    if (esRangoAvanzado(rango)) {
+      return "AVANZADO";
+    }
+
+    if (esRangoIntermedio(rango)) {
+      return "INTERMEDIO";
+    }
+
+    if (esRangoBajo(rango)) {
+      return "BAJO";
+    }
+
+    return null;
+  }
+
+  private boolean esRangoAvanzado(String rango) {
+    return Set.of("SS", "S", "AVANZADO").contains(rango);
+  }
+
+  private boolean esRangoIntermedio(String rango) {
+    return Set.of("A", "B", "INTERMEDIO").contains(rango);
+  }
+
+  private boolean esRangoBajo(String rango) {
+    return Set.of("C", "D", "BAJO", "PRINCIPIANTE").contains(rango);
   }
 
   //Metodo privado que valida el estado del partido, con esto logro ver si el partido tiene estado Finalizado o Cancelado
