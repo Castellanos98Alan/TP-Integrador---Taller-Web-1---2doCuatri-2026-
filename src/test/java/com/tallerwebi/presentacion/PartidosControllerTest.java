@@ -13,10 +13,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Estadistica;
+import com.tallerwebi.dominio.InscripcionPartido;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.CupoMaximoAlcanzado;
+import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
 import com.tallerwebi.dominio.excepcion.RevisionEstadisticasNoPermitida;
 import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
 import com.tallerwebi.dominio.servicio.ServicioEstadistica;
@@ -478,4 +480,71 @@ public class PartidosControllerTest {
       modelAndView.getViewName()
     );
   }
+
+  @Test
+public void invitarAmigoSinSesionDebeRedirigirAlLogin() throws InvitacionAlPartidoException {
+  // Given
+  when(requestMock.getSession()).thenReturn(sessionMock);
+  when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
+
+  // When
+  ModelAndView mav = partidosController.invitarAmigo(1L, 2L, requestMock);
+
+  // Then
+  assertThat(mav.getViewName(), equalTo("redirect:/login/"));
+  verify(servicioPartidoMock, never()).invitarJugador(anyLong(), anyLong(), any(Usuario.class));
+}
+
+@Test
+public void invitarAmigoConSesionDebeVolverALaSala() throws InvitacionAlPartidoException {
+  // Given
+  Usuario usuario = givenUsuario(1L);
+  givenSesion(usuario);
+
+  // When
+  ModelAndView mav = partidosController.invitarAmigo(5L, 8L, requestMock);
+
+  // Then
+  verify(servicioPartidoMock, times(1)).invitarJugador(5L, 8L, usuario);
+  assertThat(mav.getViewName(), equalTo("redirect:/partido/5/sala-de-espera"));
+}
+
+@Test
+public void invitarAmigoSiElServicioRechazaDebePropagarLaExcepcion()
+    throws InvitacionAlPartidoException {
+  // Given
+  Usuario usuario = givenUsuario(1L);
+  givenSesion(usuario);
+  doThrow(new InvitacionAlPartidoException("Ya fue invitado"))
+      .when(servicioPartidoMock).invitarJugador(5L, 8L, usuario);
+
+  // When / Then
+  boolean seRechazo = false;
+  try {
+    partidosController.invitarAmigo(5L, 8L, requestMock);
+  } catch (InvitacionAlPartidoException e) {
+    seRechazo = true;
+    assertThat(e.getMessage(), equalTo("Ya fue invitado"));
+  }
+  assertThat(seRechazo, equalTo(true));
+}
+
+
+private Usuario givenUsuario(Long id) {
+  Usuario usuario = new Usuario();
+  usuario.setId(id);
+  return usuario;
+}
+
+private void givenSesion(Usuario usuario) {
+  when(requestMock.getSession()).thenReturn(sessionMock);
+  when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+}
+
+private void givenInscripcion(Partido partido, Usuario usuario) {
+  Jugador jugador = new Jugador();
+  jugador.setUsuario(usuario);
+  InscripcionPartido inscripcion = new InscripcionPartido(partido, jugador);
+  partido.getInscripciones().add(inscripcion);
+}
 }
