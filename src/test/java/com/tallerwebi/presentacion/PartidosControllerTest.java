@@ -148,30 +148,28 @@ public class PartidosControllerTest {
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioLogueado);
 
-    ModelAndView modelAndView = partidosController.cancelarPartido(
-      idPartido,
-      modelMock,
-      requestMock
-    );
+    ModelAndView modelAndView = partidosController.cancelarPartido(idPartido, requestMock);
 
     verify(servicioPartidoMock, times(1)).cancelarPartido(idPartido, usuarioLogueado);
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/partido/"));
+
+    assertThat(
+      modelAndView.getViewName(),
+      equalToIgnoringCase("redirect:/partidos?exito=El+partido+se+cancelo+correctamente")
+    );
   }
 
   @Test
   public void SiNoHayUsuarioLogueadoAlIntentarCancelarRedirijaAlLogin() {
     Long idPartido = 5L;
 
+    // Configuramos la sesión para que devuelva NULL (simulando que no hay usuario logueado)
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
 
-    ModelAndView modelAndView = partidosController.cancelarPartido(
-      idPartido,
-      modelMock,
-      requestMock
-    );
+    ModelAndView modelAndView = partidosController.cancelarPartido(idPartido, requestMock);
 
     verify(servicioPartidoMock, never()).cancelarPartido(anyLong(), any());
+
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login/"));
   }
 
@@ -544,18 +542,24 @@ public class PartidosControllerTest {
   @Test
   public void alCancelarPartidoSiServicioFallaDebeMostrarError() {
     // Given
-    Usuario usuario = givenUsuario(1L);
-    givenSesion(usuario);
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
     doThrow(new RuntimeException("No autorizado"))
       .when(servicioPartidoMock)
       .cancelarPartido(1L, usuario);
 
     // When
-    ModelAndView mav = partidosController.cancelarPartido(1L, modelMock, requestMock);
+    ModelAndView mav = partidosController.cancelarPartido(1L, requestMock);
 
     // Then
-    assertThat(mav.getViewName(), equalTo("redirect:/partido/"));
-    verify(modelMock, times(1)).addAttribute("error", "No autorizado");
+    assertThat(
+      mav.getViewName(),
+      equalToIgnoringCase("redirect:/partido/1/sala-de-espera?error=No+autorizado")
+    );
   }
 
   @Test

@@ -126,7 +126,6 @@ public class PartidosController {
   @PostMapping("/partido/{id}")
   public ModelAndView cancelarPartido(
     @PathVariable("id") Long idPartido,
-    Model model,
     HttpServletRequest request
   ) {
     Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute(USUARIO_SESION);
@@ -137,12 +136,18 @@ public class PartidosController {
 
     try {
       servicioPartido.cancelarPartido(idPartido, usuarioLogueado);
-      model.addAttribute("exito", "El partido se canceló correctamente.");
+      return new ModelAndView("redirect:/partidos?exito=El+partido+se+cancelo+correctamente");
     } catch (Exception e) {
-      model.addAttribute(ATRIBUTO_ERROR, e.getMessage());
+      String mensajeError = e.getMessage() != null
+        ? e.getMessage()
+        : "Error al cancelar el partido";
+      return new ModelAndView(
+        REDIRECT_PARTIDO +
+        idPartido +
+        "/sala-de-espera?error=" +
+        java.net.URLEncoder.encode(mensajeError, java.nio.charset.StandardCharsets.UTF_8)
+      );
     }
-
-    return new ModelAndView(REDIRECT_PARTIDO);
   }
 
   @RequestMapping(path = "/cancelar-partido", method = RequestMethod.GET)
@@ -305,7 +310,6 @@ public class PartidosController {
       servicioPartido.expulsarJugador(idPartido, idJugador, usuarioLogueado);
       return new ModelAndView(REDIRECT_PARTIDO + idPartido + SALA_ESPERA);
     } catch (Exception e) {
-      // Ahora enviamos el error al ModelMap para que aparezca en la URL
       Map<String, Object> model = new ModelMap();
       model.put(ATRIBUTO_ERROR, e.getMessage());
       return new ModelAndView(REDIRECT_PARTIDO + idPartido + SALA_ESPERA, model);
