@@ -357,7 +357,13 @@ public class RepositorioEstadisticasTest {
 
     // when
 
-    List<Jugador> jugadoresFiltrados = repositorioJugador.buscarRankingPorNivel("B");
+    List<Jugador> jugadoresFiltrados = repositorioJugador.buscarRankingFiltrado(
+      "B",
+      null,
+      null,
+      null,
+      null
+    );
 
     // then
 
@@ -419,7 +425,13 @@ public class RepositorioEstadisticasTest {
 
     //when
 
-    List<Jugador> jugadoresFiltrados = repositorioJugador.buscarRankingPorPosicion("Arquero");
+    List<Jugador> jugadoresFiltrados = repositorioJugador.buscarRankingFiltrado(
+      null,
+      "Arquero",
+      null,
+      null,
+      null
+    );
 
     // then
 

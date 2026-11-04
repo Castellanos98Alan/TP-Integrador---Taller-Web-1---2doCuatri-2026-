@@ -14,4 +14,6 @@ public interface ServicioSolicitudAmistad {
   void rechazarSolicitud(Integer idSolicitud);
 
   Boolean sonAmigos(Usuario usuarioLogueado, Usuario usuarioPerfil);
+
+  List<Usuario> obtenerAmigos(Usuario usuarioLogueado);
 }

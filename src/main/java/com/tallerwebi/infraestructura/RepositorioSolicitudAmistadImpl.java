@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class RepositorioSolicitudAmistadImpl implements RepositorioSolicitudAmistad {
 
+  private static final String PARAMETRO_ESTADO = "estado";
+
   SessionFactory sessionFactory;
 
   @Autowired
@@ -48,7 +50,7 @@ public class RepositorioSolicitudAmistadImpl implements RepositorioSolicitudAmis
       .getCurrentSession()
       .createQuery(query, SolicitudAmistad.class)
       .setParameter("receptor", receptor)
-      .setParameter("estado", SolicitudAmistad.EstadoSolicitud.PENDIENTE)
+      .setParameter(PARAMETRO_ESTADO, SolicitudAmistad.EstadoSolicitud.PENDIENTE)
       .getResultList();
   }
 
@@ -65,7 +67,7 @@ public class RepositorioSolicitudAmistadImpl implements RepositorioSolicitudAmis
       .createQuery(query, Long.class)
       .setParameter("emisor", emisor)
       .setParameter("receptor", receptor)
-      .setParameter("estado", SolicitudAmistad.EstadoSolicitud.PENDIENTE)
+      .setParameter(PARAMETRO_ESTADO, SolicitudAmistad.EstadoSolicitud.PENDIENTE)
       .getSingleResult();
 
     return cantidad > 0;
@@ -82,10 +84,25 @@ public class RepositorioSolicitudAmistadImpl implements RepositorioSolicitudAmis
     return !sessionFactory
       .getCurrentSession()
       .createQuery(query, SolicitudAmistad.class)
-      .setParameter("estado", SolicitudAmistad.EstadoSolicitud.ACEPTADA)
+      .setParameter(PARAMETRO_ESTADO, SolicitudAmistad.EstadoSolicitud.ACEPTADA)
       .setParameter("usuario1", usuario1)
       .setParameter("usuario2", usuario2)
       .getResultList()
       .isEmpty();
+  }
+
+  @Override
+  public List<SolicitudAmistad> buscarAmistadesAceptadas(Usuario usuario) {
+    String query =
+      "SELECT s FROM SolicitudAmistad s " +
+      "WHERE (s.emisor = :usuario OR s.receptor = :usuario) " +
+      "AND s.estado = :estado";
+
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(query, SolicitudAmistad.class)
+      .setParameter("usuario", usuario)
+      .setParameter(PARAMETRO_ESTADO, SolicitudAmistad.EstadoSolicitud.ACEPTADA)
+      .getResultList();
   }
 }

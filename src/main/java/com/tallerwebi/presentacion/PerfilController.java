@@ -1,8 +1,6 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Estadistica;
-import com.tallerwebi.dominio.Jugador;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.servicio.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -10,9 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Base64;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
@@ -36,6 +32,7 @@ public class PerfilController {
   private final ServicioRanking servicioRanking;
   private final ServicioEstadistica servicioEstadistica;
   private final ServicioSolicitudAmistad servicioSolicitudAmistad;
+  private final ServicioPartido servicioPartido;
 
   private static final String USUARIO = "USUARIO";
   private static final String REDIRECT_LOGIN = "redirect:/login";
@@ -49,13 +46,15 @@ public class PerfilController {
     ServicioJugador servicioJugador,
     ServicioRanking servicioRanking,
     ServicioEstadistica servicioEstadistica,
-    ServicioSolicitudAmistad servicioSolicitudAmistad
+    ServicioSolicitudAmistad servicioSolicitudAmistad,
+    ServicioPartido servicioPartido
   ) {
     this.servicioLogin = servicioLogin;
     this.servicioJugador = servicioJugador;
     this.servicioRanking = servicioRanking;
     this.servicioEstadistica = servicioEstadistica;
     this.servicioSolicitudAmistad = servicioSolicitudAmistad;
+    this.servicioPartido = servicioPartido;
   }
 
   @GetMapping("/perfil")
@@ -315,6 +314,50 @@ public class PerfilController {
     model.put("rojas", estadisticas.getRojas());
     model.put("puntajeTotal", estadisticas.getPuntaje());
 
+    List<Partido> partidosJugador = servicioPartido.buscarPartidosPorJugador(jugador.getId());
+
+    List<Estadistica> estadisticasJugador = servicioEstadistica.obtenerEstadisticasPorJugador(
+      jugador
+    );
+
+    model.put("partidosJugador", partidosJugador);
+    model.put("estadisticasJugador", estadisticasJugador);
+    model.put("historialPartidos", armarHistorialPartidos(partidosJugador, estadisticasJugador));
+
+    model.put("estadisticasJugador", estadisticasJugador);
+
     return model;
+  }
+
+  private List<Map<String, Object>> armarHistorialPartidos(
+    List<Partido> partidosJugador,
+    List<Estadistica> estadisticasJugador
+  ) {
+    List<Map<String, Object>> historialPartidos = new ArrayList<>();
+
+    for (Partido partido : partidosJugador) {
+      Map<String, Object> datosPartido = new ModelMap();
+
+      datosPartido.put("fecha", partido.getFecha());
+
+      for (Estadistica estadistica : estadisticasJugador) {
+        if (
+          estadistica.getPartido() != null &&
+          estadistica.getPartido().getId().equals(partido.getId())
+        ) {
+          datosPartido.put("goles", estadistica.getGoles());
+          datosPartido.put("asistencias", estadistica.getAsistencias());
+          datosPartido.put("amarillas", estadistica.getAmarillas());
+          datosPartido.put("rojas", estadistica.getRojas());
+          datosPartido.put("puntaje", estadistica.getPuntaje());
+
+          break;
+        }
+      }
+
+      historialPartidos.add(datosPartido);
+    }
+
+    return historialPartidos;
   }
 }

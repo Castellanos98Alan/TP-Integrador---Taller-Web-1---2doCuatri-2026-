@@ -5,16 +5,22 @@ import java.util.List;
 
 public interface RepositorioJugador {
   void guardar(Jugador jugador);
+
   List<Jugador> buscarTodos();
+
   List<Jugador> buscarRanking();
-
-  List<Jugador> buscarRankingPorNivel(String nivel);
-
-  List<Jugador> buscarRankingPorPosicion(String posicion);
-
-  List<Jugador> buscarRankingPorPosicionYNivel(String nivel, String posicion);
 
   Jugador buscarPorUsuarioId(Long usuarioId);
 
+  Jugador buscarPorId(Long idJugador);
+
   void modificar(Jugador jugador);
+
+  List<Jugador> buscarRankingFiltrado(
+    String nivel,
+    String posicion,
+    String rango,
+    String vista,
+    Long usuarioId
+  );
 }

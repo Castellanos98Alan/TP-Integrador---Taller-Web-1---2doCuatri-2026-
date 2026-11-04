@@ -124,15 +124,13 @@
                     <i class="fa-solid fa-bell"></i>
 
                     <span
-                            th:if="${solicitudesPendientes != null
-                        and !solicitudesPendientes.isEmpty()}"
+                            th:if="${cantidadNotificaciones != null
+                             and cantidadNotificaciones > 0}"
                             class="position-absolute top-0 start-100
-                       translate-middle badge rounded-pill bg-danger"
-                            th:text="${solicitudesPendientes.size()}">
-
-            0
-
-        </span>
+                            translate-middle badge rounded-pill bg-danger"
+                            th:text="${cantidadNotificaciones}">
+                                             0
+                    </span>
 
                 </button>
 
@@ -142,17 +140,103 @@
                         style="width: 340px;">
 
                     <h6 class="fw-bold mb-3">
-                        Solicitudes de amistad
+                        Notificaciones
                     </h6>
+
+                    <div
+                            th:each="notificacion : ${notificaciones}"
+                            class="border-bottom py-2">
+
+                        <div
+                                th:if="${notificacion.tipoDeNotificacion.name()
+                                    == 'INVITACION_PARTIDO'}">
+
+                            <strong>⚽ Invitación a partido</strong>
+
+                            <p
+                                    class="mb-1"
+                                    th:text="${notificacion.mensaje}">
+                            </p>
+
+                            <form th:action="@{/notificacion/marcar-leida}"
+                                  method="post">
+
+                                <input type="hidden"
+                                       name="idNotificacion"
+                                       th:value="${notificacion.id}">
+
+                                <input type="hidden"
+                                       name="volverA"
+                                       th:value="'/partido/' + ${notificacion.partido.id} + '/sala-de-espera'">
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-success mt-1">
+                                    Ver partido
+                                </button>
+
+                            </form>
+
+                        </div>
+
+
+                        <div
+                                th:if="${notificacion.tipoDeNotificacion.name()
+                                    == 'PARTIDO_CANCELADO'}">
+
+                            <strong>❌ Partido cancelado</strong>
+
+                            <p
+                                    class="mb-1"
+                                    th:text="${notificacion.mensaje}">
+                            </p>
+
+                            <form
+                                    th:action="@{/notificacion/marcar-leida}"
+                                    method="post">
+
+                                <input
+                                        type="hidden"
+                                        name="idNotificacion"
+                                        th:value="${notificacion.id}">
+
+                                <input
+                                        type="hidden"
+                                        name="volverA"
+                                        value="/partidos">
+
+                                <button
+                                        type="submit"
+                                        class="btn btn-sm btn-outline-secondary mt-1">
+
+                                    Marcar como leída
+                                </button>
+
+                            </form>
+
+                        </div>
+
+
+                        <div
+                                th:if="${notificacion.tipoDeNotificacion.name()
+                                    == 'FORMULARIO_COMPLETADO'}">
+
+                            <strong>📋 Formulario completado</strong>
+
+                            <p
+                                    class="mb-1"
+                                    th:text="${notificacion.mensaje}">
+                            </p>
+
+                        </div>
+
+                    </div>
 
 
                     <div
-                            th:if="${solicitudesPendientes == null
-                        or solicitudesPendientes.isEmpty()}"
-                            class="text-muted">
+                            th:if="${cantidadNotificaciones == 0}"
+                            class="text-muted text-center py-2">
 
-                        No tenés solicitudes pendientes.
-
+                        No tenés notificaciones.
                     </div>
 
 
