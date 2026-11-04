@@ -123,7 +123,7 @@ public class PartidosController {
     return new ModelAndView("partidos", model);
   }
 
-  @PostMapping("/partido/cancelar/{id}")
+  @PostMapping("/partido/{id}")
   public ModelAndView cancelarPartido(
     @PathVariable("id") Long idPartido,
     Model model,
@@ -247,7 +247,7 @@ public class PartidosController {
     Usuario usuarioLogueado = (Usuario) session.getAttribute(USUARIO_SESION);
 
     if (usuarioLogueado == null) {
-      return new ModelAndView("redirect:/login?error=Debes+iniciar+sesion+para+unirte");
+      return new ModelAndView("redirect:/login/?error=Debes+iniciar+sesion+para+unirte");
     }
 
     try {

@@ -86,7 +86,7 @@ public class ServicioPartidoTest {
     Partido partido = new Partido();
     partido.setId(10L);
     partido.setOrganizador(organizador);
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     when(repositorioPartidoMock.buscarPorId(10L)).thenReturn(partido);
 
@@ -108,7 +108,7 @@ public class ServicioPartidoTest {
     Partido partido = new Partido();
     partido.setId(10L);
     partido.setOrganizador(organizador);
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     when(repositorioPartidoMock.buscarPorId(10L)).thenReturn(partido);
 
@@ -154,7 +154,7 @@ public class ServicioPartidoTest {
     partido.setCupoMaximo(10);
     partido.setInscripciones(new ArrayList<>());
 
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     Usuario usuario = new Usuario();
 
@@ -219,7 +219,7 @@ public class ServicioPartidoTest {
       () -> servicioPartido.unirseAPartido(partidoId, jugador)
     );
 
-    assertEquals("El partido ya no acepta nuevos jugadores.", exception.getMessage());
+    assertEquals("No se puede unir a un partido finalizado o cancelado.", exception.getMessage());
   }
 
   @Test
@@ -241,7 +241,7 @@ public class ServicioPartidoTest {
       () -> servicioPartido.unirseAPartido(partidoId, jugador)
     );
 
-    assertEquals("El partido ya no acepta nuevos jugadores.", exception.getMessage());
+    assertEquals("No se puede unir a un partido finalizado o cancelado.", exception.getMessage());
   }
 
   @Test
@@ -290,7 +290,7 @@ public class ServicioPartidoTest {
     partido.setId(partidoId);
     partido.setCupoMaximo(2);
 
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     partido.setInscripciones(new ArrayList<>());
 
@@ -346,7 +346,7 @@ public class ServicioPartidoTest {
 
     partidoNuevo.setCupoMaximo(10);
 
-    partidoNuevo.setEstado(Partido.EstadoPartido.ABIERTO);
+    partidoNuevo.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     partidoNuevo.setFecha(LocalDateTime.of(2026, 6, 6, 19, 0));
 
@@ -393,7 +393,7 @@ public class ServicioPartidoTest {
 
     partidoNuevo.setCupoMaximo(10);
 
-    partidoNuevo.setEstado(Partido.EstadoPartido.ABIERTO);
+    partidoNuevo.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     partidoNuevo.setFecha(LocalDateTime.of(2026, 6, 6, 17, 0));
 
@@ -558,7 +558,7 @@ public class ServicioPartidoTest {
 
     partido.setCupoMaximo(2);
 
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     partido.setInscripciones(new ArrayList<>());
 
@@ -605,7 +605,7 @@ public class ServicioPartidoTest {
 
     partido.setCupoMaximo(10);
 
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     partido.setInscripciones(new ArrayList<>());
 
@@ -711,7 +711,7 @@ public class ServicioPartidoTest {
     partido.setId(partidoId);
     partido.setNivel("b");
     partido.setCupoMaximo(10);
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
     partido.setInscripciones(new ArrayList<>());
 
     Jugador jugador = new Jugador();
@@ -833,7 +833,7 @@ public class ServicioPartidoTest {
     Long partidoId = 1L;
     Partido partido = new Partido();
     partido.setId(partidoId);
-    partido.setEstado(Partido.EstadoPartido.ABIERTO); // O el estado inicial que uses
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE); // O el estado inicial que uses
 
     Jugador jugador = new Jugador();
     jugador.setId(10L);
@@ -879,7 +879,7 @@ public class ServicioPartidoTest {
     Long partidoId = 1L;
     Partido partido = new Partido();
     partido.setId(partidoId);
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
     partido.setInscripciones(new ArrayList<>()); // Lista vacía
 
     Jugador jugador = new Jugador();
@@ -906,7 +906,7 @@ public class ServicioPartidoTest {
     Partido partido = new Partido();
     partido.setId(partidoId);
     partido.setOrganizador(organizador);
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     Jugador jugadorAExpulsar = new Jugador();
     jugadorAExpulsar.setId(20L);
@@ -980,7 +980,7 @@ public class ServicioPartidoTest {
     Partido partido = new Partido();
     partido.setId(partidoId);
     partido.setOrganizador(organizador);
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
     partido.setInscripciones(new ArrayList<>());
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);

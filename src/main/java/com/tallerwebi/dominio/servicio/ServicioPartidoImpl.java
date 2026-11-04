@@ -7,12 +7,6 @@ import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Partido.EstadoPartido;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.*;
-import com.tallerwebi.dominio.excepcion.CanchaNoDisponibleException;
-import com.tallerwebi.dominio.excepcion.CanchaNoEncontradaException;
-import com.tallerwebi.dominio.excepcion.CupoInvalidoException;
-import com.tallerwebi.dominio.excepcion.FechaPartidoInvalidaException;
-import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
-import com.tallerwebi.dominio.excepcion.RangoJugadorIncompatibleException;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
@@ -86,7 +80,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
     partido.setNivel(datos.getNivel());
     partido.setOrganizador(creador);
     partido.setEsPrivado(datos.getEsPrivado());
-    partido.setEstado(EstadoPartido.ABIERTO);
+    partido.setEstado(EstadoPartido.PENDIENTE);
 
     if (Boolean.TRUE.equals(datos.getEsPrivado())) {
       partido.setCodigoDeAcceso(UUID.randomUUID().toString().substring(0, 8));
@@ -248,7 +242,9 @@ public class ServicioPartidoImpl implements ServicioPartido {
   //Metodo privado que valida el estado del partido, con esto logro ver si el partido tiene estado Finalizado o Cancelado
   //si es asi, entonces el usuario no podra ingresar al partido.
   private void validarEstadoDelPartido(Partido partido) {
-    if (partido.getEstado() != EstadoPartido.PENDIENTE && partido.getEstado() != EstadoPartido.ACTIVO) {
+    if (
+      partido.getEstado() != EstadoPartido.PENDIENTE && partido.getEstado() != EstadoPartido.ACTIVO
+    ) {
       throw new EstadoPartidoInvalido("No se puede unir a un partido finalizado o cancelado.");
     }
   }
@@ -387,7 +383,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
   }
 
   private void validarPartidoModificable(Partido partido, String mensajeError) {
-    if (partido.getEstado() != EstadoPartido.ABIERTO) {
+    if (partido.getEstado() != EstadoPartido.PENDIENTE) {
       throw new RuntimeException(mensajeError);
     }
   }

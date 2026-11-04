@@ -23,12 +23,18 @@ VALUES(null, 'Cancha La Quinta', 'Ramos Mejia', -34.6440, -58.5630);
 INSERT INTO Cancha(id, nombre, localidad, latitud, longitud)
 VALUES(null, 'Cancha El Fortin', 'Ramos Mejia', -34.6460, -58.5600);
 -- Inserta las canchas
-INSERT INTO Cancha(id, nombre, localidad) VALUES(null, 'Cancha Los Leones', 'San Justo');
-INSERT INTO Cancha(id, nombre, localidad) VALUES(null, 'Cancha 5', 'San Justo');
-INSERT INTO Cancha(id, nombre, localidad) VALUES(null, 'Cancha El Potrero', 'Laferrere');
-INSERT INTO Cancha(id, nombre, localidad) VALUES(null, 'Cancha Los Pibes', 'Laferrere');
-INSERT INTO Cancha(id, nombre, localidad) VALUES(null, 'Cancha La Quinta', 'Ramos Mejia');
-INSERT INTO Cancha(id, nombre, localidad) VALUES(null, 'Cancha El Fortin', 'Ramos Mejia');
+-- INSERT INTO Cancha(id, nombre, localidad)
+-- VALUES (null, 'Cancha Los Leones', 'San Justo');
+-- INSERT INTO Cancha(id, nombre, localidad)
+-- VALUES (null, 'Cancha 5', 'San Justo');
+-- INSERT INTO Cancha(id, nombre, localidad)
+-- VALUES (null, 'Cancha El Potrero', 'Laferrere');
+-- INSERT INTO Cancha(id, nombre, localidad)
+-- VALUES (null, 'Cancha Los Pibes', 'Laferrere');
+-- INSERT INTO Cancha(id, nombre, localidad)
+-- VALUES (null, 'Cancha La Quinta', 'Ramos Mejia');
+-- INSERT INTO Cancha(id, nombre, localidad)
+-- VALUES (null, 'Cancha El Fortin', 'Ramos Mejia');
 
 -- Inserta los jugadores vinculándolos a sus respectivos usuarios
 INSERT INTO Jugador(nombre, posicion1, posicion2, puntos, nivel, usuario_id)
