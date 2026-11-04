@@ -36,6 +36,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
   private ServicioInvitacionPartido servicioInvitacionPartido;
   private final ServicioBalanceoEquipo servicioBalanceoEquipo;
   private static final int HORAS_MINIMAS_ENTRE_PARTIDOS = 3;
+  private static final String MENSAJE_PARTIDO_NO_EXISTE = "El partido no existe.";
 
   @Autowired
   public ServicioPartidoImpl(
@@ -247,10 +248,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
   //Metodo privado que valida el estado del partido, con esto logro ver si el partido tiene estado Finalizado o Cancelado
   //si es asi, entonces el usuario no podra ingresar al partido.
   private void validarEstadoDelPartido(Partido partido) {
-
-    if (partido.getEstado() != EstadoPartido.PENDIENTE) {
+    if (partido.getEstado() != EstadoPartido.PENDIENTE && partido.getEstado() != EstadoPartido.ACTIVO) {
       throw new EstadoPartidoInvalido("No se puede unir a un partido finalizado o cancelado.");
-
     }
   }
 
@@ -330,7 +329,6 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
   }
 
-
   @Override
   public void invitarJugador(Long idPartido, Long idJugador, Usuario usuarioQueInvita)
     throws InvitacionAlPartidoException {
@@ -340,5 +338,77 @@ public class ServicioPartidoImpl implements ServicioPartido {
   @Override
   public List<Partido> buscarPartidosPorJugador(Long idJugador) {
     return repositorioPartido.buscarPartidosPorJugador(idJugador);
+  }
+
+  @Override
+  public void abandonarPartido(Long partidoId, Jugador jugador) {
+    Partido partido = obtenerPartidoValidado(partidoId);
+    validarPartidoModificable(
+      partido,
+      "No puedes abandonar un partido que ya está en curso o finalizado."
+    );
+    InscripcionPartido inscripcion = obtenerInscripcionJugador(
+      partido,
+      jugador.getId(),
+      "No estás inscripto en este partido."
+    );
+    removerInscripcionYGuardar(partido, inscripcion);
+  }
+
+  @Override
+  public void expulsarJugador(Long partidoId, Long idJugadorAExpulsar, Usuario organizador) {
+    Partido partido = obtenerPartidoValidado(partidoId);
+    validarOrganizador(partido, organizador);
+    validarPartidoModificable(
+      partido,
+      "No puedes expulsar jugadores de un partido que ya está en curso o finalizado."
+    );
+    InscripcionPartido inscripcion = obtenerInscripcionJugador(
+      partido,
+      idJugadorAExpulsar,
+      "El jugador no está inscripto en este partido."
+    );
+    removerInscripcionYGuardar(partido, inscripcion);
+  }
+
+  private Partido obtenerPartidoValidado(Long partidoId) {
+    Partido partido = buscarPartidoPorId(partidoId);
+    if (partido == null) throw new RuntimeException(MENSAJE_PARTIDO_NO_EXISTE);
+    return partido;
+  }
+
+  private void validarOrganizador(Partido partido, Usuario organizador) {
+    if (
+      partido.getOrganizador() == null ||
+      !partido.getOrganizador().getId().equals(organizador.getId())
+    ) {
+      throw new RuntimeException("Solo el organizador puede expulsar jugadores.");
+    }
+  }
+
+  private void validarPartidoModificable(Partido partido, String mensajeError) {
+    if (partido.getEstado() != EstadoPartido.ABIERTO) {
+      throw new RuntimeException(mensajeError);
+    }
+  }
+
+  private InscripcionPartido obtenerInscripcionJugador(
+    Partido partido,
+    Long idJugador,
+    String mensajeError
+  ) {
+    if (partido.getInscripciones() == null) throw new RuntimeException(mensajeError);
+    return partido
+      .getInscripciones()
+      .stream()
+      .filter(i -> i.getJugador().getId().equals(idJugador))
+      .findFirst()
+      .orElseThrow(() -> new RuntimeException(mensajeError));
+  }
+
+  private void removerInscripcionYGuardar(Partido partido, InscripcionPartido inscripcion) {
+    partido.getInscripciones().remove(inscripcion);
+    partido.setCantJugadores(partido.getInscripciones().size());
+    repositorioPartido.modificar(partido);
   }
 }

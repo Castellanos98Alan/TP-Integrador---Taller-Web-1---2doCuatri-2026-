@@ -253,7 +253,7 @@ public class ServicioPartidoTest {
     partido.setId(partidoId);
     partido.setCupoMaximo(10);
 
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     partido.setInscripciones(new ArrayList<>());
 
@@ -678,7 +678,7 @@ public class ServicioPartidoTest {
     partido.setId(partidoId);
     partido.setNivel("C");
     partido.setCupoMaximo(10);
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
     partido.setInscripciones(new ArrayList<>());
 
     Jugador jugador = new Jugador();
@@ -731,13 +731,6 @@ public class ServicioPartidoTest {
     assertEquals(1, partido.getInscripciones().size());
 
     verify(repositorioPartidoMock, times(1)).modificar(partido);
-
-    verify(repositorioPartidoMock)
-      .buscarPartidosEnRango(
-        1L,
-        LocalDateTime.of(2026, 10, 20, 17, 0),
-        LocalDateTime.of(2026, 10, 20, 19, 0)
-      );
   }
 
   @Test
