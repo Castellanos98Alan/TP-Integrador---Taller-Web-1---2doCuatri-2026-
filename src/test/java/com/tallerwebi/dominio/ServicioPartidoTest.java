@@ -840,7 +840,7 @@ public class ServicioPartidoTest {
     Long partidoId = 1L;
     Partido partido = new Partido();
     partido.setId(partidoId);
-    partido.setEstado(Partido.EstadoPartido.ABIERTO); // O el estado inicial que uses
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE); // O el estado inicial que uses
 
     Jugador jugador = new Jugador();
     jugador.setId(10L);
@@ -886,7 +886,7 @@ public class ServicioPartidoTest {
     Long partidoId = 1L;
     Partido partido = new Partido();
     partido.setId(partidoId);
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
     partido.setInscripciones(new ArrayList<>()); // Lista vacía
 
     Jugador jugador = new Jugador();
@@ -913,7 +913,7 @@ public class ServicioPartidoTest {
     Partido partido = new Partido();
     partido.setId(partidoId);
     partido.setOrganizador(organizador);
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     Jugador jugadorAExpulsar = new Jugador();
     jugadorAExpulsar.setId(20L);
@@ -987,7 +987,7 @@ public class ServicioPartidoTest {
     Partido partido = new Partido();
     partido.setId(partidoId);
     partido.setOrganizador(organizador);
-    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
     partido.setInscripciones(new ArrayList<>());
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);

@@ -31,8 +31,6 @@ public class PartidosController {
   private ServicioJugador servicioJugador;
   private ServicioSolicitudAmistad servicioSolicitudAmistad;
   private ServicioEstadistica servicioEstadistica;
-  private static final String ATRIBUTO_ERROR = "error";
-  private static final String REDIRECT_PARTIDO = "redirect:/partido/";
 
   @Autowired
   public PartidosController(
@@ -281,7 +279,7 @@ public ModelAndView unirseAlPartido(
     @PathVariable("id") Long idPartido,
     HttpServletRequest request
   ) {
-    Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute(ATRIBUTO_USUARIO);
+    Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute(USUARIO_SESION);
     if (usuarioLogueado == null) return new ModelAndView("redirect:/login");
 
     try {
@@ -312,15 +310,15 @@ public ModelAndView unirseAlPartido(
       Map<String, Object> model = new ModelMap();
       model.put(ATRIBUTO_ERROR, e.getMessage());
       return new ModelAndView(REDIRECT_PARTIDO + idPartido + SALA_ESPERA, model);
+      }
   }
-
   @GetMapping("/partido/{id}/cargar-estadisticas")
   public ModelAndView verVistaCargarEstadisticas(
     @PathVariable("id") Long idPartido,
     HttpServletRequest request
   ) {
     HttpSession session = request.getSession();
-    Usuario usuarioLogueado = (Usuario) session.getAttribute(SESION_USUARIO);
+    Usuario usuarioLogueado = (Usuario) session.getAttribute(USUARIO_SESION);
 
     if (usuarioLogueado == null) {
       return new ModelAndView("redirect:/login?error=Debes+iniciar+sesión");
