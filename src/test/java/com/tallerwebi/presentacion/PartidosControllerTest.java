@@ -31,6 +31,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -529,6 +530,92 @@ public class PartidosControllerTest {
       assertThat(e.getMessage(), equalTo("Ya fue invitado"));
     }
     assertThat(seRechazo, equalTo(true));
+  }
+
+  @Test
+  public void cancelarCreacionFormularioDebeMostrarVistaCancelado() {
+    // When
+    ModelAndView mav = partidosController.cancelarCreacionFormulario();
+
+    // Then
+    assertThat(mav.getViewName(), equalTo("partido-cancelado"));
+  }
+
+  @Test
+  public void alCancelarPartidoSiServicioFallaDebeMostrarError() {
+    // Given
+    Usuario usuario = givenUsuario(1L);
+    givenSesion(usuario);
+    doThrow(new RuntimeException("No autorizado"))
+      .when(servicioPartidoMock)
+      .cancelarPartido(1L, usuario);
+
+    // When
+    ModelAndView mav = partidosController.cancelarPartido(1L, modelMock, requestMock);
+
+    // Then
+    assertThat(mav.getViewName(), equalTo("redirect:/partido/"));
+    verify(modelMock, times(1)).addAttribute("error", "No autorizado");
+  }
+
+  @Test
+  public void revisarEstadisticasAutorizadoDebeMostrarMarcadorYEquipos() {
+    // Given
+    Usuario usuario = givenUsuario(1L);
+    Partido partido = new Partido();
+    List<Estadistica> estadisticas = new ArrayList<>();
+    Estadistica estadistica = new Estadistica();
+    estadisticas.add(estadistica);
+    Map<String, Integer> marcador = new HashMap<>();
+    marcador.put("local", 3);
+    marcador.put("visitante", 1);
+    List<Estadistica> locales = new ArrayList<>();
+    List<Estadistica> visitantes = new ArrayList<>();
+    locales.add(estadistica);
+    Map<String, List<Estadistica>> porEquipo = new HashMap<>();
+    porEquipo.put("locales", locales);
+    porEquipo.put("visitantes", visitantes);
+
+    givenSesion(usuario);
+    when(servicioPartidoMock.buscarPartidoPorId(1L)).thenReturn(partido);
+    when(servicioEstadisticaMock.puedeRevisarEstadisticas(partido, usuario)).thenReturn(true);
+    when(servicioEstadisticaMock.obtenerEstadisticasPorPartido(partido)).thenReturn(estadisticas);
+    when(servicioEstadisticaMock.calcularMarcadorPartido(partido, estadisticas))
+      .thenReturn(marcador);
+    when(servicioEstadisticaMock.obtenerEstadisticasSeparadasPorEquipo(partido, estadisticas))
+      .thenReturn(porEquipo);
+
+    // When
+    ModelAndView mav = partidosController.verPantallaRevisionEstadisticas(1L, requestMock);
+
+    // Then
+    assertThat(mav.getViewName(), equalTo("revisar-estadisticas"));
+    assertThat(mav.getModel().get("partido"), equalTo(partido));
+    assertThat(mav.getModel().get("golesLocal"), equalTo(3));
+    assertThat(mav.getModel().get("golesVisitante"), equalTo(1));
+    assertThat(mav.getModel().get("estadisticasLocal"), equalTo(locales));
+    assertThat(mav.getModel().get("estadisticasVisitante"), equalTo(visitantes));
+    verify(servicioEstadisticaMock, times(1)).calcularMarcadorPartido(partido, estadisticas);
+  }
+
+  @Test
+  public void revisarEstadisticasSiServicioRechazaRevisionDebeRedirigirAPartidos() {
+    // Given
+    Usuario usuario = givenUsuario(1L);
+    Partido partido = new Partido();
+    givenSesion(usuario);
+    when(servicioPartidoMock.buscarPartidoPorId(1L)).thenReturn(partido);
+    when(servicioEstadisticaMock.puedeRevisarEstadisticas(partido, usuario))
+      .thenThrow(new RevisionEstadisticasNoPermitida("Revisión no permitida"));
+
+    // When
+    ModelAndView mav = partidosController.verPantallaRevisionEstadisticas(1L, requestMock);
+
+    // Then
+    assertThat(
+      mav.getViewName(),
+      equalTo("redirect:/partidos?error=No puedes revisar estas estadisticas")
+    );
   }
 
   private Usuario givenUsuario(Long id) {
