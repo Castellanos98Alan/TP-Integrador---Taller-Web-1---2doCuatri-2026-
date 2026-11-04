@@ -241,10 +241,10 @@ public class ServicioPartidoImpl implements ServicioPartido {
   //Metodo privado que valida el estado del partido, con esto logro ver si el partido tiene estado Finalizado o Cancelado
   //si es asi, entonces el usuario no podra ingresar al partido.
   private void validarEstadoDelPartido(Partido partido) {
-
-    if (partido.getEstado() != EstadoPartido.PENDIENTE) {
+    if (
+      partido.getEstado() != EstadoPartido.PENDIENTE && partido.getEstado() != EstadoPartido.ACTIVO
+    ) {
       throw new EstadoPartidoInvalido("No se puede unir a un partido finalizado o cancelado.");
-
     }
   }
 
@@ -324,7 +324,6 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
   }
 
-
   @Override
   public void invitarJugador(Long idPartido, Long idJugador, Usuario usuarioQueInvita)
     throws InvitacionAlPartidoException {
@@ -336,7 +335,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
     return repositorioPartido.buscarPartidosPorJugador(idJugador);
   }
 
-   private static final String MENSAJE_PARTIDO_NO_EXISTE = "El partido no existe.";
+  private static final String MENSAJE_PARTIDO_NO_EXISTE = "El partido no existe.";
 
   @Override
   public void abandonarPartido(Long partidoId, Jugador jugador) {
@@ -385,7 +384,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
   }
 
   private void validarPartidoModificable(Partido partido, String mensajeError) {
-    if (partido.getEstado() != EstadoPartido.ABIERTO) {
+    if (partido.getEstado() != EstadoPartido.PENDIENTE) {
       throw new RuntimeException(mensajeError);
     }
   }
@@ -409,5 +408,4 @@ public class ServicioPartidoImpl implements ServicioPartido {
     partido.setCantJugadores(partido.getInscripciones().size());
     repositorioPartido.modificar(partido);
   }
-
 }

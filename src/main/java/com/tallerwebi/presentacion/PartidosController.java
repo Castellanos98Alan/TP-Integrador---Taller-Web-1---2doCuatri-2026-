@@ -247,7 +247,7 @@ public class PartidosController {
     Usuario usuarioLogueado = (Usuario) session.getAttribute(USUARIO_SESION);
 
     if (usuarioLogueado == null) {
-      return new ModelAndView("redirect:/login?error=Debes+iniciar+sesion+para+unirte");
+      return new ModelAndView("redirect:/login/?error=Debes+iniciar+sesion+para+unirte");
     }
 
     try {
@@ -422,4 +422,3 @@ public class PartidosController {
     return new ModelAndView(REDIRECT_PARTIDO + idPartido + "/sala-de-espera");
   }
 }
- 

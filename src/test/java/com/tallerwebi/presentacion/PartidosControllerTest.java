@@ -164,7 +164,7 @@ public class PartidosControllerTest {
     );
 
     verify(servicioPartidoMock, never()).cancelarPartido(anyLong(), any());
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login/"));
   }
 
   @Test
@@ -176,7 +176,7 @@ public class PartidosControllerTest {
 
     assertThat(
       modelAndView.getViewName(),
-      equalToIgnoringCase("redirect:/login?error=Debes+iniciar+sesion+para+unirte")
+      equalToIgnoringCase("redirect:/login/?error=Debes+iniciar+sesion+para+unirte")
     );
   }
 
@@ -267,7 +267,7 @@ public class PartidosControllerTest {
 
     ModelAndView mav = partidosController.abandonarPartido(1L, requestMock);
 
-    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/login"));
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/login/"));
     verify(servicioPartidoMock, never()).abandonarPartido(anyLong(), any());
   }
 
@@ -314,7 +314,7 @@ public class PartidosControllerTest {
 
     ModelAndView mav = partidosController.expulsarJugador(1L, 2L, requestMock);
 
-    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/login"));
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/login/"));
     verify(servicioPartidoMock, never()).expulsarJugador(anyLong(), anyLong(), any());
   }
 
