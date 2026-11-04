@@ -5,16 +5,19 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.CupoMaximoAlcanzado;
+import com.tallerwebi.dominio.excepcion.RevisionEstadisticasNoPermitida;
 import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
 import com.tallerwebi.dominio.servicio.ServicioEstadistica;
 import com.tallerwebi.dominio.servicio.ServicioJugador;
@@ -26,6 +29,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
@@ -350,5 +354,128 @@ public class PartidosControllerTest {
     // Verificamos que el error ahora viaja en el Model y no en la sesión
     assertEquals("redirect:/partido/" + idPartido + "/sala-de-espera", mav.getViewName());
     assertEquals("Error al expulsar", mav.getModel().get("error"));
+  }
+
+  @Test
+  public void verVistaCargarEstadisticasExitosoDeberiaRetornarVistaCargarEstadisticasYModelo() {
+    // PREPARACIÓN
+    Long idPartido = 1L;
+    Usuario usuarioLogueado = mock(Usuario.class);
+    Partido partidoMock = mock(Partido.class);
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioLogueado);
+    when(servicioPartidoMock.buscarPartidoPorId(idPartido)).thenReturn(partidoMock);
+    when(servicioEstadisticaMock.puedeCargarEstadisticas(partidoMock, usuarioLogueado))
+      .thenReturn(true);
+
+    // EJECUCIÓN
+    ModelAndView modelAndView = partidosController.verVistaCargarEstadisticas(
+      idPartido,
+      requestMock
+    );
+
+    // VERIFICACIÓN
+    assertEquals("cargar-estadisticas", modelAndView.getViewName());
+    assertEquals(partidoMock, modelAndView.getModel().get("partido"));
+    assertNotNull(modelAndView.getModel().get("formulario"));
+    verify(servicioEstadisticaMock, times(1)).puedeCargarEstadisticas(partidoMock, usuarioLogueado);
+  }
+
+  @Test
+  public void verVistaCargarEstadisticasCuandoUsuarioNoEstaAutorizadoDeberiaRedirigirASalaDeEspera() {
+    // PREPARACIÓN
+    Long idPartido = 1L;
+    Usuario usuarioLogueado = mock(Usuario.class);
+    Partido partidoMock = mock(Partido.class);
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioLogueado);
+    when(servicioPartidoMock.buscarPartidoPorId(idPartido)).thenReturn(partidoMock);
+    when(servicioEstadisticaMock.puedeCargarEstadisticas(partidoMock, usuarioLogueado))
+      .thenReturn(false);
+
+    // EJECUCIÓN
+    ModelAndView modelAndView = partidosController.verVistaCargarEstadisticas(
+      idPartido,
+      requestMock
+    );
+
+    // VERIFICACIÓN
+    String viewNameEsperado =
+      "redirect:/partido/" +
+      idPartido +
+      "/sala-de-espera?error=No+estás+autorizado+para+cargar+estadísticas+aún";
+    assertEquals(viewNameEsperado, modelAndView.getViewName());
+  }
+
+  @Test
+  public void verPantallaRevisionEstadisticasExitosoDeberiaRetornarVistaRevisarEstadisticasYDatosSeparados() {
+    // PREPARACIÓN
+    Long idPartido = 1L;
+    Usuario usuarioLogueado = mock(Usuario.class);
+    Partido partidoMock = mock(Partido.class);
+    List<Estadistica> estadisticasMock = List.of(mock(Estadistica.class));
+
+    Map<String, Integer> marcadorMock = Map.of("local", 2, "visitante", 1);
+    Map<String, List<Estadistica>> estadisticasSeparadasMock = Map.of(
+      "locales",
+      List.of(mock(Estadistica.class)),
+      "visitantes",
+      List.of(mock(Estadistica.class))
+    );
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioLogueado);
+    when(servicioPartidoMock.buscarPartidoPorId(idPartido)).thenReturn(partidoMock);
+    when(servicioEstadisticaMock.puedeRevisarEstadisticas(partidoMock, usuarioLogueado))
+      .thenReturn(true);
+    when(servicioEstadisticaMock.obtenerEstadisticasPorPartido(partidoMock))
+      .thenReturn(estadisticasMock);
+    when(servicioEstadisticaMock.calcularMarcadorPartido(partidoMock, estadisticasMock))
+      .thenReturn(marcadorMock);
+    when(
+      servicioEstadisticaMock.obtenerEstadisticasSeparadasPorEquipo(partidoMock, estadisticasMock)
+    )
+      .thenReturn(estadisticasSeparadasMock);
+
+    // EJECUCIÓN
+    ModelAndView modelAndView = partidosController.verPantallaRevisionEstadisticas(
+      idPartido,
+      requestMock
+    );
+
+    // VERIFICACIÓN
+    assertEquals("revisar-estadisticas", modelAndView.getViewName());
+    assertEquals(partidoMock, modelAndView.getModel().get("partido"));
+    assertEquals(2, modelAndView.getModel().get("golesLocal"));
+    assertEquals(1, modelAndView.getModel().get("golesVisitante"));
+    assertNotNull(modelAndView.getModel().get("estadisticasLocal"));
+    assertNotNull(modelAndView.getModel().get("estadisticasVisitante"));
+  }
+
+  @Test
+  public void verPantallaRevisionEstadisticasQuandoLanzaExcepcionRevisionNoPermitidaDeberiaRedirigirAPartidosConError()
+    throws Exception {
+    // PREPARACIÓN
+    Long idPartido = 1L;
+    Usuario usuarioLogueado = mock(Usuario.class);
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioLogueado);
+    when(servicioPartidoMock.buscarPartidoPorId(idPartido))
+      .thenThrow(new RevisionEstadisticasNoPermitida("Error de revisión"));
+
+    // EJECUCIÓN
+    ModelAndView modelAndView = partidosController.verPantallaRevisionEstadisticas(
+      idPartido,
+      requestMock
+    );
+
+    // VERIFICACIÓN
+    assertEquals(
+      "redirect:/partidos?error=No puedes revisar estas estadisticas",
+      modelAndView.getViewName()
+    );
   }
 }
