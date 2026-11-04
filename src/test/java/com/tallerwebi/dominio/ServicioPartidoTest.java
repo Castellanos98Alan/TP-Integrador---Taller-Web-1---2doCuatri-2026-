@@ -86,7 +86,7 @@ public class ServicioPartidoTest {
     Partido partido = new Partido();
     partido.setId(10L);
     partido.setOrganizador(organizador);
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.ABIERTO);
 
     when(repositorioPartidoMock.buscarPorId(10L)).thenReturn(partido);
 
@@ -108,7 +108,7 @@ public class ServicioPartidoTest {
     Partido partido = new Partido();
     partido.setId(10L);
     partido.setOrganizador(organizador);
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.ABIERTO);
 
     when(repositorioPartidoMock.buscarPorId(10L)).thenReturn(partido);
 
@@ -154,7 +154,7 @@ public class ServicioPartidoTest {
     partido.setCupoMaximo(10);
     partido.setInscripciones(new ArrayList<>());
 
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.ABIERTO);
 
     Usuario usuario = new Usuario();
 
@@ -219,7 +219,7 @@ public class ServicioPartidoTest {
       () -> servicioPartido.unirseAPartido(partidoId, jugador)
     );
 
-    assertEquals("No se puede unir a un partido finalizado o cancelado.", exception.getMessage());
+    assertEquals("El partido ya no acepta nuevos jugadores.", exception.getMessage());
   }
 
   @Test
@@ -241,7 +241,7 @@ public class ServicioPartidoTest {
       () -> servicioPartido.unirseAPartido(partidoId, jugador)
     );
 
-    assertEquals("No se puede unir a un partido finalizado o cancelado.", exception.getMessage());
+    assertEquals("El partido ya no acepta nuevos jugadores.", exception.getMessage());
   }
 
   @Test
@@ -253,7 +253,7 @@ public class ServicioPartidoTest {
     partido.setId(partidoId);
     partido.setCupoMaximo(10);
 
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.ABIERTO);
 
     partido.setInscripciones(new ArrayList<>());
 
@@ -290,7 +290,7 @@ public class ServicioPartidoTest {
     partido.setId(partidoId);
     partido.setCupoMaximo(2);
 
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.ABIERTO);
 
     partido.setInscripciones(new ArrayList<>());
 
@@ -346,7 +346,7 @@ public class ServicioPartidoTest {
 
     partidoNuevo.setCupoMaximo(10);
 
-    partidoNuevo.setEstado(Partido.EstadoPartido.ACTIVO);
+    partidoNuevo.setEstado(Partido.EstadoPartido.ABIERTO);
 
     partidoNuevo.setFecha(LocalDateTime.of(2026, 6, 6, 19, 0));
 
@@ -393,7 +393,7 @@ public class ServicioPartidoTest {
 
     partidoNuevo.setCupoMaximo(10);
 
-    partidoNuevo.setEstado(Partido.EstadoPartido.ACTIVO);
+    partidoNuevo.setEstado(Partido.EstadoPartido.ABIERTO);
 
     partidoNuevo.setFecha(LocalDateTime.of(2026, 6, 6, 17, 0));
 
@@ -558,7 +558,7 @@ public class ServicioPartidoTest {
 
     partido.setCupoMaximo(2);
 
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.ABIERTO);
 
     partido.setInscripciones(new ArrayList<>());
 
@@ -605,7 +605,7 @@ public class ServicioPartidoTest {
 
     partido.setCupoMaximo(10);
 
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.ABIERTO);
 
     partido.setInscripciones(new ArrayList<>());
 
@@ -831,5 +831,172 @@ public class ServicioPartidoTest {
 
     verify(servicioNotificacionMock, never())
       .notificarCancelacion(any(Usuario.class), any(Partido.class));
+  }
+
+  // --- TESTS PARA ABANDONAR PARTIDO ---
+
+  @Test
+  public void queSePuedaAbandonarUnPartidoExitosamente() {
+    Long partidoId = 1L;
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setEstado(Partido.EstadoPartido.ABIERTO); // O el estado inicial que uses
+
+    Jugador jugador = new Jugador();
+    jugador.setId(10L);
+
+    InscripcionPartido inscripcion = new InscripcionPartido(partido, jugador);
+    partido.setInscripciones(new ArrayList<>(List.of(inscripcion)));
+    partido.setCantJugadores(1);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    servicioPartido.abandonarPartido(partidoId, jugador);
+
+    assertTrue(partido.getInscripciones().isEmpty());
+    assertEquals(0, partido.getCantJugadores());
+    verify(repositorioPartidoMock, times(1)).modificar(partido);
+  }
+
+  @Test
+  public void queNoSePuedaAbandonarUnPartidoQueYaEstaEnCursoOFinalizado() {
+    Long partidoId = 1L;
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+
+    Jugador jugador = new Jugador();
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> servicioPartido.abandonarPartido(partidoId, jugador)
+    );
+
+    assertEquals(
+      "No puedes abandonar un partido que ya está en curso o finalizado.",
+      exception.getMessage()
+    );
+    verify(repositorioPartidoMock, never()).modificar(any());
+  }
+
+  @Test
+  public void queNoSePuedaAbandonarSiElJugadorNoEstaInscripto() {
+    Long partidoId = 1L;
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setInscripciones(new ArrayList<>()); // Lista vacía
+
+    Jugador jugador = new Jugador();
+    jugador.setId(10L);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> servicioPartido.abandonarPartido(partidoId, jugador)
+    );
+
+    assertEquals("No estás inscripto en este partido.", exception.getMessage());
+  }
+
+  // --- PARA EXPULSAR JUGADOR ---
+
+  @Test
+  public void queUnOrganizadorPuedaExpulsarAUnJugadorExitosamente() {
+    Long partidoId = 1L;
+    Usuario organizador = new Usuario();
+    organizador.setId(1L);
+
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setOrganizador(organizador);
+    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+
+    Jugador jugadorAExpulsar = new Jugador();
+    jugadorAExpulsar.setId(20L);
+
+    InscripcionPartido inscripcion = new InscripcionPartido(partido, jugadorAExpulsar);
+    partido.setInscripciones(new ArrayList<>(List.of(inscripcion)));
+    partido.setCantJugadores(1);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    servicioPartido.expulsarJugador(partidoId, jugadorAExpulsar.getId(), organizador);
+
+    assertTrue(partido.getInscripciones().isEmpty());
+    assertEquals(0, partido.getCantJugadores());
+    verify(repositorioPartidoMock, times(1)).modificar(partido);
+  }
+
+  @Test
+  public void queNoSePuedaExpulsarAUnJugadorSiNoSosElOrganizador() {
+    Long partidoId = 1L;
+    Usuario organizadorReal = new Usuario();
+    organizadorReal.setId(1L);
+
+    Usuario falsoOrganizador = new Usuario();
+    falsoOrganizador.setId(2L);
+
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setOrganizador(organizadorReal);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> servicioPartido.expulsarJugador(partidoId, 10L, falsoOrganizador)
+    );
+
+    assertEquals("Solo el organizador puede expulsar jugadores.", exception.getMessage());
+  }
+
+  @Test
+  public void queNoSePuedaExpulsarAUnJugadorSiElPartidoEstaEnCursoOFinalizado() {
+    Long partidoId = 1L;
+    Usuario organizador = new Usuario();
+    organizador.setId(1L);
+
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setOrganizador(organizador);
+    partido.setEstado(Partido.EstadoPartido.FINALIZADO);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> servicioPartido.expulsarJugador(partidoId, 10L, organizador)
+    );
+
+    assertEquals(
+      "No puedes expulsar jugadores de un partido que ya está en curso o finalizado.",
+      exception.getMessage()
+    );
+  }
+
+  @Test
+  public void queNoSePuedaExpulsarAUnJugadorQueNoEstaInscripto() {
+    Long partidoId = 1L;
+    Usuario organizador = new Usuario();
+    organizador.setId(1L);
+
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setOrganizador(organizador);
+    partido.setEstado(Partido.EstadoPartido.ABIERTO);
+    partido.setInscripciones(new ArrayList<>());
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> servicioPartido.expulsarJugador(partidoId, 99L, organizador)
+    );
+
+    assertEquals("El jugador no está inscripto en este partido.", exception.getMessage());
   }
 }

@@ -5,10 +5,6 @@ package com.tallerwebi.dominio;
 //import jakarta.persistence.OneToMany;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +18,7 @@ public class Partido {
     FINALIZADO,
     CANCELADO,
     PENDIENTE,
+    ABIERTO,
   }
 
   public enum EstadoEstadisticas {

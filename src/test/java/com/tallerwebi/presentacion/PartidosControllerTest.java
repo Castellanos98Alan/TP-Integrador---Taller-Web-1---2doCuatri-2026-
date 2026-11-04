@@ -4,8 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Jugador;
@@ -181,10 +184,14 @@ public class PartidosControllerTest {
   public void unirseAlPartidoConSesionActivaDeberiaRedirigirASalaDeEspera() {
     Usuario usuario = new Usuario();
     usuario.setId(1L);
-    Jugador jugador = servicioJugadorMock.buscarPorUsuarioId(usuario.getId());
+    Jugador jugador = new Jugador();
+    jugador.setId(1L);
 
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+
+    // Configuración correcta del mock para que devuelva un jugador válido
+    when(servicioJugadorMock.buscarPorUsuarioId(usuario.getId())).thenReturn(jugador);
 
     ModelAndView modelAndView = partidosController.unirseAlPartido(1L, requestMock);
 
@@ -199,12 +206,14 @@ public class PartidosControllerTest {
   public void unirseAlPartidoConExcepcionDeberiaLanzarError() {
     Usuario usuario = new Usuario();
     usuario.setId(1L);
-
     Jugador jugador = new Jugador();
     jugador.setId(1L);
 
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+    when(servicioJugadorMock.buscarPorUsuarioId(usuario.getId())).thenReturn(jugador);
+
+    // Configuración correcta del mock para que devuelva un jugador válido
     when(servicioJugadorMock.buscarPorUsuarioId(usuario.getId())).thenReturn(jugador);
 
     // Simulamos que el servicio lanza la excepción de negocio cuando intenta unirse
@@ -249,5 +258,97 @@ public class PartidosControllerTest {
       filtroPartido,
       filtroLocalidad
     );
+  }
+
+  @Test
+  public void abandonarPartidoSinSesionRedirigeALogin() {
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
+
+    ModelAndView mav = partidosController.abandonarPartido(1L, requestMock);
+
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/login"));
+    verify(servicioPartidoMock, never()).abandonarPartido(anyLong(), any());
+  }
+
+  @Test
+  public void abandonarPartidoConExitoRedirigeAPartidos() {
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+    Jugador jugador = new Jugador();
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+    when(servicioJugadorMock.buscarPorUsuarioId(usuario.getId())).thenReturn(jugador);
+
+    ModelAndView mav = partidosController.abandonarPartido(1L, requestMock);
+
+    verify(servicioPartidoMock, times(1)).abandonarPartido(1L, jugador);
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/partidos"));
+  }
+
+  @Test
+  public void abandonarPartidoConErrorRedirigeASalaDeEspera() {
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+    Jugador jugador = new Jugador();
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+    when(servicioJugadorMock.buscarPorUsuarioId(usuario.getId())).thenReturn(jugador);
+
+    doThrow(new RuntimeException("No estás inscripto en este partido."))
+      .when(servicioPartidoMock)
+      .abandonarPartido(1L, jugador);
+
+    ModelAndView mav = partidosController.abandonarPartido(1L, requestMock);
+
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/partido/1/sala-de-espera"));
+    assertThat(mav.getModel().get("error"), notNullValue());
+  }
+
+  @Test
+  public void expulsarJugadorSinSesionRedirigeALogin() {
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
+
+    ModelAndView mav = partidosController.expulsarJugador(1L, 2L, requestMock);
+
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/login"));
+    verify(servicioPartidoMock, never()).expulsarJugador(anyLong(), anyLong(), any());
+  }
+
+  @Test
+  public void expulsarJugadorConExitoRedirigeASalaDeEspera() {
+    Usuario organizador = new Usuario();
+    organizador.setId(1L);
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(organizador);
+
+    ModelAndView mav = partidosController.expulsarJugador(1L, 2L, requestMock);
+
+    verify(servicioPartidoMock, times(1)).expulsarJugador(1L, 2L, organizador);
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/partido/1/sala-de-espera"));
+  }
+
+  @Test
+  public void expulsarJugadorConErrorGuardaErrorEnModelYRedirige() {
+    Long idPartido = 1L;
+    Long idJugador = 2L;
+    Usuario usuarioLogueado = new Usuario();
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioLogueado);
+
+    doThrow(new RuntimeException("Error al expulsar"))
+      .when(servicioPartidoMock)
+      .expulsarJugador(idPartido, idJugador, usuarioLogueado);
+
+    ModelAndView mav = partidosController.expulsarJugador(idPartido, idJugador, requestMock);
+
+    // Verificamos que el error ahora viaja en el Model y no en la sesión
+    assertEquals("redirect:/partido/" + idPartido + "/sala-de-espera", mav.getViewName());
+    assertEquals("Error al expulsar", mav.getModel().get("error"));
   }
 }
