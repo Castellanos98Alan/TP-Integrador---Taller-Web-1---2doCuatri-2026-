@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -482,69 +483,155 @@ public class PartidosControllerTest {
   }
 
   @Test
-public void invitarAmigoSinSesionDebeRedirigirAlLogin() throws InvitacionAlPartidoException {
-  // Given
-  when(requestMock.getSession()).thenReturn(sessionMock);
-  when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
+  public void invitarAmigoSinSesionDebeRedirigirAlLogin() throws InvitacionAlPartidoException {
+    // Given
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
 
-  // When
-  ModelAndView mav = partidosController.invitarAmigo(1L, 2L, requestMock);
+    // When
+    ModelAndView mav = partidosController.invitarAmigo(1L, 2L, requestMock);
 
-  // Then
-  assertThat(mav.getViewName(), equalTo("redirect:/login/"));
-  verify(servicioPartidoMock, never()).invitarJugador(anyLong(), anyLong(), any(Usuario.class));
-}
-
-@Test
-public void invitarAmigoConSesionDebeVolverALaSala() throws InvitacionAlPartidoException {
-  // Given
-  Usuario usuario = givenUsuario(1L);
-  givenSesion(usuario);
-
-  // When
-  ModelAndView mav = partidosController.invitarAmigo(5L, 8L, requestMock);
-
-  // Then
-  verify(servicioPartidoMock, times(1)).invitarJugador(5L, 8L, usuario);
-  assertThat(mav.getViewName(), equalTo("redirect:/partido/5/sala-de-espera"));
-}
-
-@Test
-public void invitarAmigoSiElServicioRechazaDebePropagarLaExcepcion()
-    throws InvitacionAlPartidoException {
-  // Given
-  Usuario usuario = givenUsuario(1L);
-  givenSesion(usuario);
-  doThrow(new InvitacionAlPartidoException("Ya fue invitado"))
-      .when(servicioPartidoMock).invitarJugador(5L, 8L, usuario);
-
-  // When / Then
-  boolean seRechazo = false;
-  try {
-    partidosController.invitarAmigo(5L, 8L, requestMock);
-  } catch (InvitacionAlPartidoException e) {
-    seRechazo = true;
-    assertThat(e.getMessage(), equalTo("Ya fue invitado"));
+    // Then
+    assertThat(mav.getViewName(), equalTo("redirect:/login/"));
+    verify(servicioPartidoMock, never()).invitarJugador(anyLong(), anyLong(), any(Usuario.class));
   }
-  assertThat(seRechazo, equalTo(true));
-}
 
+  @Test
+  public void invitarAmigoConSesionDebeVolverALaSala() throws InvitacionAlPartidoException {
+    // Given
+    Usuario usuario = givenUsuario(1L);
+    givenSesion(usuario);
 
-private Usuario givenUsuario(Long id) {
-  Usuario usuario = new Usuario();
-  usuario.setId(id);
-  return usuario;
-}
+    // When
+    ModelAndView mav = partidosController.invitarAmigo(5L, 8L, requestMock);
 
-private void givenSesion(Usuario usuario) {
-  when(requestMock.getSession()).thenReturn(sessionMock);
-  when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
-}
+    // Then
+    verify(servicioPartidoMock, times(1)).invitarJugador(5L, 8L, usuario);
+    assertThat(mav.getViewName(), equalTo("redirect:/partido/5/sala-de-espera"));
+  }
 
-private void givenInscripcion(Partido partido, Usuario usuario) {
-  Jugador jugador = new Jugador();
-  jugador.setUsuario(usuario);
-  InscripcionPartido inscripcion = new InscripcionPartido(partido, jugador);
-  partido.getInscripciones().add(inscripcion);
-}
+  @Test
+  public void invitarAmigoSiElServicioRechazaDebePropagarLaExcepcion()
+    throws InvitacionAlPartidoException {
+    // Given
+    Usuario usuario = givenUsuario(1L);
+    givenSesion(usuario);
+    doThrow(new InvitacionAlPartidoException("Ya fue invitado"))
+      .when(servicioPartidoMock)
+      .invitarJugador(5L, 8L, usuario);
+
+    // When / Then
+    boolean seRechazo = false;
+    try {
+      partidosController.invitarAmigo(5L, 8L, requestMock);
+    } catch (InvitacionAlPartidoException e) {
+      seRechazo = true;
+      assertThat(e.getMessage(), equalTo("Ya fue invitado"));
+    }
+    assertThat(seRechazo, equalTo(true));
+  }
+
+  @Test
+  public void cancelarCreacionFormularioDebeMostrarVistaCancelado() {
+    // When
+    ModelAndView mav = partidosController.cancelarCreacionFormulario();
+
+    // Then
+    assertThat(mav.getViewName(), equalTo("partido-cancelado"));
+  }
+
+  @Test
+  public void alCancelarPartidoSiServicioFallaDebeMostrarError() {
+    // Given
+    Usuario usuario = givenUsuario(1L);
+    givenSesion(usuario);
+    doThrow(new RuntimeException("No autorizado"))
+      .when(servicioPartidoMock)
+      .cancelarPartido(1L, usuario);
+
+    // When
+    ModelAndView mav = partidosController.cancelarPartido(1L, modelMock, requestMock);
+
+    // Then
+    assertThat(mav.getViewName(), equalTo("redirect:/partido/"));
+    verify(modelMock, times(1)).addAttribute("error", "No autorizado");
+  }
+
+  @Test
+  public void revisarEstadisticasAutorizadoDebeMostrarMarcadorYEquipos() {
+    // Given
+    Usuario usuario = givenUsuario(1L);
+    Partido partido = new Partido();
+    List<Estadistica> estadisticas = new ArrayList<>();
+    Estadistica estadistica = new Estadistica();
+    estadisticas.add(estadistica);
+    Map<String, Integer> marcador = new HashMap<>();
+    marcador.put("local", 3);
+    marcador.put("visitante", 1);
+    List<Estadistica> locales = new ArrayList<>();
+    List<Estadistica> visitantes = new ArrayList<>();
+    locales.add(estadistica);
+    Map<String, List<Estadistica>> porEquipo = new HashMap<>();
+    porEquipo.put("locales", locales);
+    porEquipo.put("visitantes", visitantes);
+
+    givenSesion(usuario);
+    when(servicioPartidoMock.buscarPartidoPorId(1L)).thenReturn(partido);
+    when(servicioEstadisticaMock.puedeRevisarEstadisticas(partido, usuario)).thenReturn(true);
+    when(servicioEstadisticaMock.obtenerEstadisticasPorPartido(partido)).thenReturn(estadisticas);
+    when(servicioEstadisticaMock.calcularMarcadorPartido(partido, estadisticas))
+      .thenReturn(marcador);
+    when(servicioEstadisticaMock.obtenerEstadisticasSeparadasPorEquipo(partido, estadisticas))
+      .thenReturn(porEquipo);
+
+    // When
+    ModelAndView mav = partidosController.verPantallaRevisionEstadisticas(1L, requestMock);
+
+    // Then
+    assertThat(mav.getViewName(), equalTo("revisar-estadisticas"));
+    assertThat(mav.getModel().get("partido"), equalTo(partido));
+    assertThat(mav.getModel().get("golesLocal"), equalTo(3));
+    assertThat(mav.getModel().get("golesVisitante"), equalTo(1));
+    assertThat(mav.getModel().get("estadisticasLocal"), equalTo(locales));
+    assertThat(mav.getModel().get("estadisticasVisitante"), equalTo(visitantes));
+    verify(servicioEstadisticaMock, times(1)).calcularMarcadorPartido(partido, estadisticas);
+  }
+
+  @Test
+  public void revisarEstadisticasSiServicioRechazaRevisionDebeRedirigirAPartidos() {
+    // Given
+    Usuario usuario = givenUsuario(1L);
+    Partido partido = new Partido();
+    givenSesion(usuario);
+    when(servicioPartidoMock.buscarPartidoPorId(1L)).thenReturn(partido);
+    when(servicioEstadisticaMock.puedeRevisarEstadisticas(partido, usuario))
+      .thenThrow(new RevisionEstadisticasNoPermitida("Revisión no permitida"));
+
+    // When
+    ModelAndView mav = partidosController.verPantallaRevisionEstadisticas(1L, requestMock);
+
+    // Then
+    assertThat(
+      mav.getViewName(),
+      equalTo("redirect:/partidos?error=No puedes revisar estas estadisticas")
+    );
+  }
+
+  private Usuario givenUsuario(Long id) {
+    Usuario usuario = new Usuario();
+    usuario.setId(id);
+    return usuario;
+  }
+
+  private void givenSesion(Usuario usuario) {
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuario);
+  }
+
+  private void givenInscripcion(Partido partido, Usuario usuario) {
+    Jugador jugador = new Jugador();
+    jugador.setUsuario(usuario);
+    InscripcionPartido inscripcion = new InscripcionPartido(partido, jugador);
+    partido.getInscripciones().add(inscripcion);
+  }
 }
