@@ -7,13 +7,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Enumeration.TipoDeNotificacion;
+import com.tallerwebi.dominio.excepcion.CanchaNoDisponibleException;
+import com.tallerwebi.dominio.excepcion.CanchaNoEncontradaException;
+import com.tallerwebi.dominio.excepcion.CupoInvalidoException;
+import com.tallerwebi.dominio.excepcion.FechaPartidoInvalidaException;
+import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
+import com.tallerwebi.dominio.excepcion.RangoJugadorIncompatibleException;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
-import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
-import com.tallerwebi.dominio.servicio.ServicioJugador;
-import com.tallerwebi.dominio.servicio.ServicioPartido;
-import com.tallerwebi.dominio.servicio.ServicioPartidoImpl;
+import com.tallerwebi.dominio.servicio.*;
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,6 +40,11 @@ public class ServicioPartidoTest {
 
   private ServicioBalanceoEquipo servicioBalanceoEquipoMock;
 
+  private ServicioNotificacion servicioNotificacionMock;
+
+  private ServicioSolicitudAmistad servicioSolicitudAmistadMock;
+  private ServicioInvitacionPartido servicioInvitacionPartidoMock;
+
   private static final String FILTRO_TODOS = "TODOS";
 
   @BeforeEach
@@ -48,7 +57,13 @@ public class ServicioPartidoTest {
 
     servicioJugadorMock = mock(ServicioJugador.class);
 
+    servicioInvitacionPartidoMock = mock(ServicioInvitacionPartido.class);
+
     servicioBalanceoEquipoMock = mock(ServicioBalanceoEquipo.class);
+
+    servicioNotificacionMock = mock(ServicioNotificacion.class);
+
+    servicioSolicitudAmistadMock = mock(ServicioSolicitudAmistad.class);
 
     servicioPartido =
       new ServicioPartidoImpl(
@@ -56,7 +71,10 @@ public class ServicioPartidoTest {
         repositorioCanchaMock,
         repositorioUsuarioMock,
         servicioJugadorMock,
-        servicioBalanceoEquipoMock
+        servicioBalanceoEquipoMock,
+        servicioNotificacionMock,
+        servicioSolicitudAmistadMock,
+        servicioInvitacionPartidoMock
       );
   }
 
@@ -68,7 +86,7 @@ public class ServicioPartidoTest {
     Partido partido = new Partido();
     partido.setId(10L);
     partido.setOrganizador(organizador);
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     when(repositorioPartidoMock.buscarPorId(10L)).thenReturn(partido);
 
@@ -90,7 +108,7 @@ public class ServicioPartidoTest {
     Partido partido = new Partido();
     partido.setId(10L);
     partido.setOrganizador(organizador);
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     when(repositorioPartidoMock.buscarPorId(10L)).thenReturn(partido);
 
@@ -127,134 +145,6 @@ public class ServicioPartidoTest {
   }
 
   @Test
-  public void deberiaDelegarLaBusquedaAlRepositorioConLosFiltrosCorrectos() {
-    List<Partido> listaFalsa = List.of(new Partido(), new Partido());
-
-    when(
-      repositorioPartidoMock.buscarPartidosPorFiltro(
-        "PRINCIPIANTE",
-        FILTRO_TODOS,
-        "22",
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS
-      )
-    )
-      .thenReturn(listaFalsa);
-
-    List<Partido> resultado = servicioPartido.listarPartidosSegunFiltro(
-      "PRINCIPIANTE",
-      FILTRO_TODOS,
-      "22",
-      FILTRO_TODOS,
-      FILTRO_TODOS,
-      FILTRO_TODOS,
-      FILTRO_TODOS
-    );
-
-    assertEquals(listaFalsa, resultado);
-
-    verify(repositorioPartidoMock)
-      .buscarPartidosPorFiltro(
-        "PRINCIPIANTE",
-        FILTRO_TODOS,
-        "22",
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS,
-        FILTRO_TODOS
-      );
-  }
-
-  @Test
-  public void queSePuedanObtenerProvinciasYLocalidadesDisponiblesSinRepetir() {
-    Partido partido1 = new Partido();
-
-    Cancha cancha1 = new Cancha();
-    cancha1.setProvincia("Buenos Aires");
-    cancha1.setLocalidad("La Matanza");
-
-    partido1.setCancha(cancha1);
-
-    Partido partido2 = new Partido();
-
-    Cancha cancha2 = new Cancha();
-    cancha2.setProvincia("Buenos Aires");
-    cancha2.setLocalidad("Moron");
-
-    partido2.setCancha(cancha2);
-
-    List<Partido> partidosSimulados = Arrays.asList(partido1, partido2);
-
-    when(
-      repositorioPartidoMock.buscarPartidosPorFiltro(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString()
-      )
-    )
-      .thenReturn(partidosSimulados);
-
-    List<String> provincias = servicioPartido.obtenerProvinciasDisponibles();
-
-    List<String> localidades = servicioPartido.obtenerLocalidadesDisponibles();
-
-    assertThat(provincias.size(), equalTo(1));
-
-    assertTrue(provincias.contains("Buenos Aires"));
-
-    assertThat(localidades.size(), equalTo(2));
-
-    assertTrue(localidades.contains("La Matanza"));
-
-    assertTrue(localidades.contains("Moron"));
-  }
-
-  @Test
-  public void queNoFalleAlObtenerProvinciasYLocalidadesSiLaCanchaOAtributosSonNulos() {
-    Partido partidoSinCancha = new Partido();
-
-    partidoSinCancha.setCancha(null);
-
-    Partido partidoSinUbicacion = new Partido();
-
-    Cancha canchaVacia = new Cancha();
-
-    canchaVacia.setProvincia(null);
-    canchaVacia.setLocalidad(null);
-
-    partidoSinUbicacion.setCancha(canchaVacia);
-
-    List<Partido> partidosIncompletos = Arrays.asList(partidoSinCancha, partidoSinUbicacion);
-
-    when(
-      repositorioPartidoMock.buscarPartidosPorFiltro(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString()
-      )
-    )
-      .thenReturn(partidosIncompletos);
-
-    List<String> provincias = servicioPartido.obtenerProvinciasDisponibles();
-
-    List<String> localidades = servicioPartido.obtenerLocalidadesDisponibles();
-
-    assertTrue(provincias.isEmpty());
-
-    assertTrue(localidades.isEmpty());
-  }
-
-  @Test
   public void queUnUsuarioPuedaUnirseAPartidoExitosamente() {
     Long partidoId = 1L;
 
@@ -264,7 +154,7 @@ public class ServicioPartidoTest {
     partido.setCupoMaximo(10);
     partido.setInscripciones(new ArrayList<>());
 
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     Usuario usuario = new Usuario();
 
@@ -272,6 +162,8 @@ public class ServicioPartidoTest {
     usuario.setEmail("test@unlam.edu.ar");
 
     Jugador jugador = new Jugador();
+    partido.setNivel("B");
+    jugador.setNivel("INTERMEDIO");
 
     jugador.setId(1L);
     jugador.setUsuario(usuario);
@@ -305,7 +197,7 @@ public class ServicioPartidoTest {
       () -> servicioPartido.unirseAPartido(partidoId, jugador)
     );
 
-    assertEquals("El partido no existe.", exception.getMessage());
+    assertEquals("El partido" + partidoId + " no existe.", exception.getMessage());
   }
 
   @Test
@@ -361,13 +253,15 @@ public class ServicioPartidoTest {
     partido.setId(partidoId);
     partido.setCupoMaximo(10);
 
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     partido.setInscripciones(new ArrayList<>());
 
     Jugador jugador = new Jugador();
 
     jugador.setId(100L);
+    partido.setNivel("B");
+    jugador.setNivel("INTERMEDIO");
 
     InscripcionPartido inscripcionExistente = new InscripcionPartido();
 
@@ -396,7 +290,7 @@ public class ServicioPartidoTest {
     partido.setId(partidoId);
     partido.setCupoMaximo(2);
 
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     partido.setInscripciones(new ArrayList<>());
 
@@ -425,6 +319,8 @@ public class ServicioPartidoTest {
     Jugador jugadorNuevo = new Jugador();
 
     jugadorNuevo.setId(103L);
+    partido.setNivel("B");
+    jugadorNuevo.setNivel("INTERMEDIO");
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
 
@@ -450,7 +346,7 @@ public class ServicioPartidoTest {
 
     partidoNuevo.setCupoMaximo(10);
 
-    partidoNuevo.setEstado(Partido.EstadoPartido.ACTIVO);
+    partidoNuevo.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     partidoNuevo.setFecha(LocalDateTime.of(2026, 6, 6, 19, 0));
 
@@ -470,6 +366,8 @@ public class ServicioPartidoTest {
 
     jugador.setId(50L);
     jugador.setUsuario(usuario);
+    partidoNuevo.setNivel("B");
+    jugador.setNivel("INTERMEDIO");
 
     when(repositorioPartidoMock.buscarPorId(partidoIdNuevo)).thenReturn(partidoNuevo);
 
@@ -495,7 +393,7 @@ public class ServicioPartidoTest {
 
     partidoNuevo.setCupoMaximo(10);
 
-    partidoNuevo.setEstado(Partido.EstadoPartido.ACTIVO);
+    partidoNuevo.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     partidoNuevo.setFecha(LocalDateTime.of(2026, 6, 6, 17, 0));
 
@@ -508,6 +406,8 @@ public class ServicioPartidoTest {
     Jugador jugador = new Jugador();
 
     jugador.setId(50L);
+    partidoNuevo.setNivel("B");
+    jugador.setNivel("INTERMEDIO");
 
     when(repositorioPartidoMock.buscarPorId(partidoIdNuevo)).thenReturn(partidoNuevo);
 
@@ -574,7 +474,7 @@ public class ServicioPartidoTest {
     );
 
     Exception exception = assertThrows(
-      RuntimeException.class,
+      CanchaNoEncontradaException.class,
       () -> servicioPartido.crearPartido(datos, new Usuario())
     );
 
@@ -593,7 +493,7 @@ public class ServicioPartidoTest {
     );
 
     Exception exception = assertThrows(
-      RuntimeException.class,
+      CupoInvalidoException.class,
       () -> servicioPartido.crearPartido(datos, new Usuario())
     );
 
@@ -607,7 +507,7 @@ public class ServicioPartidoTest {
     DatosCrearPartido datos = new DatosCrearPartido("Cancha Los Leones", null, 10, "INTERMEDIO");
 
     Exception exception = assertThrows(
-      RuntimeException.class,
+      FechaPartidoInvalidaException.class,
       () -> servicioPartido.crearPartido(datos, new Usuario())
     );
 
@@ -619,7 +519,6 @@ public class ServicioPartidoTest {
   @Test
   public void noDeberiaCrearPartidoSiLaCanchaEstaOcupada() {
     Cancha cancha = new Cancha();
-
     cancha.setId(1L);
 
     Partido partidoExistente = new Partido();
@@ -637,11 +536,14 @@ public class ServicioPartidoTest {
     );
 
     Exception exception = assertThrows(
-      RuntimeException.class,
+      CanchaNoDisponibleException.class,
       () -> servicioPartido.crearPartido(datos, new Usuario())
     );
 
-    assertTrue(exception.getMessage().contains("La cancha no está disponible"));
+    assertEquals(
+      "La cancha no está disponible en esa franja horaria (los partidos duran 1 hora).",
+      exception.getMessage()
+    );
 
     verify(repositorioPartidoMock, never()).guardar(any());
   }
@@ -656,7 +558,7 @@ public class ServicioPartidoTest {
 
     partido.setCupoMaximo(2);
 
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     partido.setInscripciones(new ArrayList<>());
 
@@ -673,6 +575,9 @@ public class ServicioPartidoTest {
     Jugador jugadorNuevo = new Jugador();
 
     jugadorNuevo.setId(20L);
+    partido.setNivel("B");
+    jugadorExistente.setNivel("INTERMEDIO");
+    jugadorNuevo.setNivel("INTERMEDIO");
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
 
@@ -700,13 +605,13 @@ public class ServicioPartidoTest {
 
     partido.setCupoMaximo(10);
 
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
 
     partido.setInscripciones(new ArrayList<>());
 
     for (int i = 0; i < 8; i++) {
       Jugador jugador = new Jugador();
-
+      jugador.setNivel("INTERMEDIO");
       jugador.setId((long) i);
 
       InscripcionPartido inscripcion = new InscripcionPartido(partido, jugador);
@@ -717,7 +622,8 @@ public class ServicioPartidoTest {
     partido.setCantJugadores(8);
 
     Jugador nuevoJugador = new Jugador();
-
+    partido.setNivel("B");
+    nuevoJugador.setNivel("INTERMEDIO");
     nuevoJugador.setId(100L);
 
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
@@ -734,114 +640,6 @@ public class ServicioPartidoTest {
     verify(servicioBalanceoEquipoMock, never()).asignarCapitanes(any(Partido.class));
 
     verify(repositorioPartidoMock, times(1)).modificar(partido);
-  }
-
-  @Test
-  public void deberiaObtenerFechasDisponiblesSinRepetir() {
-    Partido partido1 = new Partido();
-
-    partido1.setFecha(LocalDateTime.of(2026, 10, 20, 18, 0));
-
-    Partido partido2 = new Partido();
-
-    partido2.setFecha(LocalDateTime.of(2026, 10, 20, 20, 0));
-
-    Partido partido3 = new Partido();
-
-    partido3.setFecha(LocalDateTime.of(2026, 10, 21, 18, 0));
-
-    when(
-      repositorioPartidoMock.buscarPartidosPorFiltro(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString()
-      )
-    )
-      .thenReturn(List.of(partido1, partido2, partido3));
-
-    List<String> fechas = servicioPartido.obtenerFechasDisponibles();
-
-    assertEquals(2, fechas.size());
-
-    assertTrue(fechas.contains("2026-10-20"));
-
-    assertTrue(fechas.contains("2026-10-21"));
-  }
-
-  @Test
-  public void deberiaObtenerHorasDisponiblesSinRepetir() {
-    Partido partido1 = new Partido();
-
-    partido1.setFecha(LocalDateTime.of(2026, 10, 20, 18, 30));
-
-    Partido partido2 = new Partido();
-
-    partido2.setFecha(LocalDateTime.of(2026, 10, 21, 18, 30));
-
-    Partido partido3 = new Partido();
-
-    partido3.setFecha(LocalDateTime.of(2026, 10, 21, 20, 0));
-
-    when(
-      repositorioPartidoMock.buscarPartidosPorFiltro(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString()
-      )
-    )
-      .thenReturn(List.of(partido1, partido2, partido3));
-
-    List<String> horas = servicioPartido.obtenerHorasDisponibles();
-
-    assertEquals(2, horas.size());
-
-    assertTrue(horas.contains("18:30"));
-
-    assertTrue(horas.contains("20:00"));
-  }
-
-  @Test
-  public void deberiaObtenerCuposDisponiblesSinRepetir() {
-    Partido partido1 = new Partido();
-
-    partido1.setCupoMaximo(10);
-
-    Partido partido2 = new Partido();
-
-    partido2.setCupoMaximo(10);
-
-    Partido partido3 = new Partido();
-
-    partido3.setCupoMaximo(14);
-
-    when(
-      repositorioPartidoMock.buscarPartidosPorFiltro(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString()
-      )
-    )
-      .thenReturn(List.of(partido1, partido2, partido3));
-
-    List<Integer> cupos = servicioPartido.obtenerCuposDisponibles();
-
-    assertEquals(2, cupos.size());
-
-    assertTrue(cupos.contains(10));
-
-    assertTrue(cupos.contains(14));
   }
 
   //Axel
@@ -870,24 +668,328 @@ public class ServicioPartidoTest {
     verify(repositorioPartidoMock, never()).guardar(any());
   }
 
+  //Axel Sprint 4
   @Test
-  public void deberiaBuscarLosPartidosDeLaCanchaUnaHoraAntesYUnaHoraDespuesDelHorarioElegido() {
+  public void noDeberiaPermitirUnirseAUnPartidoDeRangoIncompatible() {
     // Given
-    LocalDateTime fecha = LocalDateTime.of(2026, 10, 20, 18, 0);
-    Cancha cancha = new Cancha();
-    cancha.setId(1L);
-    when(repositorioCanchaMock.buscarPorNombre("Cancha Los Leones")).thenReturn(cancha);
-    DatosCrearPartido datos = new DatosCrearPartido("Cancha Los Leones", fecha, 10, "B");
+    Long partidoId = 1L;
+
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setNivel("C");
+    partido.setCupoMaximo(10);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
+    partido.setInscripciones(new ArrayList<>());
+
+    Jugador jugador = new Jugador();
+    jugador.setId(100L);
+    jugador.setNivel("INTERMEDIO");
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
 
     // When
-    servicioPartido.crearPartido(datos, new Usuario());
+    RangoJugadorIncompatibleException exception = assertThrows(
+      RangoJugadorIncompatibleException.class,
+      () -> servicioPartido.unirseAPartido(partidoId, jugador)
+    );
 
     // Then
-    verify(repositorioPartidoMock)
-      .buscarPartidosEnRango(
-        1L,
-        LocalDateTime.of(2026, 10, 20, 17, 0),
-        LocalDateTime.of(2026, 10, 20, 19, 0)
-      );
+    assertEquals(
+      "No podes unirte a este partido porque no corresponde a tu rango.",
+      exception.getMessage()
+    );
+
+    verify(repositorioPartidoMock, never()).modificar(any());
+  }
+
+  @Test
+  public void deberiaPermitirUnirseAUnPartidoDeRangoCompatible() {
+    // Given
+    Long partidoId = 1L;
+
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setNivel("b");
+    partido.setCupoMaximo(10);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
+    partido.setInscripciones(new ArrayList<>());
+
+    Jugador jugador = new Jugador();
+    jugador.setId(100L);
+    jugador.setNivel("INTERMEDIO");
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    when(repositorioPartidoMock.buscarPartidosPorJugador(jugador.getId()))
+      .thenReturn(new ArrayList<>());
+
+    // When
+    servicioPartido.unirseAPartido(partidoId, jugador);
+
+    // Then
+    assertEquals(1, partido.getCantJugadores());
+    assertEquals(1, partido.getInscripciones().size());
+
+    verify(repositorioPartidoMock, times(1)).modificar(partido);
+  }
+
+  @Test
+  public void alInvitarUnJugadorDebeLlamarAlServicioDeInvitacion()
+    throws InvitacionAlPartidoException {
+    // Given
+
+    Long idPartido = 1L;
+    Long idJugador = 2L;
+
+    Usuario usuarioQueInvita = new Usuario();
+
+    // When
+
+    servicioPartido.invitarJugador(idPartido, idJugador, usuarioQueInvita);
+
+    // Then
+
+    verify(servicioInvitacionPartidoMock, times(1))
+      .invitarJugador(idPartido, idJugador, usuarioQueInvita);
+  }
+
+  @Test
+  public void dadoQueUnPartidoTieneJugadoresCuandoSeCancelaDebeNotificarlos() {
+    // Given
+
+    Usuario organizador = new Usuario();
+    organizador.setId(1L);
+
+    Usuario usuario1 = new Usuario();
+    usuario1.setId(2L);
+
+    Usuario usuario2 = new Usuario();
+    usuario2.setId(3L);
+
+    Jugador jugador1 = new Jugador();
+    jugador1.setUsuario(usuario1);
+
+    Jugador jugador2 = new Jugador();
+    jugador2.setUsuario(usuario2);
+
+    Partido partido = new Partido();
+    partido.setId(10L);
+    partido.setOrganizador(organizador);
+    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+
+    InscripcionPartido inscripcion1 = new InscripcionPartido(partido, jugador1);
+
+    InscripcionPartido inscripcion2 = new InscripcionPartido(partido, jugador2);
+
+    partido.getInscripciones().add(inscripcion1);
+
+    partido.getInscripciones().add(inscripcion2);
+
+    when(repositorioPartidoMock.buscarPorId(10L)).thenReturn(partido);
+
+    // When
+
+    servicioPartido.cancelarPartido(10L, organizador);
+
+    // Then
+
+    assertThat(partido.getEstado(), equalTo(Partido.EstadoPartido.CANCELADO));
+
+    verify(servicioNotificacionMock).notificarCancelacion(usuario1, partido);
+
+    verify(servicioNotificacionMock).notificarCancelacion(usuario2, partido);
+  }
+
+  @Test
+  public void alCancelarUnPartidoSinJugadoresNoDebeEnviarNotificaciones() {
+    // Given
+
+    Usuario organizador = new Usuario();
+    organizador.setId(1L);
+
+    Partido partido = new Partido();
+    partido.setId(10L);
+    partido.setOrganizador(organizador);
+    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+
+    partido.setInscripciones(new ArrayList<>());
+
+    when(repositorioPartidoMock.buscarPorId(10L)).thenReturn(partido);
+
+    // When
+
+    servicioPartido.cancelarPartido(10L, organizador);
+
+    // Then
+
+    verify(servicioNotificacionMock, never())
+      .notificarCancelacion(any(Usuario.class), any(Partido.class));
+  }
+
+  // --- TESTS PARA ABANDONAR PARTIDO ---
+
+  @Test
+  public void queSePuedaAbandonarUnPartidoExitosamente() {
+    Long partidoId = 1L;
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE); // O el estado inicial que uses
+
+    Jugador jugador = new Jugador();
+    jugador.setId(10L);
+
+    InscripcionPartido inscripcion = new InscripcionPartido(partido, jugador);
+    partido.setInscripciones(new ArrayList<>(List.of(inscripcion)));
+    partido.setCantJugadores(1);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    servicioPartido.abandonarPartido(partidoId, jugador);
+
+    assertTrue(partido.getInscripciones().isEmpty());
+    assertEquals(0, partido.getCantJugadores());
+    verify(repositorioPartidoMock, times(1)).modificar(partido);
+  }
+
+  @Test
+  public void queNoSePuedaAbandonarUnPartidoQueYaEstaEnCursoOFinalizado() {
+    Long partidoId = 1L;
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+
+    Jugador jugador = new Jugador();
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> servicioPartido.abandonarPartido(partidoId, jugador)
+    );
+
+    assertEquals(
+      "No puedes abandonar un partido que ya está en curso o finalizado.",
+      exception.getMessage()
+    );
+    verify(repositorioPartidoMock, never()).modificar(any());
+  }
+
+  @Test
+  public void queNoSePuedaAbandonarSiElJugadorNoEstaInscripto() {
+    Long partidoId = 1L;
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
+    partido.setInscripciones(new ArrayList<>()); // Lista vacía
+
+    Jugador jugador = new Jugador();
+    jugador.setId(10L);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> servicioPartido.abandonarPartido(partidoId, jugador)
+    );
+
+    assertEquals("No estás inscripto en este partido.", exception.getMessage());
+  }
+
+  // --- PARA EXPULSAR JUGADOR ---
+
+  @Test
+  public void queUnOrganizadorPuedaExpulsarAUnJugadorExitosamente() {
+    Long partidoId = 1L;
+    Usuario organizador = new Usuario();
+    organizador.setId(1L);
+
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setOrganizador(organizador);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
+
+    Jugador jugadorAExpulsar = new Jugador();
+    jugadorAExpulsar.setId(20L);
+
+    InscripcionPartido inscripcion = new InscripcionPartido(partido, jugadorAExpulsar);
+    partido.setInscripciones(new ArrayList<>(List.of(inscripcion)));
+    partido.setCantJugadores(1);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    servicioPartido.expulsarJugador(partidoId, jugadorAExpulsar.getId(), organizador);
+
+    assertTrue(partido.getInscripciones().isEmpty());
+    assertEquals(0, partido.getCantJugadores());
+    verify(repositorioPartidoMock, times(1)).modificar(partido);
+  }
+
+  @Test
+  public void queNoSePuedaExpulsarAUnJugadorSiNoSosElOrganizador() {
+    Long partidoId = 1L;
+    Usuario organizadorReal = new Usuario();
+    organizadorReal.setId(1L);
+
+    Usuario falsoOrganizador = new Usuario();
+    falsoOrganizador.setId(2L);
+
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setOrganizador(organizadorReal);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> servicioPartido.expulsarJugador(partidoId, 10L, falsoOrganizador)
+    );
+
+    assertEquals("Solo el organizador puede expulsar jugadores.", exception.getMessage());
+  }
+
+  @Test
+  public void queNoSePuedaExpulsarAUnJugadorSiElPartidoEstaEnCursoOFinalizado() {
+    Long partidoId = 1L;
+    Usuario organizador = new Usuario();
+    organizador.setId(1L);
+
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setOrganizador(organizador);
+    partido.setEstado(Partido.EstadoPartido.FINALIZADO);
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> servicioPartido.expulsarJugador(partidoId, 10L, organizador)
+    );
+
+    assertEquals(
+      "No puedes expulsar jugadores de un partido que ya está en curso o finalizado.",
+      exception.getMessage()
+    );
+  }
+
+  @Test
+  public void queNoSePuedaExpulsarAUnJugadorQueNoEstaInscripto() {
+    Long partidoId = 1L;
+    Usuario organizador = new Usuario();
+    organizador.setId(1L);
+
+    Partido partido = new Partido();
+    partido.setId(partidoId);
+    partido.setOrganizador(organizador);
+    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
+    partido.setInscripciones(new ArrayList<>());
+
+    when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
+
+    Exception exception = assertThrows(
+      RuntimeException.class,
+      () -> servicioPartido.expulsarJugador(partidoId, 99L, organizador)
+    );
+
+    assertEquals("El jugador no está inscripto en este partido.", exception.getMessage());
   }
 }

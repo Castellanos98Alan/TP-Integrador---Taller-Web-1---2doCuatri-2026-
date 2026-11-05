@@ -6,6 +6,8 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.servicio.ServicioRanking;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,16 +18,24 @@ public class RankingControllerTest {
 
   private RankingController rankingController;
   private ServicioRanking servicioRankingMock;
+  private HttpServletRequest requestMock;
+  private HttpSession sessionMock;
 
   @BeforeEach
   public void init() {
     this.servicioRankingMock = mock(ServicioRanking.class);
+    this.requestMock = mock(HttpServletRequest.class);
+    this.sessionMock = mock(HttpSession.class);
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+
     this.rankingController = new RankingController(this.servicioRankingMock);
   }
 
   @Test
   public void mostrarRankingDeberiaMostrarLaVistaRankingConLosJugadores() {
     // preparacion
+
     Jugador pedro = new Jugador();
     pedro.setNombre("Pedro");
     pedro.setPuntos(1500);
@@ -38,15 +48,20 @@ public class RankingControllerTest {
     rankingEsperado.add(pedro);
     rankingEsperado.add(juan);
 
-    when(this.servicioRankingMock.obtenerRanking()).thenReturn(rankingEsperado);
+    when(this.servicioRankingMock.obtenerRankingFiltrado(null, null, null, null, null))
+      .thenReturn(rankingEsperado);
 
     // ejecucion
-    ModelAndView modelAndView = this.rankingController.mostrarRanking(null, null);
+
+    ModelAndView modelAndView =
+      this.rankingController.mostrarRanking(null, null, null, null, requestMock);
 
     // validacion
+
     assertThat(modelAndView.getViewName(), equalTo("ranking"));
+
     assertThat(modelAndView.getModel().get("ranking"), equalTo(rankingEsperado));
 
-    verify(this.servicioRankingMock, times(1)).obtenerRanking();
+    verify(this.servicioRankingMock, times(1)).obtenerRankingFiltrado(null, null, null, null, null);
   }
 }

@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
@@ -9,6 +10,7 @@ import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.servicio.ServicioEstadistica;
 import com.tallerwebi.dominio.servicio.ServicioEstadisticasImpl;
+import com.tallerwebi.dominio.servicio.ServicioNotificacion;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,22 +19,27 @@ import org.junit.jupiter.api.Test;
 
 public class ServicioEstadisticaTest {
 
-  private ServicioEstadistica servicioEstadistica;
   private RepositorioEstadistica repositorioEstadisticaMock;
   private RepositorioPartido repositorioPartidoMock;
   private RepositorioJugador repositorioJugadorMock;
+  private ServicioNotificacion servicioNotificacionMock;
+
+  private ServicioEstadistica servicioEstadistica;
 
   @BeforeEach
   public void init() {
     this.repositorioEstadisticaMock = mock(RepositorioEstadistica.class);
     this.repositorioPartidoMock = mock(RepositorioPartido.class);
     this.repositorioJugadorMock = mock(RepositorioJugador.class);
+    this.repositorioJugadorMock = mock(RepositorioJugador.class);
+    this.servicioNotificacionMock = mock(ServicioNotificacion.class);
 
-    this.servicioEstadistica =
+    servicioEstadistica =
       new ServicioEstadisticasImpl(
         this.repositorioEstadisticaMock,
         this.repositorioPartidoMock,
-        this.repositorioJugadorMock
+        this.repositorioJugadorMock,
+        this.servicioNotificacionMock
       );
   }
 
@@ -196,33 +203,185 @@ public class ServicioEstadisticaTest {
 
   @Test
   public void queSePuedanGuardarEstadisticasYEnviarARevision() {
-    // 1. Preparación (Given)
     Long idPartido = 1L;
     Partido partidoMock = mock(Partido.class);
     Jugador jugadorMock = mock(Jugador.class);
+    Usuario organizadorMock = mock(Usuario.class);
 
-    DTOEstadisticaJugador dto = new DTOEstadisticaJugador(10L, 2, 1, 0); // idJugador, goles, amarillas, rojas
+    DTOEstadisticaJugador dto = new DTOEstadisticaJugador(10L, 2, 1, 0, 0); // idJugador, goles, amarillas, rojas
     List<DTOEstadisticaJugador> datosCargados = List.of(dto);
 
-    // Configuramos los comportamientos de los mocks
     when(repositorioPartidoMock.buscarPorId(idPartido)).thenReturn(partidoMock);
-    when(repositorioJugadorMock.buscarPorUsuarioId(dto.getIdJugador())).thenReturn(jugadorMock);
+    when(repositorioJugadorMock.buscarPorId(dto.getIdJugador())).thenReturn(jugadorMock);
     when(repositorioEstadisticaMock.buscarPorPartidoYJugador(partidoMock, jugadorMock))
       .thenReturn(null); // Simulamos que no existe todavía (creación)
+    when(partidoMock.getOrganizador()).thenReturn(organizadorMock);
 
-    // 2. Ejecución (When)
     servicioEstadistica.guardarEstadisticasYEnviarARevision(idPartido, datosCargados);
 
-    // 3. Verificación (Then)
-    // Verificamos que se haya buscado el partido y el jugador
     verify(repositorioPartidoMock, times(1)).buscarPorId(idPartido);
-    verify(repositorioJugadorMock, times(1)).buscarPorUsuarioId(dto.getIdJugador());
+    verify(repositorioJugadorMock, times(1)).buscarPorId(dto.getIdJugador());
 
-    // Verificamos que se haya intentado guardar la estadística
     verify(repositorioEstadisticaMock, times(1)).guardar(any(Estadistica.class));
 
-    // Verificamos que se haya cambiado el estado del partido a EN_REVISION y se haya guardado/actualizado
     verify(partidoMock, times(1)).setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
     verify(repositorioPartidoMock, times(1)).guardar(partidoMock);
+
+    verify(servicioNotificacionMock, times(1))
+      .notificarFormularioCompletado(organizadorMock, partidoMock);
+  }
+
+  @Test
+  public void debePermitirRevisarEstadisticasAlCapitanDelEquipoRival() {
+    // Given
+    Usuario usuarioOrganizador = crearUsuario(1L, "organizador@test.com");
+    Usuario usuarioCapitanRival = crearUsuario(2L, "capitanrival@test.com");
+
+    Jugador jugadorOrganizador = crearJugador(10L, "Organizador", usuarioOrganizador);
+    Jugador jugadorCapitanRival = crearJugador(20L, "Capitán Rival", usuarioCapitanRival);
+
+    Equipo equipoLocal = crearEquipo(100L, "Equipo Local");
+    Equipo equipoVisitante = crearEquipo(200L, "Equipo Visitante");
+
+    Partido partido = new Partido();
+    partido.setId(1L);
+    partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    partido.setOrganizador(usuarioOrganizador);
+    partido.setEquipo1(equipoLocal);
+    partido.setEquipo2(equipoVisitante);
+
+    List<InscripcionPartido> inscripciones = new ArrayList<>();
+    inscripciones.add(crearInscripcion(jugadorOrganizador, equipoLocal, true));
+    inscripciones.add(crearInscripcion(jugadorCapitanRival, equipoVisitante, true));
+    partido.setInscripciones(inscripciones);
+
+    when(repositorioJugadorMock.buscarPorUsuarioId(usuarioOrganizador.getId()))
+      .thenReturn(jugadorOrganizador);
+    when(repositorioJugadorMock.buscarPorUsuarioId(usuarioCapitanRival.getId()))
+      .thenReturn(jugadorCapitanRival);
+
+    // When
+    boolean puedeRevisar = servicioEstadistica.puedeRevisarEstadisticas(
+      partido,
+      usuarioCapitanRival
+    );
+
+    // Then
+    assertThat(puedeRevisar, is(true));
+  }
+
+  @Test
+  public void noDebePermitirRevisarEstadisticasAlOrganizadorDelPartido() {
+    // Given
+    Usuario usuarioOrganizador = crearUsuario(1L, "organizador@test.com");
+    Jugador jugadorOrganizador = crearJugador(10L, "Organizador", usuarioOrganizador);
+
+    Equipo equipoLocal = crearEquipo(100L, "Equipo Local");
+    Equipo equipoVisitante = crearEquipo(200L, "Equipo Visitante");
+
+    Partido partido = new Partido();
+    partido.setId(1L);
+    partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    partido.setOrganizador(usuarioOrganizador);
+    partido.setEquipo1(equipoLocal);
+    partido.setEquipo2(equipoVisitante);
+
+    List<InscripcionPartido> inscripciones = new ArrayList<>();
+    inscripciones.add(crearInscripcion(jugadorOrganizador, equipoLocal, true));
+    partido.setInscripciones(inscripciones);
+
+    // When
+    boolean puedeRevisar = servicioEstadistica.puedeRevisarEstadisticas(
+      partido,
+      usuarioOrganizador
+    );
+
+    // Then
+    assertThat(puedeRevisar, is(false));
+  }
+
+  @Test
+  public void noDebePermitirRevisarSiElPartidoNoEstaEnRevision() {
+    // Given
+    Usuario usuarioCapitanRival = crearUsuario(2L, "capitanrival@test.com");
+    Partido partido = new Partido();
+    partido.setId(1L);
+    partido.setEstadoEstadisticas(null);
+
+    // When
+    boolean puedeRevisar = servicioEstadistica.puedeRevisarEstadisticas(
+      partido,
+      usuarioCapitanRival
+    );
+
+    // Then
+    assertThat(puedeRevisar, is(false));
+  }
+
+  @Test
+  public void noDebePermitirRevisarAUnJugadorQueNoEsCapitan() {
+    // Given
+    Usuario usuarioOrganizador = crearUsuario(1L, "organizador@test.com");
+    Usuario usuarioJugadorComun = crearUsuario(3L, "jugadorcomun@test.com");
+
+    Jugador jugadorOrganizador = crearJugador(10L, "Organizador", usuarioOrganizador);
+    Jugador jugadorComun = crearJugador(30L, "Jugador Común", usuarioJugadorComun);
+
+    Equipo equipoLocal = crearEquipo(100L, "Equipo Local");
+    Equipo equipoVisitante = crearEquipo(200L, "Equipo Visitante");
+
+    Partido partido = new Partido();
+    partido.setId(1L);
+    partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    partido.setOrganizador(usuarioOrganizador);
+    partido.setEquipo1(equipoLocal);
+    partido.setEquipo2(equipoVisitante);
+
+    List<InscripcionPartido> inscripciones = new ArrayList<>();
+    inscripciones.add(crearInscripcion(jugadorOrganizador, equipoLocal, true));
+    inscripciones.add(crearInscripcion(jugadorComun, equipoVisitante, false));
+    partido.setInscripciones(inscripciones);
+
+    when(repositorioJugadorMock.buscarPorUsuarioId(usuarioJugadorComun.getId()))
+      .thenReturn(jugadorComun);
+
+    // When
+    boolean puedeRevisar = servicioEstadistica.puedeRevisarEstadisticas(
+      partido,
+      usuarioJugadorComun
+    );
+
+    // Then
+    assertThat(puedeRevisar, is(false));
+  }
+
+  private Usuario crearUsuario(Long id, String email) {
+    Usuario u = new Usuario();
+    u.setId(id);
+    u.setEmail(email);
+    return u;
+  }
+
+  private Jugador crearJugador(Long id, String nombre, Usuario usuario) {
+    Jugador j = new Jugador();
+    j.setId(id);
+    j.setNombre(nombre);
+    j.setUsuario(usuario);
+    return j;
+  }
+
+  private Equipo crearEquipo(Long id, String nombre) {
+    Equipo e = new Equipo();
+    e.setId(id);
+    e.setNombre(nombre);
+    return e;
+  }
+
+  private InscripcionPartido crearInscripcion(Jugador jugador, Equipo equipo, boolean esCapitan) {
+    InscripcionPartido ins = new InscripcionPartido();
+    ins.setJugador(jugador);
+    ins.setEquipo(equipo);
+    ins.setEsCapitan(esCapitan);
+    return ins;
   }
 }

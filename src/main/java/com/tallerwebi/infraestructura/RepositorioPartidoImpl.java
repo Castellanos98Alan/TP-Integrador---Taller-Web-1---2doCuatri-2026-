@@ -70,6 +70,9 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       .getCurrentSession()
       .createQuery(hql.toString(), Partido.class);
 
+    query.setParameter("PENDIENTE", Partido.EstadoPartido.PENDIENTE);
+    query.setParameter("ACTIVO", Partido.EstadoPartido.ACTIVO);
+
     inyectarParametrosFiltro(
       query,
       filtroNivel,
@@ -178,7 +181,10 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
     String filtroProvincia,
     String filtroLocalidad
   ) {
-    StringBuilder hql = new StringBuilder("from Partido p where 1=1 ");
+    StringBuilder hql = new StringBuilder(
+      "from Partido p where p.estado IN (:PENDIENTE, :ACTIVO) "
+    );
+
     if (!FILTRO_TODOS.equals(filtroNivel)) {
       hql.append("and p.nivel = :nivel ");
     }

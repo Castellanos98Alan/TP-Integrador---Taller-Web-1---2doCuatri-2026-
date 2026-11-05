@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.excepcion.ExcepcionNegocio;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
@@ -51,7 +52,7 @@ public class CrearPartidoController {
       try {
         servicioPartido.crearPartido(datosPartido, usuario);
         return new ModelAndView("redirect:/partidos");
-      } catch (RuntimeException e) {
+      } catch (ExcepcionNegocio e) {
         error = e.getMessage();
       }
     }
