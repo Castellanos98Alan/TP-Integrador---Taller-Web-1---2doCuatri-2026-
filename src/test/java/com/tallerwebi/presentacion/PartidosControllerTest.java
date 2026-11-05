@@ -6,7 +6,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -20,6 +22,7 @@ import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.CupoMaximoAlcanzado;
 import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
+import com.tallerwebi.dominio.excepcion.PartidoNoEncontrado;
 import com.tallerwebi.dominio.excepcion.RevisionEstadisticasNoPermitida;
 import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
 import com.tallerwebi.dominio.servicio.ServicioEstadistica;
@@ -620,6 +623,160 @@ public class PartidosControllerTest {
       mav.getViewName(),
       equalTo("redirect:/partidos?error=No puedes revisar estas estadisticas")
     );
+  }
+
+  @Test
+  public void verSalaDeEsperaSinSesionDeberiaRedirigirAlLogin() {
+    // Configuración para simular que no hay usuario en sesión
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
+
+    // Ejecución
+    ModelAndView mav = partidosController.verSalaDeEspera(1L, null, requestMock);
+
+    // Verificación
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/login/"));
+    verify(servicioPartidoMock, never()).buscarPartidoPorId(anyLong());
+  }
+
+  @Test
+  public void verSalaDeEsperaConErrorEnParametroDeberiaAgregarElErrorAlModelo()
+    throws PartidoNoEncontrado {
+    // Preparación
+    Long idPartido = 1L;
+    Usuario usuarioLogueado = givenUsuario(1L);
+    Partido partidoMock = new Partido();
+    partidoMock.setId(idPartido);
+    partidoMock.setOrganizador(usuarioLogueado); // Para pasar validación de esParticipante
+
+    givenSesion(usuarioLogueado);
+    when(servicioPartidoMock.buscarPartidoPorId(idPartido)).thenReturn(partidoMock);
+
+    // Mocks de estadísticas
+    when(servicioEstadisticaMock.puedeCargarEstadisticas(partidoMock, usuarioLogueado))
+      .thenReturn(false);
+    when(servicioEstadisticaMock.puedeRevisarEstadisticas(partidoMock, usuarioLogueado))
+      .thenReturn(false);
+
+    // Ejecución con un mensaje de error simulado desde la URL
+    String mensajeErrorPrueba = "No se pudo realizar la acción";
+    ModelAndView mav = partidosController.verSalaDeEspera(
+      idPartido,
+      mensajeErrorPrueba,
+      requestMock
+    );
+
+    // Verificación
+    assertThat(mav.getViewName(), equalToIgnoringCase("sala-de-espera"));
+    assertThat(mav.getModel().get("error"), equalTo(mensajeErrorPrueba));
+    assertThat(mav.getModel().get("partido"), equalTo(partidoMock));
+  }
+
+  @Test
+  public void verSalaDeEsperaCuandoPartidoNoExisteDeberiaRedirigirConExcepcion() {
+    // Preparación
+    Long idPartido = 99L;
+    Usuario usuarioLogueado = givenUsuario(1L);
+    givenSesion(usuarioLogueado);
+
+    // Simulamos que el servicio lanza la excepción PartidoNoEncontrado
+    String mensajeExcepcion = "El partido solicitado no existe";
+    when(servicioPartidoMock.buscarPartidoPorId(idPartido))
+      .thenThrow(new PartidoNoEncontrado(mensajeExcepcion));
+
+    // Ejecución
+    ModelAndView mav = partidosController.verSalaDeEspera(idPartido, null, requestMock);
+
+    // Verificación
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/partido/"));
+    assertThat(mav.getModel().get("error"), equalTo(mensajeExcepcion));
+  }
+
+  @Test
+  public void verSalaDeEsperaExitosoSiUsuarioEsOrganizadorDeberiaMarcarloComoParticipante() {
+    // Preparación
+    Long idPartido = 1L;
+    Usuario usuarioLogueado = givenUsuario(50L);
+    givenSesion(usuarioLogueado);
+
+    Partido partidoMock = new Partido();
+    partidoMock.setId(idPartido);
+    partidoMock.setOrganizador(usuarioLogueado); // El usuario logueado es el organizador
+
+    // Simulamos amigos
+    List<Usuario> amigosSimulados = new ArrayList<>();
+    when(servicioSolicitudAmistadMock.obtenerAmigos(usuarioLogueado)).thenReturn(amigosSimulados);
+
+    when(servicioPartidoMock.buscarPartidoPorId(idPartido)).thenReturn(partidoMock);
+    when(servicioEstadisticaMock.puedeCargarEstadisticas(partidoMock, usuarioLogueado))
+      .thenReturn(true);
+    when(servicioEstadisticaMock.puedeRevisarEstadisticas(partidoMock, usuarioLogueado))
+      .thenReturn(true);
+
+    // Ejecución
+    ModelAndView mav = partidosController.verSalaDeEspera(idPartido, null, requestMock);
+
+    // Verificación
+    assertThat(mav.getViewName(), equalToIgnoringCase("sala-de-espera"));
+    assertTrue((Boolean) mav.getModel().get("esParticipante")); // Validamos la lógica de getEsParticipante
+    assertThat(mav.getModel().get("amigos"), equalTo(amigosSimulados));
+    assertTrue((Boolean) mav.getModel().get("puedeCargarEstadisticas"));
+    assertTrue((Boolean) mav.getModel().get("puedeRevisarEstadisticas"));
+  }
+
+  @Test
+  public void verSalaDeEsperaExitosoSiUsuarioEstaInscriptoDeberiaMarcarloComoParticipante() {
+    // Preparación
+    Long idPartido = 1L;
+    Usuario usuarioLogueado = givenUsuario(25L);
+    givenSesion(usuarioLogueado);
+
+    Partido partidoMock = new Partido();
+    partidoMock.setId(idPartido);
+
+    // Creamos un organizador distinto
+    Usuario organizador = givenUsuario(99L);
+    partidoMock.setOrganizador(organizador);
+
+    // Agregamos al usuario logueado a la lista de inscripciones
+    givenInscripcion(partidoMock, usuarioLogueado);
+
+    when(servicioPartidoMock.buscarPartidoPorId(idPartido)).thenReturn(partidoMock);
+
+    // Ejecución
+    ModelAndView mav = partidosController.verSalaDeEspera(idPartido, null, requestMock);
+
+    // Verificación
+    assertThat(mav.getViewName(), equalToIgnoringCase("sala-de-espera"));
+    assertTrue((Boolean) mav.getModel().get("esParticipante")); // Pasó por el bucle de confirmados en getEsParticipante
+  }
+
+  @Test
+  public void verSalaDeEsperaExitosoSiUsuarioNoEsParticipanteNoCargaAmigos() {
+    // Preparación
+    Long idPartido = 1L;
+    Usuario usuarioLogueado = givenUsuario(10L);
+    givenSesion(usuarioLogueado);
+
+    Partido partidoMock = new Partido();
+    partidoMock.setId(idPartido);
+
+    // Un organizador distinto
+    Usuario organizador = givenUsuario(99L);
+    partidoMock.setOrganizador(organizador);
+
+    // El usuario no está en las inscripciones
+    when(servicioPartidoMock.buscarPartidoPorId(idPartido)).thenReturn(partidoMock);
+
+    // Ejecución
+    ModelAndView mav = partidosController.verSalaDeEspera(idPartido, null, requestMock);
+
+    // Verificación
+    assertThat(mav.getViewName(), equalToIgnoringCase("sala-de-espera"));
+    assertFalse((Boolean) mav.getModel().get("esParticipante"));
+
+    // Verificamos que si no es participante, no se llama al servicio de amigos
+    verify(servicioSolicitudAmistadMock, never()).obtenerAmigos(any(Usuario.class));
   }
 
   private Usuario givenUsuario(Long id) {
