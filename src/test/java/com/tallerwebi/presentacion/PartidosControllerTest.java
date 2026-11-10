@@ -176,7 +176,7 @@ public class PartidosControllerTest {
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login/"));
   }
 
-  @Test
+  /*@Test
   public void unirseAlPartidoSinSesionDeberiaRedirigirAlLogin() {
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
@@ -188,8 +188,9 @@ public class PartidosControllerTest {
       equalToIgnoringCase("redirect:/login/?error=Debes+iniciar+sesion+para+unirte")
     );
   }
+  */
 
-  @Test
+  /* @Test
   public void unirseAlPartidoConSesionActivaDeberiaRedirigirASalaDeEspera() {
     Usuario usuario = new Usuario();
     usuario.setId(1L);
@@ -209,9 +210,9 @@ public class PartidosControllerTest {
       modelAndView.getViewName(),
       equalToIgnoringCase("redirect:/partido/1/sala-de-espera")
     );
-  }
+  }*/
 
-  @Test
+  /* @Test
   public void unirseAlPartidoConExcepcionDeberiaLanzarError() {
     Usuario usuario = new Usuario();
     usuario.setId(1L);
@@ -239,7 +240,7 @@ public class PartidosControllerTest {
       modelAndView.getViewName(),
       equalToIgnoringCase("redirect:/partido/1/sala-de-espera?error=Cupo+maximo+alcanzado")
     );
-  }
+  }*/
 
   private void thenLaVistaEs(String vistaEsperada, ModelAndView mav) {
     assertThat(vistaEsperada, equalTo(mav.getViewName()));

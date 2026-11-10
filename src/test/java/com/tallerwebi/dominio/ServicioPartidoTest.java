@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 public class ServicioPartidoTest {
 
@@ -44,6 +45,8 @@ public class ServicioPartidoTest {
 
   private ServicioSolicitudAmistad servicioSolicitudAmistadMock;
   private ServicioInvitacionPartido servicioInvitacionPartidoMock;
+
+  private ValidadorInscripcionPartido validadorInscripcionPartido;
 
   private static final String FILTRO_TODOS = "TODOS";
 
@@ -74,7 +77,8 @@ public class ServicioPartidoTest {
         servicioBalanceoEquipoMock,
         servicioNotificacionMock,
         servicioSolicitudAmistadMock,
-        servicioInvitacionPartidoMock
+        servicioInvitacionPartidoMock,
+        validadorInscripcionPartido
       );
   }
 
