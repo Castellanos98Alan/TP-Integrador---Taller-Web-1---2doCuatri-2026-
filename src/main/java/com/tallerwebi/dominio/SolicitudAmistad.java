@@ -1,15 +1,10 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.Enumeration.EstadoSolicitud;
 import jakarta.persistence.*;
 
 @Entity
 public class SolicitudAmistad {
-
-  public enum EstadoSolicitud {
-    PENDIENTE,
-    RECHAZADA,
-    ACEPTADA,
-  }
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

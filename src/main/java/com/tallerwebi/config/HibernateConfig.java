@@ -28,7 +28,7 @@ public class HibernateConfig {
     if (dbName == null) dbName = "tallerwebi";
 
     if (dbUser == null) dbUser = "root";
-    if (dbPassword == null) dbPassword = "";
+    if (dbPassword == null) dbPassword = "41005584Alan";
 
     String url = String.format(
       "jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=America/Buenos_Aires&allowPublicKeyRetrieval=true",
@@ -63,7 +63,7 @@ public class HibernateConfig {
     properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
     properties.setProperty("hibernate.show_sql", "true");
     properties.setProperty("hibernate.format_sql", "true");
-    properties.setProperty("hibernate.hbm2ddl.auto", "create");
+    properties.setProperty("hibernate.hbm2ddl.auto", "update");
     properties.setProperty("hibernate.hbm2ddl.import_files", "");
     properties.setProperty("hibernate.connection.characterEncoding", "utf8");
     properties.setProperty("hibernate.connection.CharSet", "utf8");
