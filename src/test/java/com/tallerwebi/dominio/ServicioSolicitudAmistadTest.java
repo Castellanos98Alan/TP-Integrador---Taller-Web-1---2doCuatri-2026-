@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Enumeration.EstadoSolicitud;
 import com.tallerwebi.dominio.excepcion.SolicitudAmistadInvalida;
 import com.tallerwebi.dominio.repositorio.RepositorioSolicitudAmistad;
 import com.tallerwebi.dominio.servicio.ServicioSolicitudAmistad;
@@ -49,7 +50,7 @@ public class ServicioSolicitudAmistadTest {
     SolicitudAmistad solicitud = givenDadoqueTengoUnaSolicitudDeAmistad(
       matias,
       ivana,
-      SolicitudAmistad.EstadoSolicitud.PENDIENTE
+      EstadoSolicitud.PENDIENTE
     );
 
     List<SolicitudAmistad> solicitudes = new ArrayList<>();
@@ -75,7 +76,7 @@ public class ServicioSolicitudAmistadTest {
     // Given
 
     SolicitudAmistad solicitud = new SolicitudAmistad();
-    solicitud.setEstado(SolicitudAmistad.EstadoSolicitud.PENDIENTE);
+    solicitud.setEstado(EstadoSolicitud.PENDIENTE);
 
     when(repositorioSolicitudAmistadMock.buscarPorId(1)).thenReturn(solicitud);
 
@@ -84,7 +85,7 @@ public class ServicioSolicitudAmistadTest {
     servicioSolicitudAmistad.aceptarSolicitud(1);
 
     // Then
-    assertThat(solicitud.getEstado(), equalTo(SolicitudAmistad.EstadoSolicitud.ACEPTADA));
+    assertThat(solicitud.getEstado(), equalTo(EstadoSolicitud.ACEPTADA));
 
     verify(repositorioSolicitudAmistadMock).modificar(solicitud);
   }
@@ -97,7 +98,7 @@ public class ServicioSolicitudAmistadTest {
 
     SolicitudAmistad solicitud = new SolicitudAmistad();
 
-    solicitud.setEstado(SolicitudAmistad.EstadoSolicitud.PENDIENTE);
+    solicitud.setEstado(EstadoSolicitud.PENDIENTE);
 
     when(repositorioSolicitudAmistadMock.buscarPorId(1)).thenReturn(solicitud);
 
@@ -107,7 +108,7 @@ public class ServicioSolicitudAmistadTest {
 
     // Then
 
-    assertThat(solicitud.getEstado(), equalTo(SolicitudAmistad.EstadoSolicitud.RECHAZADA));
+    assertThat(solicitud.getEstado(), equalTo(EstadoSolicitud.RECHAZADA));
 
     verify(repositorioSolicitudAmistadMock).modificar(solicitud);
   }
@@ -195,13 +196,13 @@ public class ServicioSolicitudAmistadTest {
     SolicitudAmistad solicitud1 = givenDadoqueTengoUnaSolicitudDeAmistad(
       juan,
       pedro,
-      SolicitudAmistad.EstadoSolicitud.ACEPTADA
+      EstadoSolicitud.ACEPTADA
     );
 
     SolicitudAmistad solicitud2 = givenDadoqueTengoUnaSolicitudDeAmistad(
       juan,
       lucas,
-      SolicitudAmistad.EstadoSolicitud.ACEPTADA
+      EstadoSolicitud.ACEPTADA
     );
 
     List<SolicitudAmistad> solicitudes = new ArrayList<>();
@@ -236,7 +237,7 @@ public class ServicioSolicitudAmistadTest {
     SolicitudAmistad solicitud = givenDadoqueTengoUnaSolicitudDeAmistad(
       pedro,
       juan,
-      SolicitudAmistad.EstadoSolicitud.ACEPTADA
+      EstadoSolicitud.ACEPTADA
     );
 
     List<SolicitudAmistad> solicitudes = new ArrayList<>();
@@ -287,7 +288,7 @@ public class ServicioSolicitudAmistadTest {
   private SolicitudAmistad givenDadoqueTengoUnaSolicitudDeAmistad(
     Usuario emisor,
     Usuario receptor,
-    SolicitudAmistad.EstadoSolicitud estadoSolicitud
+    EstadoSolicitud estadoSolicitud
   ) {
     SolicitudAmistad solicitudAmistad = new SolicitudAmistad(emisor, receptor, estadoSolicitud);
 
