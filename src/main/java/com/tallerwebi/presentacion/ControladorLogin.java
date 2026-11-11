@@ -84,7 +84,7 @@ public class ControladorLogin {
     model.put(ATRIBUTO_USUARIO, new Usuario());
     return new ModelAndView("nuevo-usuario", model);
   }
-
+  /* 
   @RequestMapping(path = "/home", method = RequestMethod.GET)
   public ModelAndView irAHome() {
     return new ModelAndView("home");
@@ -94,4 +94,5 @@ public class ControladorLogin {
   public ModelAndView inicio() {
     return new ModelAndView("redirect:/login");
   }
+  */
 }

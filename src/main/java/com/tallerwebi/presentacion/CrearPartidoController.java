@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.ExcepcionNegocio;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,14 @@ public class CrearPartidoController {
   }
 
   @GetMapping("/crearPartido")
-  public ModelAndView irACrearPartido() {
+  public ModelAndView irACrearPartido(HttpServletRequest request) {
+    if (request.getSession().getAttribute("USUARIO") == null) {
+      return new ModelAndView("redirect:/login?error=Debes+iniciar+sesion+para+crear+un+partido");
+    }
+
     ModelAndView model = new ModelAndView("crearPartido");
 
     DatosCrearPartido datos = new DatosCrearPartido();
-
     datos.setCodigoDeAcceso(servicioPartido.generarCodigoAcceso());
 
     model.getModelMap().put("datosPartido", datos);
