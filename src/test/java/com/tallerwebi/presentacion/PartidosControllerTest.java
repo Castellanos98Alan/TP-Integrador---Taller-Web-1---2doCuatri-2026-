@@ -642,7 +642,7 @@ public class PartidosControllerTest {
 
   @Test
   public void verSalaDeEsperaConErrorEnParametroDeberiaAgregarElErrorAlModelo()
-          throws PartidoNoEncontrado {
+    throws PartidoNoEncontrado {
     // Preparación
     Long idPartido = 1L;
     Usuario usuarioLogueado = givenUsuario(1L);
@@ -656,16 +656,16 @@ public class PartidosControllerTest {
 
     // Mocks de estadísticas
     when(servicioEstadisticaMock.puedeCargarEstadisticas(partidoMock, usuarioLogueado))
-            .thenReturn(false);
+      .thenReturn(false);
     when(servicioEstadisticaMock.puedeRevisarEstadisticas(partidoMock, usuarioLogueado))
-            .thenReturn(false);
+      .thenReturn(false);
 
     // Ejecución con un mensaje de error simulado desde la URL
     String mensajeErrorPrueba = "No se pudo realizar la acción";
     ModelAndView mav = partidosController.verSalaDeEspera(
-            idPartido,
-            mensajeErrorPrueba,
-            requestMock
+      idPartido,
+      mensajeErrorPrueba,
+      requestMock
     );
 
     // Verificación
@@ -685,7 +685,7 @@ public class PartidosControllerTest {
     // Simulamos que el servicio lanza la excepción PartidoNoEncontrado
     String mensajeExcepcion = "El partido solicitado no existe";
     when(servicioPartidoMock.buscarPartidoPorId(idPartido))
-            .thenThrow(new PartidoNoEncontrado(mensajeExcepcion));
+      .thenThrow(new PartidoNoEncontrado(mensajeExcepcion));
 
     // Ejecución
     ModelAndView mav = partidosController.verSalaDeEspera(idPartido, null, requestMock);
@@ -713,9 +713,9 @@ public class PartidosControllerTest {
 
     when(servicioPartidoMock.buscarPartidoPorId(idPartido)).thenReturn(partidoMock);
     when(servicioEstadisticaMock.puedeCargarEstadisticas(partidoMock, usuarioLogueado))
-            .thenReturn(true);
+      .thenReturn(true);
     when(servicioEstadisticaMock.puedeRevisarEstadisticas(partidoMock, usuarioLogueado))
-            .thenReturn(true);
+      .thenReturn(true);
 
     // Ejecución
     ModelAndView mav = partidosController.verSalaDeEspera(idPartido, null, requestMock);
@@ -784,7 +784,6 @@ public class PartidosControllerTest {
     // Verificamos que si no es participante, no se llama al servicio de amigos
     verify(servicioSolicitudAmistadMock, never()).obtenerAmigos(any(Usuario.class));
   }
-
 
   private Usuario givenUsuario(Long id) {
     Usuario usuario = new Usuario();
