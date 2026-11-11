@@ -168,6 +168,7 @@
             <a class="nav-link" th:href="@{/home}">Inicio</a>
             <a class="nav-link active" th:href="@{/partidos}">Partidos</a>
             <a class="nav-link" th:href="@{/ranking}">Ranking</a>
+            <a class="nav-link" th:href="@{/centro-ayuda}">Centro de ayuda</a>
             <a class="nav-link" th:href="@{/perfil}">Mi Perfil</a>
         </div>
 
@@ -324,6 +325,16 @@
                                 <span th:text="${partido.cantJugadores != null ? partido.cantJugadores : 0}">0</span> /
                                 <span th:text="${partido.cupoMaximo}">10</span>
                             </strong>
+                        </div>
+                    </div>
+
+                    <!-- Código de acceso (solo lo ve el organizador de un partido privado) -->
+                    <div th:if="${partido.esPrivado != null and partido.esPrivado and session.USUARIO != null and partido.organizador != null and partido.organizador.id == session.USUARIO.id}"
+                         class="info-pill d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-key text-warning fs-5"></i>
+                        <div>
+                            <small class="d-block text-white-50" style="font-size: 10px;">CÓDIGO DE ACCESO</small>
+                            <strong class="font-monospace" style="font-size: 13px;" th:text="${partido.codigoDeAcceso}">ABC12345</strong>
                         </div>
                     </div>
 
