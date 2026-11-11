@@ -50,6 +50,7 @@ public class ServicioPartidoTest {
 
   private static final String FILTRO_TODOS = "TODOS";
 
+
   @BeforeEach
   public void init() {
     repositorioPartidoMock = mock(RepositorioPartido.class);
@@ -67,6 +68,8 @@ public class ServicioPartidoTest {
     servicioNotificacionMock = mock(ServicioNotificacion.class);
 
     servicioSolicitudAmistadMock = mock(ServicioSolicitudAmistad.class);
+
+    validadorInscripcionPartido = new ValidadorInscripcionPartido(repositorioPartidoMock);
 
     servicioPartido =
       new ServicioPartidoImpl(
@@ -188,7 +191,6 @@ public class ServicioPartidoTest {
     verify(repositorioPartidoMock, times(1)).modificar(partido);
   }
 
-  @Test
   public void queLanceExcepcionSiElPartidoNoExisteAlQuererUnirse() {
     Long partidoId = 99L;
 
@@ -197,12 +199,13 @@ public class ServicioPartidoTest {
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(null);
 
     Exception exception = assertThrows(
-      RuntimeException.class,
-      () -> servicioPartido.unirseAPartido(partidoId, jugador)
+            RuntimeException.class,
+            () -> servicioPartido.unirseAPartido(partidoId, jugador)
     );
 
-    assertEquals("El partido" + partidoId + " no existe.", exception.getMessage());
+    assertEquals("El partido " + partidoId + " no existe.", exception.getMessage());
   }
+
 
   @Test
   public void queLanceExcepcionSiElPartidoEstaCancelado() {
@@ -633,7 +636,7 @@ public class ServicioPartidoTest {
     when(repositorioPartidoMock.buscarPorId(partidoId)).thenReturn(partido);
 
     when(repositorioPartidoMock.buscarPartidosPorJugador(nuevoJugador.getId()))
-      .thenReturn(new ArrayList<>());
+            .thenReturn(new ArrayList<>());
 
     servicioPartido.unirseAPartido(partidoId, nuevoJugador);
 
@@ -645,6 +648,7 @@ public class ServicioPartidoTest {
 
     verify(repositorioPartidoMock, times(1)).modificar(partido);
   }
+
 
   //Axel
   @Test
