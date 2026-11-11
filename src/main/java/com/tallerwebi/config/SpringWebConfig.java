@@ -5,6 +5,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -13,6 +15,8 @@ import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
 
+@Import(EmailConfig.class)
+@EnableScheduling
 @EnableWebMvc
 @Configuration
 @ComponentScan(
@@ -27,8 +31,13 @@ public class SpringWebConfig implements WebMvcConfigurer {
   @Override
   public void addResourceHandlers(final ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/css/**").addResourceLocations("/resources/core/css/");
+
     registry.addResourceHandler("/js/**").addResourceLocations("/resources/core/js/");
+
     registry.addResourceHandler("/webjars/**").addResourceLocations("/webjars/");
+
+    // Imágenes de las canchas y perfiles
+    registry.addResourceHandler("/uploads/**").addResourceLocations("/uploads/");
   }
 
   // https://www.thymeleaf.org/doc/tutorials/3.0/thymeleafspring.html

@@ -92,6 +92,27 @@
             margin-bottom: 30px;
             border: 1px solid #e3ece8;
         }
+
+        /* TARJETAS DE PARTIDOS */
+        .card-partido {
+            border: 1px solid #e3ece8 !important;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-partido:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 22px rgba(0, 60, 46, 0.12) !important;
+        }
+
+        /* IMAGEN DE LA CANCHA */
+        .imagen-cancha {
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+            display: block;
+        }
     </style>
 </head>
 
@@ -108,6 +129,7 @@
             <!-- Pestaña activa -->
             <a class="nav-link active" th:href="@{/partidos}">Partidos</a>
             <a class="nav-link" th:href="@{/ranking}">Ranking</a>
+            <a class="nav-link" th:href="@{/centro-ayuda}">Centro de ayuda</a>
             <a class="nav-link" th:href="@{/perfil}">Mi Perfil</a>
         </div>
         <div class="d-flex align-items-center">
@@ -325,6 +347,7 @@
             + Crear partido
         </a>
 
+
     </div>
 </nav>
 
@@ -358,13 +381,13 @@
                             </select>
                         </div>
 
-                        <!-- Filtro Provincia 
+                        <!-- Filtro Provincia
                         <div class="col-md-4 col-lg-2">
                             <label for="filtroProvincia" class="form-label small fw-bold mb-1">Provincia</label>
                             <select name="filtroProvincia" id="filtroProvincia" class="form-select form-select-sm">
                                 <option value="TODOS" th:selected="${provinciaSeleccionada == null or provinciaSeleccionada == 'TODOS'}">Cualquiera</option>
-                                <option th:each="prov : ${provinciasDisponibles}" 
-                                        th:value="${prov}" 
+                                <option th:each="prov : ${provinciasDisponibles}"
+                                        th:value="${prov}"
                                         th:text="${prov}"
                                         th:selected="${provinciaSeleccionada == prov}">
                                 </option>
@@ -376,8 +399,8 @@
                             <label for="filtroLocalidad" class="form-label small fw-bold mb-1">Localidad</label>
                             <select name="filtroLocalidad" id="filtroLocalidad" class="form-select form-select-sm">
                                 <option value="TODOS" th:selected="${localidadSeleccionada == null or localidadSeleccionada == 'TODOS'}">Cualquiera</option>
-                                <option th:each="loc : ${localidadesDisponibles}" 
-                                        th:value="${loc}" 
+                                <option th:each="loc : ${localidadesDisponibles}"
+                                        th:value="${loc}"
                                         th:text="${loc}"
                                         th:selected="${localidadSeleccionada == loc}">
                                 </option>
@@ -437,6 +460,10 @@
             </div>
 
             <!-- GRILLA DE PARTIDOS -->
+            <div th:if="${param.error != null}" class="alert alert-danger" role="alert">
+                <i class="fa-solid fa-circle-exclamation me-1"></i> <span th:text="${param.error[0]}">Error</span>
+            </div>
+
             <div class="row">
                 <!-- Mensaje si no hay partidos -->
                 <div th:if="${listaPartidos == null or listaPartidos.isEmpty()}" class="col-12 text-center py-5">
@@ -445,7 +472,15 @@
 
                 <!-- Tarjetas -->
                 <div th:each="partido : ${listaPartidos}" class="col-md-6 col-lg-4 mb-4">
-                    <div class="card shadow-sm h-100 border-0" style="border: 1px solid #e3ece8 !important;">
+                    <div class="card card-partido shadow-sm h-100 border-0">
+
+                        <!-- Imagen de la cancha -->
+                        <img th:if="${partido.cancha != null and partido.cancha.id != null}"
+                             th:src="@{'/uploads/canchas/cancha' + ${partido.cancha.id} + '.jpg'}"
+                             class="imagen-cancha"
+                             alt="Imagen de la cancha"
+                             onerror="this.onerror=null; this.src='/uploads/canchas/cancha1.jpg';">
+
                         <div class="card-body d-flex flex-column">
 
                             <h5 class="card-title text-success fw-bold mb-3" th:text="${partido.cancha != null ? partido.cancha.nombre : 'Cancha'}">Cancha</h5>
@@ -479,35 +514,59 @@
                             </div>
 
                             <!-- Acción para unirse -->
-                            <div class="mt-auto" th:with="soyOrganizador=${session.USUARIO != null and partido.organizador != null and partido.organizador.id == session.USUARIO.id},
-                                                        estoyInscripto=${session.USUARIO != null and partido.inscripciones != null and partido.inscripciones.![jugador.usuario.id].contains(session.USUARIO.id)}">
 
-                                <!-- CASO 1: Ya estoy inscripto o soy el creador (Entra directo sin código) -->
+                            <!-- Acción para unirse -->
+                            <div class="mt-auto"
+                                 th:with="soyOrganizador=${session.USUARIO != null and partido.organizador != null and partido.organizador.id == session.USUARIO.id},
+              estoyInscripto=${session.USUARIO != null and partido.inscripciones != null and partido.inscripciones.![jugador.usuario.id].contains(session.USUARIO.id)}">
+
+                                <!-- Organizador o jugador inscripto -->
                                 <a th:if="${soyOrganizador or estoyInscripto}"
-                                th:href="@{/partido/{id}/sala-de-espera(id=${partido.id})}"
-                                class="btn btn-success w-100 fw-bold">
-                                Ir a la sala <i class="fa-solid fa-arrow-right-to-bracket ms-1"></i>
+                                   th:href="@{/partido/{id}/sala-de-espera(id=${partido.id})}"
+                                   class="btn btn-success w-100 fw-bold">
+
+                                    Ir a la sala
+                                    <i class="fa-solid fa-arrow-right-to-bracket ms-1"></i>
                                 </a>
 
-                                <!-- CASO 2: No estoy inscripto y es Privado (Pide código) -->
-                                <form th:if="${!(soyOrganizador or estoyInscripto) and partido.esPrivado != null and partido.esPrivado}"
-                                    th:action="@{/partido/{id}/sala-de-espera(id=${partido.id})}"
-                                    method="GET">
+                                <!-- Partido privado: solicitar código -->
+                                <form th:if="${partido.esPrivado != null and partido.esPrivado and !soyOrganizador and !estoyInscripto}"
+                                      th:action="@{/partido/{id}/unirse(id=${partido.id})}"
+                                      method="POST">
+
                                     <div class="mb-2">
-                                        <input type="text" name="codigoAcceso" class="form-control form-control-sm" placeholder="Ingresá el código de acceso" required>
+                                        <input type="text"
+                                               name="codigoAcceso"
+                                               class="form-control form-control-sm text-uppercase"
+                                               placeholder="Ingresá el código de acceso"
+                                               maxlength="8"
+                                               autocomplete="off"
+                                               required>
                                     </div>
-                                    <button type="submit" class="btn btn-warning text-dark w-100 fw-bold">
-                                        Entrar con código <i class="fa-solid fa-key ms-1"></i>
+
+                                    <button type="submit"
+                                            class="btn btn-warning text-dark w-100 fw-bold">
+
+                                        Entrar con código
+                                        <i class="fa-solid fa-key ms-1"></i>
                                     </button>
                                 </form>
 
-                                <!-- CASO 3: No estoy inscripto y es Público (Botón normal) -->
-                                <a th:if="${!(soyOrganizador or estoyInscripto) and (partido.esPrivado == null or !partido.esPrivado)}"
-                                th:href="@{/partido/{id}/sala-de-espera(id=${partido.id})}"
-                                class="btn btn-outline-success w-100 fw-bold">
-                                Unirme <i class="fa-solid fa-arrow-right ms-1"></i>
-                                </a>
+                                <!-- Partido público -->
+                                <form th:if="${(partido.esPrivado == null or !partido.esPrivado) and !soyOrganizador and !estoyInscripto}"
+                                      th:action="@{/partido/{id}/unirse(id=${partido.id})}"
+                                      method="POST">
+
+                                    <button type="submit"
+                                            class="btn btn-outline-success w-100 fw-bold">
+
+                                        Unirme
+                                        <i class="fa-solid fa-arrow-right ms-1"></i>
+                                    </button>
+                                </form>
+
                             </div>
+
 
                         </div>
                     </div>
