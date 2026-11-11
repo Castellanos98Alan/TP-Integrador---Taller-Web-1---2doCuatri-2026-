@@ -25,15 +25,9 @@ public class CrearPartidoController {
   @GetMapping("/crearPartido")
   public ModelAndView irACrearPartido() {
     ModelAndView model = new ModelAndView("crearPartido");
-
-    DatosCrearPartido datos = new DatosCrearPartido();
-
-    datos.setCodigoDeAcceso(servicioPartido.generarCodigoAcceso());
-
-    model.getModelMap().put("datosPartido", datos);
-    model.getModelMap().put("localidades", servicioPartido.listarLocalidades());
-    model.getModelMap().put("canchas", servicioPartido.listarCanchas());
-
+    model.getModelMap().put("datosPartido", new DatosCrearPartido());
+    model.getModelMap().put("localidades", servicioPartido.listarLocalidades()); // NUEVO
+    model.getModelMap().put("canchas", servicioPartido.listarCanchas()); // NUEVO
     return model;
   }
 

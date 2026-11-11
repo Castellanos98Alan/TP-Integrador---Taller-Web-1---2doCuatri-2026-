@@ -2,7 +2,6 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.*;
-import com.tallerwebi.dominio.excepcion.CodigoAccesoInvalidoException;
 import com.tallerwebi.dominio.servicio.ServicioBalanceoEquipo;
 import com.tallerwebi.dominio.servicio.ServicioEstadistica;
 import com.tallerwebi.dominio.servicio.ServicioJugador;
@@ -179,12 +178,6 @@ public class PartidosController {
       return new ModelAndView(REDIRECT_LOGIN);
     }
 
-    if (!servicioPartido.puedeAccederAPartido(idPartido, usuarioLogueado)) {
-      return new ModelAndView(
-        "redirect:/partidos?error=Necesit%C3%A1s+el+c%C3%B3digo+de+acceso+para+entrar"
-      );
-    }
-
     Map<String, Object> model = new ModelMap();
 
     if (error != null && !error.isBlank()) {
@@ -252,7 +245,6 @@ public class PartidosController {
   @RequestMapping(path = "/partido/{id}/unirse", method = RequestMethod.POST)
   public ModelAndView unirseAlPartido(
     @PathVariable("id") Long idPartido,
-    @RequestParam(value = "codigoAcceso", required = false) String codigoAcceso,
     HttpServletRequest request
   ) {
     HttpSession session = request.getSession();
@@ -265,8 +257,7 @@ public class PartidosController {
 
     try {
       Jugador jugadorLogueado = servicioJugador.buscarPorUsuarioId(usuarioLogueado.getId());
-
-      servicioPartido.unirseAPartido(idPartido, jugadorLogueado, codigoAcceso);
+      servicioPartido.unirseAPartido(idPartido, jugadorLogueado);
 
       return new ModelAndView(REDIRECT_PARTIDO + idPartido + "/sala-de-espera");
     } catch (
@@ -275,12 +266,13 @@ public class PartidosController {
       | JugadorInscripto
       | DiferenciaHoraria
       | RangoJugadorIncompatibleException
-      | CodigoAccesoInvalidoException
       | PartidoNoEncontrado e
     ) {
       String mensajeError = e.getMessage();
       return new ModelAndView(
-        "redirect:/partidos?error=" +
+        REDIRECT_PARTIDO +
+        idPartido +
+        "/sala-de-espera?error=" +
         java.net.URLEncoder.encode(mensajeError, java.nio.charset.StandardCharsets.UTF_8)
       );
     }
