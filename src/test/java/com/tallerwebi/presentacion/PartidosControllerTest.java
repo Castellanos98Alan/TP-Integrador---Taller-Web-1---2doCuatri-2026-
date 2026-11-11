@@ -176,7 +176,7 @@ public class PartidosControllerTest {
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login/"));
   }
 
-  /*@Test
+  @Test
   public void unirseAlPartidoSinSesionDeberiaRedirigirAlLogin() {
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
@@ -188,9 +188,8 @@ public class PartidosControllerTest {
       equalToIgnoringCase("redirect:/login/?error=Debes+iniciar+sesion+para+unirte")
     );
   }
-  */
 
-  /* @Test
+  @Test
   public void unirseAlPartidoConSesionActivaDeberiaRedirigirASalaDeEspera() {
     Usuario usuario = new Usuario();
     usuario.setId(1L);
@@ -210,9 +209,9 @@ public class PartidosControllerTest {
       modelAndView.getViewName(),
       equalToIgnoringCase("redirect:/partido/1/sala-de-espera")
     );
-  }*/
+  }
 
-  /* @Test
+  @Test
   public void unirseAlPartidoConExcepcionDeberiaLanzarError() {
     Usuario usuario = new Usuario();
     usuario.setId(1L);
@@ -240,7 +239,7 @@ public class PartidosControllerTest {
       modelAndView.getViewName(),
       equalToIgnoringCase("redirect:/partido/1/sala-de-espera?error=Cupo+maximo+alcanzado")
     );
-  }*/
+  }
 
   private void thenLaVistaEs(String vistaEsperada, ModelAndView mav) {
     assertThat(vistaEsperada, equalTo(mav.getViewName()));
@@ -651,7 +650,6 @@ public class PartidosControllerTest {
     partidoMock.setOrganizador(usuarioLogueado); // Para pasar validación de esParticipante
 
     givenSesion(usuarioLogueado);
-    when(servicioPartidoMock.puedeAccederAPartido(idPartido, usuarioLogueado)).thenReturn(true);
     when(servicioPartidoMock.buscarPartidoPorId(idPartido)).thenReturn(partidoMock);
 
     // Mocks de estadísticas
@@ -680,7 +678,6 @@ public class PartidosControllerTest {
     Long idPartido = 99L;
     Usuario usuarioLogueado = givenUsuario(1L);
     givenSesion(usuarioLogueado);
-    when(servicioPartidoMock.puedeAccederAPartido(idPartido, usuarioLogueado)).thenReturn(true);
 
     // Simulamos que el servicio lanza la excepción PartidoNoEncontrado
     String mensajeExcepcion = "El partido solicitado no existe";
@@ -701,7 +698,6 @@ public class PartidosControllerTest {
     Long idPartido = 1L;
     Usuario usuarioLogueado = givenUsuario(50L);
     givenSesion(usuarioLogueado);
-    when(servicioPartidoMock.puedeAccederAPartido(idPartido, usuarioLogueado)).thenReturn(true);
 
     Partido partidoMock = new Partido();
     partidoMock.setId(idPartido);
@@ -734,7 +730,6 @@ public class PartidosControllerTest {
     Long idPartido = 1L;
     Usuario usuarioLogueado = givenUsuario(25L);
     givenSesion(usuarioLogueado);
-    when(servicioPartidoMock.puedeAccederAPartido(idPartido, usuarioLogueado)).thenReturn(true);
 
     Partido partidoMock = new Partido();
     partidoMock.setId(idPartido);
@@ -762,7 +757,6 @@ public class PartidosControllerTest {
     Long idPartido = 1L;
     Usuario usuarioLogueado = givenUsuario(10L);
     givenSesion(usuarioLogueado);
-    when(servicioPartidoMock.puedeAccederAPartido(idPartido, usuarioLogueado)).thenReturn(true);
 
     Partido partidoMock = new Partido();
     partidoMock.setId(idPartido);
