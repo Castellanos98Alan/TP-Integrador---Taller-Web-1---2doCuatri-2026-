@@ -37,6 +37,7 @@ public class CrearPartidoController {
     model.getModelMap().put("datosPartido", datos);
     model.getModelMap().put("localidades", servicioPartido.listarLocalidades());
     model.getModelMap().put("canchas", servicioPartido.listarCanchas());
+
     return model;
   }
 

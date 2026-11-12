@@ -32,8 +32,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
   private ServicioSolicitudAmistad servicioSolicitudAmistad;
   private ServicioInvitacionPartido servicioInvitacionPartido;
   private final ServicioBalanceoEquipo servicioBalanceoEquipo;
-  private static final int HORAS_MINIMAS_ENTRE_PARTIDOS = 3;
   private static final String MENSAJE_PARTIDO_NO_EXISTE = "El partido no existe.";
+  private final ValidadorInscripcionPartido validadorInscripcionPartido;
 
   @Autowired
   public ServicioPartidoImpl(
@@ -44,7 +44,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
     ServicioBalanceoEquipo servicioBalanceoEquipo,
     ServicioNotificacion servicioNotificacion,
     ServicioSolicitudAmistad servicioSolicitudAmistad,
-    ServicioInvitacionPartido servicioInvitacionPartido
+    ServicioInvitacionPartido servicioInvitacionPartido,
+    ValidadorInscripcionPartido validadorInscripcionPartido
   ) {
     this.repositorioCancha = repositorioCancha;
     this.repositorioPartido = repositorioPartido;
@@ -54,6 +55,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
     this.servicioNotificacion = servicioNotificacion;
     this.servicioSolicitudAmistad = servicioSolicitudAmistad;
     this.servicioInvitacionPartido = servicioInvitacionPartido;
+    this.validadorInscripcionPartido = validadorInscripcionPartido;
   }
 
   //cambiar los runtime a por excepcion por ser
@@ -83,13 +85,25 @@ public class ServicioPartidoImpl implements ServicioPartido {
     partido.setNivel(datos.getNivel());
     partido.setOrganizador(creador);
     partido.setEsPrivado(datos.getEsPrivado());
-    partido.setEstado(EstadoPartido.PENDIENTE);
 
     if (Boolean.TRUE.equals(datos.getEsPrivado())) {
-      partido.setCodigoDeAcceso(UUID.randomUUID().toString().substring(0, 8));
+      partido.setCodigoDeAcceso(obtenerCodigoParaPartido(datos.getCodigoDeAcceso()));
     }
 
     repositorioPartido.guardar(partido);
+  }
+
+  private String obtenerCodigoParaPartido(String codigoIngresado) {
+    if (codigoIngresado == null || codigoIngresado.isBlank()) {
+      return generarCodigoAcceso();
+    }
+
+    return codigoIngresado.trim().toUpperCase(Locale.ROOT);
+  }
+
+  @Override
+  public String generarCodigoAcceso() {
+    return UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase(Locale.ROOT);
   }
 
   private void validarCanchaDisponible(Cancha cancha, LocalDateTime fechaHora) {
@@ -153,16 +167,20 @@ public class ServicioPartidoImpl implements ServicioPartido {
 
   @Override
   public void unirseAPartido(Long partidoId, Jugador usuarioLogueadoJugador) {
+    unirseAPartido(partidoId, usuarioLogueadoJugador, null);
+  }
+
+  @Override
+  public void unirseAPartido(Long partidoId, Jugador usuarioLogueadoJugador, String codigoAcceso) {
     Partido partido = buscarPartidoPorId(partidoId);
 
     if (partido == null) {
-      throw new PartidoNoEncontrado("El partido" + partidoId + " no existe.");
+      throw new PartidoNoEncontrado("El partido " + partidoId + " no existe.");
     }
 
-    validarEstadoDelPartido(partido);
-    validarRangoJugador(partido, usuarioLogueadoJugador); // Axel sprint 4
-    validarCuposYDisponibilidad(partido, usuarioLogueadoJugador);
-    validarHorarioParaInscripcion(partido, usuarioLogueadoJugador);
+    validarCodigoDeAcceso(partido, usuarioLogueadoJugador, codigoAcceso);
+
+    validadorInscripcionPartido.validarInscripcion(partido, usuarioLogueadoJugador);
 
     InscripcionPartido nuevaInscripcion = new InscripcionPartido(partido, usuarioLogueadoJugador);
 
@@ -171,8 +189,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
     partido.getInscripciones().add(nuevaInscripcion);
     partido.setCantJugadores(partido.getInscripciones().size());
 
-    // Disparador del balanceo automático
     int cupoMaximo = partido.getCupoMaximo();
+
     if (partido.getCantJugadores() == cupoMaximo) {
       servicioBalanceoEquipo.balancearEquipos(partido);
       servicioBalanceoEquipo.asignarCapitanes(partido);
@@ -182,142 +200,32 @@ public class ServicioPartidoImpl implements ServicioPartido {
     repositorioPartido.modificar(partido);
   }
 
-  // Axel sprint 4
-  private void validarRangoJugador(Partido partido, Jugador jugador) {
-    String categoriaJugador = obtenerCategoriaRango(jugador.getNivel());
-    String categoriaPartido = obtenerCategoriaRango(partido.getNivel());
+  private void validarCodigoDeAcceso(Partido partido, Jugador jugador, String codigoAcceso) {
+    Usuario usuario = jugador.getUsuario();
 
-    if (categoriaJugador == null || categoriaPartido == null) {
-      throw new RangoJugadorIncompatibleException(
-        "El rango del jugador o del partido no es válido."
-      );
-    }
-
-    if (!categoriaJugador.equals(categoriaPartido)) {
-      throw new RangoJugadorIncompatibleException(
-        "No podes unirte a este partido porque no corresponde a tu rango."
-      );
-    }
-  }
-
-  private String obtenerCategoriaRango(String nivel) {
-    if (nivel == null) {
-      return null;
-    }
-
-    String rango = nivel.trim().toUpperCase(Locale.ROOT);
-
-    if (esRangoAvanzado(rango)) {
-      return "AVANZADO";
-    }
-
-    if (esRangoIntermedio(rango)) {
-      return "INTERMEDIO";
-    }
-
-    if (esRangoBajo(rango)) {
-      return "BAJO";
-    }
-
-    return null;
-  }
-
-  private boolean esRangoAvanzado(String rango) {
-    return Set.of("SS", "S", "AVANZADO").contains(rango);
-  }
-
-  private boolean esRangoIntermedio(String rango) {
-    return Set.of("A", "B", "INTERMEDIO").contains(rango);
-  }
-
-  private boolean esRangoBajo(String rango) {
-    return Set.of("C", "D", "BAJO", "PRINCIPIANTE").contains(rango);
-  }
-
-  //Metodo privado que valida el estado del partido, con esto logro ver si el partido tiene estado Finalizado o Cancelado
-  //si es asi, entonces el usuario no podra ingresar al partido.
-  private void validarEstadoDelPartido(Partido partido) {
-    if (
-      partido.getEstado() != EstadoPartido.PENDIENTE && partido.getEstado() != EstadoPartido.ACTIVO
-    ) {
-      throw new EstadoPartidoInvalido("No se puede unir a un partido finalizado o cancelado.");
-    }
-  }
-
-  //Metodo privado que valida los cupos de la lista de Inscripciones, donde primero valido si la lista es nula
-  //si es asi, entonces inicializo la lista de inscripciones. Luego de eso valido si el usuarioLogueado esta dentro de la lista
-  //confirmados, si es asi significa que el usuario ya esta dentro de la sala de espera.
-  //Por ultimo valido que el partido tenga un cupo maximo de jugadores, para luego validar si los usuarios anotados supera el
-  //cupo maximo de jugadores
-  private void validarCuposYDisponibilidad(Partido partido, Jugador usuarioLogueadoJugador) {
-    if (partido.getInscripciones() == null) {
-      partido.setInscripciones(new ArrayList<>());
-    }
-
-    boolean inscripto = partido
-      .getInscripciones()
-      .stream()
-      .anyMatch(i -> i.getJugador().getId().equals(usuarioLogueadoJugador.getId()));
-
-    if (inscripto) {
-      throw new JugadorInscripto("Ya estas anotado en la sala de espera de este partido.");
-    }
-
-    if (
-      partido.getCupoMaximo() != null &&
-      partido.getInscripciones().size() >= partido.getCupoMaximo()
-    ) {
-      throw new CupoMaximoAlcanzado("Cupo maximo alcanzado.");
-    }
-  }
-
-  //Este metodo valida la diferencia horaria entre un partido que el usuario ya esta inscripto y el partido nuevo al cual
-  //se quiere inscribir, esto para manejar mejor la logica de negocio y que un usuario pueda ingresar a varios partidos en
-  //el mismo dia, solamente que tendra una diferencia horaria de al menos 3 horas para poder inscribirse.
-  //Utilice ChronoUnit.HOURS para poder comparar la fecha del partido donde ya esta inscripto y la fecha del nuevo partido.
-  //Luego hago una validacion donde utilizo el metodo abs de la clase Math para poder manejar los numeros positivos y negativos.
-  //Esto para poder compararlo con la CONSTANTE de HORAS_MINIMAS_ENTRE_PARTIDOS que es el minimo de horas que tiene
-  //que pasar para que un usuario pueda ingresar a otro partido.
-  private void validarDiferenciaHoraria(
-    LocalDateTime fechaYHoraExistente,
-    LocalDateTime fechaHoraNuevoPartido
-  ) {
-    if (fechaYHoraExistente == null) {
-      return;
-    }
-
-    long horasDeDiferencia = java.time.temporal.ChronoUnit.HOURS.between(
-      fechaYHoraExistente,
-      fechaHoraNuevoPartido
+    ControlAccesoPartido.validarCodigo(
+      partido,
+      usuario,
+      codigoAcceso,
+      () -> servicioNotificacion.existeInvitacionParaPartido(usuario.getId(), partido.getId())
     );
-
-    if (Math.abs(horasDeDiferencia) < HORAS_MINIMAS_ENTRE_PARTIDOS) {
-      throw new DiferenciaHoraria(
-        "No podes unirte, es necesario que haya al menos 3 horas de diferencia (" +
-        fechaYHoraExistente.format(
-          java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-        ) +
-        ")."
-      );
-    }
   }
 
-  //Este metodo sirve para poder validar el horario para que el usuario pueda inscribirse, en este metodo
-  //buscamos directamente los partidos del usuario, donde mandaremos todos los datos al momento de utilizar
-  //validarDiferenciaHoraria para que haga la comparacion de las fechas.
-  private void validarHorarioParaInscripcion(Partido partidoNuevo, Jugador usuarioLogueadoJugador) {
-    List<Partido> partidosUsuarioJugador = repositorioPartido.buscarPartidosPorJugador(
-      usuarioLogueadoJugador.getId()
+  @Override
+  public boolean puedeAccederAPartido(Long partidoId, Usuario usuario) {
+    Partido partido = buscarPartidoPorId(partidoId);
+
+    if (partido == null) {
+      throw new PartidoNoEncontrado("El partido " + partidoId + " no existe.");
+    }
+
+    return ControlAccesoPartido.tieneAcceso(
+      partido,
+      usuario,
+      () ->
+        usuario != null &&
+        servicioNotificacion.existeInvitacionParaPartido(usuario.getId(), partido.getId())
     );
-    LocalDateTime fechaHoraNuevoPartido = partidoNuevo.getFecha();
-
-    if (fechaHoraNuevoPartido == null) {
-      return;
-    }
-
-    for (Partido partidoExistente : partidosUsuarioJugador) {
-      validarDiferenciaHoraria(partidoExistente.getFecha(), fechaHoraNuevoPartido);
-    }
   }
 
   @Override

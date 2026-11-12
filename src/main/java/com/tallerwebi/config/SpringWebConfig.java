@@ -31,8 +31,12 @@ public class SpringWebConfig implements WebMvcConfigurer {
   @Override
   public void addResourceHandlers(final ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/css/**").addResourceLocations("/resources/core/css/");
+
     registry.addResourceHandler("/js/**").addResourceLocations("/resources/core/js/");
+
     registry.addResourceHandler("/webjars/**").addResourceLocations("/webjars/");
+
+    // Imágenes de las canchas y perfiles
     registry.addResourceHandler("/uploads/**").addResourceLocations("/uploads/");
   }
 

@@ -13,6 +13,8 @@ public interface ServicioPartido {
   void crearPartido(DatosCrearPartido datos, Usuario creador);
   void cancelarPartido(Long partidoId, Usuario usuarioLogueado);
   void unirseAPartido(Long partidoId, Jugador usuarioLogueadoJugador);
+  void unirseAPartido(Long partidoId, Jugador jugador, String codigoAcceso);
+  boolean puedeAccederAPartido(Long partidoId, Usuario usuario);
   void abandonarPartido(Long partidoId, Jugador jugador);
   void expulsarJugador(Long partidoId, Long idJugadorAExpulsar, Usuario organizador);
 
@@ -23,5 +25,6 @@ public interface ServicioPartido {
   void invitarJugador(Long idPartido, Long idJugador, Usuario usuarioQueInvita)
     throws InvitacionAlPartidoException;
   List<Partido> buscarPartidosPorJugador(Long idJugador);
+
   String generarCodigoAcceso();
 }
