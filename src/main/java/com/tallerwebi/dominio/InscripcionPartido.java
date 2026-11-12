@@ -24,6 +24,9 @@ public class InscripcionPartido {
 
   private Boolean confirmado = true;
 
+  @Column(nullable = false)
+  private Boolean recordatorioEnviado = false;
+
   private boolean esCapitan;
 
   private LocalDateTime fechaInscripcion;
@@ -89,5 +92,13 @@ public class InscripcionPartido {
 
   public void setFechaInscripcion(LocalDateTime fechaInscripcion) {
     this.fechaInscripcion = fechaInscripcion;
+  }
+
+  public Boolean getRecordatorioEnviado() {
+    return recordatorioEnviado;
+  }
+
+  public void setRecordatorioEnviado(Boolean recordatorioEnviado) {
+    this.recordatorioEnviado = recordatorioEnviado;
   }
 }

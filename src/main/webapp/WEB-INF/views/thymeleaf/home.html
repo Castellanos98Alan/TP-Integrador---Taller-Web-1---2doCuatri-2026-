@@ -1,58 +1,225 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - ArmoLaCancha</title>
 
-  <title>Taller Web I</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-  <!-- Boostrap core css -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 
-  <!-- custom style -->
-  <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background-color: #f4f7f6;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #17332b;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+
+        /* NAVBAR */
+        .navbar-principal { background-color: #003c2e; padding: 12px 35px; }
+        .marca { color: white; font-size: 25px; font-weight: bold; text-decoration: none; }
+        .marca span { color: #50e3a4; }
+        .nav-link { color: white !important; margin: 0 10px; }
+        .nav-link.active { color: #ffe600 !important; border-bottom: 3px solid #ffe600; }
+        .boton-crear {
+            background-color: #ffe600; color: #18352c; font-weight: bold;
+            border-radius: 8px; padding: 10px 20px; text-decoration: none; transition: background-color 0.2s;
+        }
+        .boton-crear:hover { background-color: #f4dc00; color: #18352c; }
+
+        /* HERO */
+        .hero-seccion-video {
+            position: relative; min-height: 80vh; display: flex; align-items: center; padding: 45px;
+            color: white; overflow: hidden;
+        }
+        .hero-video {
+            position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
+            transform: translate(-50%, -50%); z-index: -2; object-fit: cover;
+        }
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, rgba(0, 67, 50, 0.95), rgba(0, 67, 50, 0.75), rgba(0, 67, 50, 0.55));
+            z-index: -1;
+        }
+        .hero-seccion-video small { color: #67e6ad; font-weight: bold; letter-spacing: 2px; }
+        .hero-seccion-video h1 { font-size: 55px; font-weight: 800; margin-top: 10px; margin-bottom: 15px; }
+        .hero-seccion-video h1 span { color: #61e7ae; }
+        .hero-seccion-video p { font-size: 20px; margin-bottom: 30px; max-width: 600px; }
+
+        /* CONTENIDO PRINCIPAL Y CARRUSEL */
+        .contenido-principal {
+            position: relative; z-index: 10; margin-top: -40px; background-color: #f4f7f6;
+            border-radius: 25px 25px 0 0; padding: 40px 30px; flex-grow: 1;
+        }
+        .titulo-seccion { color: #003c2e; font-weight: 800; margin-bottom: 25px; font-size: 28px; text-align: center;}
+        .titulo-seccion i { color: #006747; margin-right: 8px; }
+        
+        .carousel-item img {
+            height: 400px;
+            object-fit: cover;
+            border-radius: 15px;
+            filter: brightness(0.8);
+        }
+        .carousel-caption {
+            background: rgba(0, 60, 46, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            bottom: 30px;
+        }
+
+        /* FOOTER (Idéntico a perfil.html) */
+        .footer {
+            background-color: #003c2e;
+            color: #8da49d;
+            text-align: center;
+            padding: 25px 20px;
+            font-size: 14px;
+            margin-top: auto;
+        }
+        .footer p { margin-bottom: 0; }
+        .footer span { color: #50e3a4; margin: 0 8px; }
+    </style>
 
 </head>
 
 <body>
 
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="#">UNLAM</a>
-  </nav>
-
-  <main role="main" class="container">
-    <div class="container">
-      <h1>Bienvenidos a Taller Web 1</h1>
-
-      <a href="http://localhost:8080/spring/login" class="btn btn-lg btn-primary btn-block">Volver</a>
+<nav class="navbar navbar-expand-lg navbar-principal sticky-top">
+    <!-- Navbar reducida por legibilidad, copiá tu Navbar completo con la campanita aquí -->
+    <div class="container-fluid">
+        <a class="marca" th:href="@{/home}"><i class="fa-solid fa-futbol"></i> ArmoLaCancha</a>
+        <div class="navbar-nav ms-auto me-auto">
+            <a class="nav-link active" th:href="@{/home}">Inicio</a>
+            <a class="nav-link" th:href="@{/partidos}">Partidos</a>
+            <a class="nav-link" th:href="@{/ranking}">Ranking</a>
+            <a class="nav-link" th:href="@{/perfil}">Mi Perfil</a>
+            <!-- Nuevo enlace al Centro de Ayuda -->
+            <a class="nav-link" th:href="@{/centro-ayuda}">Centro de Ayuda</a>
+        </div>
+        <div class="d-flex align-items-center">
+            <a class="boton-crear" th:href="@{/crearPartido}">+ Crear partido</a>
+        </div>
     </div>
+</nav>
 
+<section class="hero-seccion-video">
+    <video class="hero-video" autoplay loop muted playsinline>
+        <source th:src="@{uploads/videos/partidoEnJuego.mp4}" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="container position-relative z-1">
+        <small>MÁS FÚTBOL. MÁS AMIGOS. MENOS LÍO.</small>
+        <h1>TU EQUIPO, <span>TU CANCHA</span></h1>
+        <p>Unite a la comunidad más grande de fútbol amateur. Encontrá partidos cerca tuyo, sumá puntos en el ranking y armá tu propio encuentro en segundos.</p>
+        <div>
+            <a th:href="@{/partidos}" class="btn btn-success btn-lg me-3 px-4 fw-bold">Buscar Partidos</a>
+            <a th:href="@{/crearPartido}" class="btn btn-outline-light btn-lg px-4 fw-bold">Armar el mío</a>
+        </div>
+    </div>
+</section>
 
-    <a href="http://localhost:8080/spring/partidos">partidos</a>
+<div class="container-fluid contenido-principal">
+    
+    <!-- SECCIÓN 1: CARRUSEL (Centrado y más angosto) -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <h2 class="titulo-seccion"><i class="fa-solid fa-map-location-dot"></i> Canchas Destacadas</h2>
+            
+            <!-- Carrusel de Bootstrap -->
+            <div id="canchasCarousel" class="carousel slide shadow-lg rounded-4 overflow-hidden" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div th:each="cancha, estado : ${canchasDestacadas}" 
+                        th:class="${estado.index == 0} ? 'carousel-item active' : 'carousel-item'"
+                        data-bs-interval="3000">
+                        
+                        <img th:src="@{'/' + ${cancha.imagenUrl}}" 
+                          onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1529900965600-71c8eb0f19a6?auto=format&fit=crop&q=80&w=1200&h=400';"
+                          class="d-block w-100" 
+                          alt="Foto de cancha">
+                        
+                        <div class="carousel-caption d-none d-md-block border border-success">
+                            <h4 class="text-warning fw-bold mb-1" th:text="${cancha.nombre}">Nombre Cancha</h4>
+                            <p class="mb-0">
+                                <i class="fa-solid fa-location-dot me-2"></i>
+                                <span th:text="${cancha.localidad}">Localidad</span>
+                            </p>
+                        </div>
+                    </div>
 
-    <a href="http://localhost:8080/spring/perfil">perfil</a>
+                    <!-- Fallback estático -->
+                    <div th:if="${canchasDestacadas == null or canchasDestacadas.isEmpty()}" class="carousel-item active">
+                        <img src="https://images.unsplash.com/photo-1518605368461-1e1e38ce702e?auto=format&fit=crop&q=80&w=1200&h=400" class="d-block w-100" alt="Cancha">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h4 class="text-warning fw-bold">Sumá tu complejo deportivo</h4>
+                            <p>Formá parte de la comunidad ArmoLaCancha.</p>
+                        </div>
+                    </div>
+                </div>
 
-    <a th:href="@{/ranking}">ranking</a>
+                <button class="carousel-control-prev" type="button" data-bs-target="#canchasCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#canchasCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Siguiente</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SECCIÓN 2: 3 PASOS (Ancho completo) -->
+    <section class="py-5" style="background-color: #eef3f1; border-radius: 20px; margin: 0 -30px -40px -30px; padding: 40px 30px;">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="titulo-seccion mb-2">¿Cómo funciona ArmoLaCancha?</h2>
+                <p class="text-muted fs-5">Tu próximo partido a solo tres pasos de distancia.</p>
+            </div>
+            <div class="row text-center g-4">
+                <div class="col-md-4">
+                    <div class="p-4 bg-white border-0 rounded-4 shadow-sm h-100" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle mb-4" style="width: 70px; height: 70px; font-size: 30px;">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                        </div>
+                        <h4 class="fw-bold" style="color: #003c2e;">1. Elegí la cancha</h4>
+                        <p class="text-muted mt-3">Explorá los mejores complejos deportivos de tu zona o dejá que el sistema busque por vos.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 bg-white border-0 rounded-4 shadow-sm h-100" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle mb-4" style="width: 70px; height: 70px; font-size: 30px;">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <h4 class="fw-bold" style="color: #003c2e;">2. Juntá al equipo</h4>
+                        <p class="text-muted mt-3">Creá un partido público para que se sumen nuevos jugadores o hacelo privado solo para amigos.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 bg-white border-0 rounded-4 shadow-sm h-100" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle mb-4" style="width: 70px; height: 70px; font-size: 30px;">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <h4 class="fw-bold" style="color: #003c2e;">3. Jugá y sumá puntos</h4>
+                        <p class="text-muted mt-3">Cargá las estadísticas al finalizar, evaluá a tus compañeros y subí en el ranking general.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <a href="http://localhost:8080/spring/crearPartido">crearPartido</a>
+</div>
 
-    <a href="http://localhost:8080/spring/partidoFinalizado"></a>
-
-
-
-
-
-
-  </main>
-  <!-- /.container -->
-
-  <!-- Boostrap core js -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
-    crossorigin="anonymous"></script>
-
+<footer class="footer">
+    <p class="mb-0">ArmoLaCancha <span>&bull;</span> Conectando jugadores, creando equipos.</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

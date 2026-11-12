@@ -1,5 +1,6 @@
 package com.tallerwebi.infraestructura;
 
+import com.tallerwebi.dominio.Enumeration.CondicionJugador;
 import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
@@ -49,10 +50,7 @@ public class RepositorioEstadisticaImpl implements RepositorioEstadistica {
   }
 
   @Override
-  public List<Estadistica> buscarPorJugadorYCondicion(
-    Jugador jugador,
-    Estadistica.CondicionJugador condicion
-  ) {
+  public List<Estadistica> buscarPorJugadorYCondicion(Jugador jugador, CondicionJugador condicion) {
     String query =
       "SELECT e FROM Estadistica e WHERE e.jugador = :jugador AND e.condicion = :condicion";
 

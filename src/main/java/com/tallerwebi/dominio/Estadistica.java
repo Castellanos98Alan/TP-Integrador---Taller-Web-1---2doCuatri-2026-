@@ -1,14 +1,10 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.Enumeration.CondicionJugador;
 import jakarta.persistence.*;
 
 @Entity
 public class Estadistica {
-
-  public enum CondicionJugador {
-    LOCAL,
-    VISITANTE,
-  }
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -7,6 +7,6 @@ public interface RepositorioCancha {
   Cancha buscarPorNombre(String nombre);
 
   List<Cancha> buscarTodas();
-
+  List<Cancha> buscarDestacadas(Integer limite);
   List<String> buscarLocalidades();
 }

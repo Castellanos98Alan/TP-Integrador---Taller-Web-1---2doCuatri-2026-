@@ -7,6 +7,8 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.servicio.ServicioPartido;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpSession;
@@ -18,11 +20,17 @@ public class CrearPartidoControllerTest {
   private CrearPartidoController controlador;
   private MockHttpSession session;
 
+  private HttpServletRequest requestMock;
+  private HttpSession sessionMock;
+
   @BeforeEach
   public void init() {
     servicioPartido = mock(ServicioPartido.class);
     controlador = new CrearPartidoController(servicioPartido);
     session = new MockHttpSession();
+
+    requestMock = mock(HttpServletRequest.class);
+    sessionMock = mock(HttpSession.class);
   }
 
   @Test
@@ -77,7 +85,10 @@ public class CrearPartidoControllerTest {
   // Métodos auxiliares: Ejecución
 
   private ModelAndView whenSePideIrACrearPartido() {
-    return controlador.irACrearPartido();
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(new Usuario());
+
+    return controlador.irACrearPartido(requestMock);
   }
 
   private ModelAndView whenSeIntentaCrearPartido(DatosCrearPartido datos) {

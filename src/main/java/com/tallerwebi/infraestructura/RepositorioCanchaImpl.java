@@ -38,4 +38,14 @@ public class RepositorioCanchaImpl implements RepositorioCancha {
     String query = "select distinct c.localidad from Cancha c order by c.localidad";
     return sessionFactory.getCurrentSession().createQuery(query, String.class).getResultList();
   }
+
+  @Override
+  public List<Cancha> buscarDestacadas(Integer limite) {
+    String query = "select c from Cancha c order by c.id desc";
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(query, Cancha.class)
+      .setMaxResults(limite)
+      .getResultList();
+  }
 }

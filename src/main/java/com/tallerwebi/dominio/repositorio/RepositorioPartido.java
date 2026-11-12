@@ -22,4 +22,6 @@ public interface RepositorioPartido {
   List<Partido> buscarPartidosPorJugador(Long idJugador);
 
   List<Partido> buscarPartidosEnRango(Long canchaId, LocalDateTime inicio, LocalDateTime fin);
+
+  List<Partido> buscarPartidosParaRecordatorio(LocalDateTime inicio, LocalDateTime fin);
 }
