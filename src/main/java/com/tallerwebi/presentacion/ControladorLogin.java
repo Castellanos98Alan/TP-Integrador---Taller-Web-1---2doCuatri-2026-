@@ -26,7 +26,7 @@ public class ControladorLogin {
     this.servicioLogin = servicioLogin;
   }
 
-  @RequestMapping("/login")
+  @RequestMapping(path = { "/login", "/login/" }, method = RequestMethod.GET)
   public ModelAndView irALogin() {
     Map<String, Object> modelo = new ModelMap();
     modelo.put("datosLogin", new DatosLogin());

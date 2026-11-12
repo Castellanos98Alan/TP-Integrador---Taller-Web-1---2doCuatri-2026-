@@ -87,7 +87,6 @@
         .footer p { margin-bottom: 0; }
         .footer span { color: #50e3a4; margin: 0 8px; }
     </style>
-
 </head>
 
 <body>
@@ -110,9 +109,10 @@
     </div>
 </nav>
 
+
 <section class="hero-seccion-video">
     <video class="hero-video" autoplay loop muted playsinline>
-        <source th:src="@{uploads/videos/partidoEnJuego.mp4}" type="video/mp4">
+        <source th:src="@{/uploads/videos/partidoEnJuego.mp4}" type="video/mp4">
     </video>
     <div class="hero-overlay"></div>
     <div class="container position-relative z-1">
@@ -140,10 +140,18 @@
                         th:class="${estado.index == 0} ? 'carousel-item active' : 'carousel-item'"
                         data-bs-interval="3000">
                         
-                        <img th:src="@{'/' + ${cancha.imagenUrl}}" 
-                          onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1529900965600-71c8eb0f19a6?auto=format&fit=crop&q=80&w=1200&h=400';"
-                          class="d-block w-100" 
-                          alt="Foto de cancha">
+                        <!-- Si la cancha TIENE una imagen guardada en la base de datos -->
+                        <img th:if="${cancha.imagenUrl != null and !cancha.imagenUrl.isEmpty()}" 
+                            th:src="@{|/${cancha.imagenUrl}|}" 
+                            class="d-block w-100" 
+                            alt="Foto de cancha"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1529900965600-71c8eb0f19a6?auto=format&fit=crop&q=80&w=1200&h=400';">
+
+                        <!-- Si el campo en la base de datos es NULL o está vacío, muestra la de por defecto -->
+                        <img th:unless="${cancha.imagenUrl != null and !cancha.imagenUrl.isEmpty()}" 
+                            src="https://images.unsplash.com/photo-1529900965600-71c8eb0f19a6?auto=format&fit=crop&q=80&w=1200&h=400" 
+                            class="d-block w-100" 
+                            alt="Cancha genérica">
                         
                         <div class="carousel-caption d-none d-md-block border border-success">
                             <h4 class="text-warning fw-bold mb-1" th:text="${cancha.nombre}">Nombre Cancha</h4>

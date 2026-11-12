@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implementación del servicio de gestión de partidos.
+ */
 @Service("servicioPartido")
 @Transactional
 public class ServicioPartidoImpl implements ServicioPartido {
@@ -118,15 +121,9 @@ public class ServicioPartidoImpl implements ServicioPartido {
 
   @Override
   public void cancelarPartido(Long partidoId, Usuario usuarioLogueado) {
-    Partido partido = repositorioPartido.buscarPorId(partidoId);
-    if (partido == null) throw new RuntimeException("El partido no existe.");
+    Partido partido = obtenerPartidoValidado(partidoId);
 
-    if (
-      partido.getOrganizador() == null ||
-      !partido.getOrganizador().getId().equals(usuarioLogueado.getId())
-    ) {
-      throw new RuntimeException("No estas autorizado para cancelar este partido.");
-    }
+    validarOrganizador(partido, usuarioLogueado, "No estas autorizado para cancelar este partido.");
 
     if (partido.getEstado() == Partido.EstadoPartido.FINALIZADO) {
       throw new RuntimeException("No se puede cancelar un partido que ya finalizo.");
@@ -135,11 +132,9 @@ public class ServicioPartidoImpl implements ServicioPartido {
     partido.cancelarPartido();
     repositorioPartido.modificar(partido);
 
-    List<Usuario> jugadores = partido.getConfirmados();
-
-    for (Usuario jugador : jugadores) {
-      servicioNotificacion.notificarCancelacion(jugador, partido);
-    }
+    partido
+      .getConfirmados()
+      .forEach(jugador -> servicioNotificacion.notificarCancelacion(jugador, partido));
   }
 
   //Utilice el Transactional para que no se me cierre la sesion al momento de ejecutar el metodo,
@@ -354,7 +349,9 @@ public class ServicioPartidoImpl implements ServicioPartido {
   @Override
   public void expulsarJugador(Long partidoId, Long idJugadorAExpulsar, Usuario organizador) {
     Partido partido = obtenerPartidoValidado(partidoId);
-    validarOrganizador(partido, organizador);
+
+    validarOrganizador(partido, organizador, "Solo el organizador puede expulsar jugadores.");
+
     validarPartidoModificable(
       partido,
       "No puedes expulsar jugadores de un partido que ya está en curso o finalizado."
@@ -367,18 +364,23 @@ public class ServicioPartidoImpl implements ServicioPartido {
     removerInscripcionYGuardar(partido, inscripcion);
   }
 
+  @Override
+  public String generarCodigoAcceso() {
+    return UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase(Locale.ROOT);
+  }
+
   private Partido obtenerPartidoValidado(Long partidoId) {
     Partido partido = buscarPartidoPorId(partidoId);
     if (partido == null) throw new RuntimeException(MENSAJE_PARTIDO_NO_EXISTE);
     return partido;
   }
 
-  private void validarOrganizador(Partido partido, Usuario organizador) {
+  private void validarOrganizador(Partido partido, Usuario organizador, String mensajeError) {
     if (
       partido.getOrganizador() == null ||
       !partido.getOrganizador().getId().equals(organizador.getId())
     ) {
-      throw new RuntimeException("Solo el organizador puede expulsar jugadores.");
+      throw new RuntimeException(mensajeError);
     }
   }
 
