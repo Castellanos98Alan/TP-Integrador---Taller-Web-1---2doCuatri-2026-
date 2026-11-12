@@ -279,11 +279,237 @@
             <a class="nav-link" th:href="@{/home}">Inicio</a>
             <a class="nav-link" th:href="@{/partidos}">Partidos</a>
             <a class="nav-link" th:href="@{/ranking}">Ranking</a>
+            <a class="nav-link" th:href="@{/centro-ayuda}">
+                Centro de ayuda
+            </a>
             <a class="nav-link" th:href="@{/perfil}">Mi Perfil</a>
         </div>
 
+        <!-- CAMPANITA -->
+        <div class="dropdown me-3">
+
+            <button
+                    type="button"
+                    class="btn text-white position-relative"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+
+                <i class="fa-solid fa-bell"></i>
+
+                <span
+                        th:if="${cantidadNotificaciones != null
+                             and cantidadNotificaciones > 0}"
+                        class="position-absolute top-0 start-100
+                            translate-middle badge rounded-pill bg-danger"
+                        th:text="${cantidadNotificaciones}">
+                                             0
+                    </span>
+
+            </button>
+
+
+            <div
+                    class="dropdown-menu dropdown-menu-end p-3"
+                    style="width: 340px;">
+
+                <h6 class="fw-bold mb-3">
+                    Notificaciones
+                </h6>
+
+                <div
+                        th:each="notificacion : ${notificaciones}"
+                        class="border-bottom py-2">
+
+                    <div
+                            th:if="${notificacion.tipoDeNotificacion.name()
+                                    == 'INVITACION_PARTIDO'}">
+
+                        <strong>⚽ Invitación a partido</strong>
+
+                        <p
+                                class="mb-1"
+                                th:text="${notificacion.mensaje}">
+                        </p>
+
+                        <form th:action="@{/notificacion/marcar-leida}"
+                              method="post">
+
+                            <input type="hidden"
+                                   name="idNotificacion"
+                                   th:value="${notificacion.id}">
+
+                            <input type="hidden"
+                                   name="volverA"
+                                   th:value="'/partido/' + ${notificacion.partido.id} + '/sala-de-espera'">
+
+                            <button type="submit"
+                                    class="btn btn-sm btn-success mt-1">
+                                Ver partido
+                            </button>
+
+                        </form>
+
+                    </div>
+
+
+                    <div
+                            th:if="${notificacion.tipoDeNotificacion.name()
+                                    == 'PARTIDO_CANCELADO'}">
+
+                        <strong>❌ Partido cancelado</strong>
+
+                        <p
+                                class="mb-1"
+                                th:text="${notificacion.mensaje}">
+                        </p>
+
+                        <form
+                                th:action="@{/notificacion/marcar-leida}"
+                                method="post">
+
+                            <input
+                                    type="hidden"
+                                    name="idNotificacion"
+                                    th:value="${notificacion.id}">
+
+                            <input
+                                    type="hidden"
+                                    name="volverA"
+                                    value="/perfil">
+
+                            <button
+                                    type="submit"
+                                    class="btn btn-sm btn-outline-secondary mt-1">
+
+                                Marcar como leída
+                            </button>
+
+                        </form>
+
+                    </div>
+
+
+                    <div
+                            th:if="${notificacion.tipoDeNotificacion.name()
+                                    == 'FORMULARIO_COMPLETADO'}">
+
+                        <strong>📋 Formulario completado</strong>
+
+                        <p
+                                class="mb-1"
+                                th:text="${notificacion.mensaje}">
+                        </p>
+
+
+                        <a
+                                th:href="@{'/partido/' + ${notificacion.partido.id}}"
+                                class="btn btn-sm btn-outline-success mt-1">
+
+                            Ver revisión
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                        th:if="${cantidadNotificaciones == 0}"
+                        class="text-muted text-center py-2">
+
+                    No tenés notificaciones.
+                </div>
+
+
+                <div
+                        th:if="${solicitudesPendientes != null}"
+                        th:each="solicitud : ${solicitudesPendientes}"
+                        class="border-bottom py-2">
+
+                    <div>
+
+                        <strong
+                                th:text="${solicitud.emisor.nickname}">
+                            Usuario
+                        </strong>
+
+                        <span>
+                    quiere agregarte como amigo.
+                </span>
+
+                    </div>
+
+
+                    <div class="d-flex gap-2 mt-2">
+
+                        <form th:action="@{/amistad/aceptar}" method="post">
+
+                            <input type="hidden"
+                                   name="idSolicitud"
+                                   th:value="${solicitud.id}">
+
+                            <!-- Si estoy en MI perfil -->
+                            <input th:if="${esMiPerfil}"
+                                   type="hidden"
+                                   name="volverA"
+                                   value="/perfil">
+
+                            <!-- Si estoy viendo OTRO perfil -->
+                            <input th:unless="${esMiPerfil}"
+                                   type="hidden"
+                                   name="volverA"
+                                   th:value="'/perfil/' + ${idUsuarioPerfil}">
+
+                            <button type="submit"
+                                    class="btn btn-success btn-sm">
+                                Aceptar
+                            </button>
+
+                        </form>
+
+
+                        <form
+                                th:action="@{/amistad/rechazar}"
+                                method="post">
+
+                            <input
+                                    type="hidden"
+                                    name="idSolicitud"
+                                    th:value="${solicitud.id}">
+
+                            <!-- Si estoy en MI perfil -->
+                            <input th:if="${esMiPerfil}"
+                                   type="hidden"
+                                   name="volverA"
+                                   value="/perfil">
+
+                            <!-- Si estoy viendo OTRO perfil -->
+                            <input th:unless="${esMiPerfil}"
+                                   type="hidden"
+                                   name="volverA"
+                                   th:value="'/perfil/' + ${idUsuarioPerfil}">
+
+                            <button
+                                    type="submit"
+                                    class="btn btn-outline-danger btn-sm">
+
+                                Rechazar
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
         <a class="boton-crear" th:href="@{/crearPartido}">
-            Crear partido
+            + Crear partido
         </a>
     </div>
 </nav>
@@ -417,23 +643,32 @@
                             </div>
                         </div>
 
-                        <!-- CONTENEDOR DINÁMICO DEL CÓDIGO (Visible si es privado) -->
+                        <!-- CÓDIGO DE ACCESO (visible si es privado). Es el mismo que se guarda al crear el partido -->
                         <div class="row" id="contenedorCodigo" style="display: none;">
                             <div class="col-12 mb-4">
-                                <div class="p-3 rounded border border-warning" style="background-color: #fffdf0;">
-                                    <label for="codigoDeAcceso" class="form-label text-dark fw-bold mb-1">
-                                        <i class="fa-solid fa-key text-warning me-1"></i> Código de acceso de tu partido:
+                                <div class="p-3 rounded border border-warning"
+                                     style="background-color: #fffdf0;">
+
+                                    <label for="codigoDeAcceso"
+                                           class="form-label text-dark fw-bold mb-1">
+                                        <i class="fa-solid fa-key text-warning me-1"></i>
+                                        Código de acceso de tu partido:
                                     </label>
+
                                     <div class="input-group">
                                         <input type="text"
                                                id="codigoDeAcceso"
                                                class="form-control font-monospace fw-bold fs-5 bg-white"
                                                th:field="*{codigoDeAcceso}"
                                                readonly>
-                                        <button type="button" class="btn btn-outline-secondary" onclick="copiarCodigo()" title="Copiar código">
+
+                                        <button type="button"
+                                                class="btn btn-outline-secondary"
+                                                onclick="copiarCodigo()">
                                             <i class="fa-regular fa-copy"></i> Copiar
                                         </button>
                                     </div>
+
                                     <small class="text-muted mt-1 d-block">
                                         Compartí este código con las personas que quieras invitar.
                                     </small>
@@ -663,31 +898,29 @@
 
 
     // ==========================================
-    // 6. GENERAR Y MOSTRAR CÓDIGO PRIVADO
+    // 6. MOSTRAR EL CÓDIGO PRIVADO (lo genera el servidor al abrir el formulario)
     // ==========================================
 
     const selectEsPrivado = document.getElementById("esPrivado");
     const contenedorCodigo = document.getElementById("contenedorCodigo");
     const inputCodigo = document.getElementById("codigoDeAcceso");
 
-    function generarCodigoAleatorio() {
-        return Math.random().toString(36).substring(2, 10).toUpperCase();
+    // Solo por si el input llegara vacío: 8 letras/números, que es el formato que acepta el servidor.
+    function generarCodigoDeRespaldo() {
+        const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const azar = new Uint32Array(8);
+        crypto.getRandomValues(azar);
+        return Array.from(azar, n => caracteres[n % caracteres.length]).join("");
     }
 
     function toggleCodigoPrivado() {
-
         if (selectEsPrivado.value === "true") {
-
             if (!inputCodigo.value) {
-                inputCodigo.value = generarCodigoAleatorio();
+                inputCodigo.value = generarCodigoDeRespaldo();
             }
-
             contenedorCodigo.style.display = "block";
-
         } else {
-
             contenedorCodigo.style.display = "none";
-            inputCodigo.value = "";
         }
     }
 
