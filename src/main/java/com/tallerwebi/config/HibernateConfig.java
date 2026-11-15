@@ -26,9 +26,8 @@ public class HibernateConfig {
     if (dbHost == null) dbHost = "localhost";
     if (dbPort == null) dbPort = "3306";
     if (dbName == null) dbName = "tallerwebi";
-
     if (dbUser == null) dbUser = "root";
-    if (dbPassword == null) dbPassword = "root123";
+    if (dbPassword == null) dbPassword = "41005584Alan";
 
     String url = String.format(
       "jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=America/Buenos_Aires&allowPublicKeyRetrieval=true",
