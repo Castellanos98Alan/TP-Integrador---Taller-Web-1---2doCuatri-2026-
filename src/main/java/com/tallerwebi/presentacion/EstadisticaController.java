@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class EstadisticaController {
@@ -26,19 +27,17 @@ public class EstadisticaController {
   }
 
   @PostMapping("/partido/{id}/guardar-estadisticas")
-  public ModelAndView guardarEstadisticas(
+  public String guardarEstadisticas(
     @PathVariable("id") Long idPartido,
     @ModelAttribute("formulario") WrapperEstadistica wrapperEstadistica,
     HttpServletRequest request,
-    Model modelo
+    RedirectAttributes redirectAttributes
   ) {
     HttpSession session = request.getSession();
     Usuario usuarioLogueado = (Usuario) session.getAttribute("USUARIO");
 
     if (usuarioLogueado == null) {
-      return new ModelAndView(
-        "redirect:/login?error=Debes+iniciar+sesion+para+realizar+esta+accion"
-      );
+      return "redirect:/login?error=Debes+iniciar+sesion+para+realizar+esta+accion";
     }
 
     try {
@@ -47,18 +46,14 @@ public class EstadisticaController {
         wrapperEstadistica.getEstadisticas()
       );
 
-      return new ModelAndView(
-        "redirect:/partido/" +
-        idPartido +
-        "/sala-de-espera?exito=Estadisticas+guardadas+correctamente"
+      redirectAttributes.addFlashAttribute(
+        "exito",
+        "Las estadisticas se guardaron correctamente, se enviaron al capitan rival para su revision."
       );
+      return "redirect:/partido/" + idPartido + "/sala-de-espera";
     } catch (EstadisticasNoGuardadas e) {
-      return new ModelAndView(
-        "redirect:/partido/" +
-        idPartido +
-        "/cargar-estadisticas?error=" +
-        "No se pudo guardar las estadisticas"
-      );
+      redirectAttributes.addFlashAttribute("error", "No se pudieron guardar las estadisticas.");
+      return "redirect:/partido/" + idPartido + "/cargar-estadisticas";
     }
   }
 }

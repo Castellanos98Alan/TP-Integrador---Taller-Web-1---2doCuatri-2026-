@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Enumeration.EstadoEstadisticas;
 import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
@@ -224,7 +225,7 @@ public class ServicioEstadisticaTest {
 
     verify(repositorioEstadisticaMock, times(1)).guardar(any(Estadistica.class));
 
-    verify(partidoMock, times(1)).setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    verify(partidoMock, times(1)).setEstadoEstadisticas(EstadoEstadisticas.EN_REVISION);
     verify(repositorioPartidoMock, times(1)).guardar(partidoMock);
 
     verify(servicioNotificacionMock, times(1))
@@ -245,7 +246,7 @@ public class ServicioEstadisticaTest {
 
     Partido partido = new Partido();
     partido.setId(1L);
-    partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.EN_REVISION);
     partido.setOrganizador(usuarioOrganizador);
     partido.setEquipo1(equipoLocal);
     partido.setEquipo2(equipoVisitante);
@@ -281,7 +282,7 @@ public class ServicioEstadisticaTest {
 
     Partido partido = new Partido();
     partido.setId(1L);
-    partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.EN_REVISION);
     partido.setOrganizador(usuarioOrganizador);
     partido.setEquipo1(equipoLocal);
     partido.setEquipo2(equipoVisitante);
@@ -332,7 +333,7 @@ public class ServicioEstadisticaTest {
 
     Partido partido = new Partido();
     partido.setId(1L);
-    partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.EN_REVISION);
     partido.setOrganizador(usuarioOrganizador);
     partido.setEquipo1(equipoLocal);
     partido.setEquipo2(equipoVisitante);

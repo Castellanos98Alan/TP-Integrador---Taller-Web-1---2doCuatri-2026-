@@ -1,5 +1,6 @@
 package com.tallerwebi.infraestructura;
 
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import jakarta.persistence.EntityManager;
@@ -70,8 +71,8 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       .getCurrentSession()
       .createQuery(hql.toString(), Partido.class);
 
-    query.setParameter("PENDIENTE", Partido.EstadoPartido.PENDIENTE);
-    query.setParameter("ACTIVO", Partido.EstadoPartido.ACTIVO);
+    query.setParameter("PENDIENTE", EstadoPartido.PENDIENTE);
+    query.setParameter("ACTIVO", EstadoPartido.ACTIVO);
 
     inyectarParametrosFiltro(
       query,
@@ -129,8 +130,8 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       .setParameter("canchaId", canchaId)
       .setParameter("inicio", inicio)
       .setParameter("fin", fin)
-      .setParameter("finalizado", Partido.EstadoPartido.FINALIZADO)
-      .setParameter("cancelado", Partido.EstadoPartido.CANCELADO)
+      .setParameter("finalizado", EstadoPartido.FINALIZADO)
+      .setParameter("cancelado", EstadoPartido.CANCELADO)
       .getResultList();
   }
 
@@ -232,8 +233,8 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
       .createQuery(hql, Partido.class)
       .setParameter("inicio", inicio)
       .setParameter("fin", fin)
-      .setParameter("cancelado", Partido.EstadoPartido.CANCELADO)
-      .setParameter("finalizado", Partido.EstadoPartido.FINALIZADO)
+      .setParameter("cancelado", EstadoPartido.CANCELADO)
+      .setParameter("finalizado", EstadoPartido.FINALIZADO)
       .getResultList();
   }
 }

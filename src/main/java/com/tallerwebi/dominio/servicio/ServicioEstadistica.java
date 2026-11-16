@@ -30,4 +30,8 @@ public interface ServicioEstadistica {
     Partido partido,
     List<Estadistica> estadisticas
   );
+
+  void rechazarEstadisticas(Long idPartido, Usuario usuarioLogueado);
+
+  void confirmarEstadisticas(Long idPartido, Usuario usuarioLogueado);
 }

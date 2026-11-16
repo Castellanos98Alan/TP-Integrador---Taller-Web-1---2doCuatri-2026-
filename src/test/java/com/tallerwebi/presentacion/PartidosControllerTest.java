@@ -14,6 +14,9 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import com.tallerwebi.dominio.excepcion.ConfirmarEstadisticasNoPermitida;
+import com.tallerwebi.dominio.excepcion.RechazarEstadisticasNoPermitida;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.InscripcionPartido;
@@ -739,11 +742,11 @@ public class PartidosControllerTest {
     Partido partidoMock = new Partido();
     partidoMock.setId(idPartido);
 
-    // Creamos un organizador distinto
+
     Usuario organizador = givenUsuario(99L);
     partidoMock.setOrganizador(organizador);
 
-    // Agregamos al usuario logueado a la lista de inscripciones
+
     givenInscripcion(partidoMock, usuarioLogueado);
 
     when(servicioPartidoMock.buscarPartidoPorId(idPartido)).thenReturn(partidoMock);
@@ -754,6 +757,182 @@ public class PartidosControllerTest {
     // Verificación
     assertThat(mav.getViewName(), equalToIgnoringCase("sala-de-espera"));
     assertTrue((Boolean) mav.getModel().get("esParticipante")); // Pasó por el bucle de confirmados en getEsParticipante
+  }
+
+  @Test
+  public void confirmarEstadisticasSinSesionDeberiaRedirigirAlLogin() {
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+
+    String vista = partidosController.confirmarEstadisticas(
+            1L,
+            requestMock,
+            redirectAttributesMock
+    );
+
+    assertEquals("redirect:/login?error=Debes+iniciar+sesion", vista);
+    verify(servicioEstadisticaMock, never()).confirmarEstadisticas(anyLong(), any());
+  }
+
+  @Test
+  public void confirmarEstadisticasExitosoDeberiaRedirigirASalaDeEsperaConMensajeExito() {
+    Long idPartido = 1L;
+    Usuario usuario = givenUsuario(10L);
+    givenSesion(usuario);
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+
+    String vista = partidosController.confirmarEstadisticas(
+            idPartido,
+            requestMock,
+            redirectAttributesMock
+    );
+
+    verify(servicioEstadisticaMock, times(1)).confirmarEstadisticas(idPartido, usuario);
+    verify(redirectAttributesMock, times(1))
+            .addFlashAttribute(
+                    "exito",
+                    "¡Estadisticas aprobadas con exito! El partido ha finalizado correctamente."
+            );
+    assertEquals("redirect:/partido/" + idPartido + "/sala-de-espera", vista);
+  }
+
+  @Test
+  public void confirmarEstadisticasCuandoNoEstaAutorizadoDeberiaRedirigirARevisarConError() {
+    Long idPartido = 1L;
+    Usuario usuario = givenUsuario(10L);
+    givenSesion(usuario);
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+
+    doThrow(new ConfirmarEstadisticasNoPermitida("No estas autorizado para confirmar estas estadisticas."))
+            .when(servicioEstadisticaMock)
+            .confirmarEstadisticas(idPartido, usuario);
+
+    String vista = partidosController.confirmarEstadisticas(
+            idPartido,
+            requestMock,
+            redirectAttributesMock
+    );
+
+    verify(redirectAttributesMock, times(1))
+            .addFlashAttribute("error", "No estas autorizado para confirmar estas estadisticas.");
+    assertEquals("redirect:/partido/" + idPartido + "/revisar-estadisticas", vista);
+  }
+
+  @Test
+  public void rechazarEstadisticasSinSesionDeberiaRedirigirAlLogin() {
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+
+    String vista = partidosController.rechazarEstadisticas(
+            1L,
+            requestMock,
+            redirectAttributesMock
+    );
+
+    assertEquals("redirect:/login?error=Debes+iniciar+sesion", vista);
+    verify(servicioEstadisticaMock, never()).rechazarEstadisticas(anyLong(), any());
+  }
+
+  @Test
+  public void rechazarEstadisticasExitosoDeberiaRedirigirASalaDeEsperaConMensajeExito() {
+    Long idPartido = 1L;
+    Usuario usuario = givenUsuario(10L);
+    givenSesion(usuario);
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+
+    String vista = partidosController.rechazarEstadisticas(
+            idPartido,
+            requestMock,
+            redirectAttributesMock
+    );
+
+    verify(servicioEstadisticaMock, times(1)).rechazarEstadisticas(idPartido, usuario);
+    verify(redirectAttributesMock, times(1))
+            .addFlashAttribute(
+                    "exito",
+                    "Has rechazado las estadisticas correctamente. Se le notifico al organizador para que pueda corregirlas."
+            );
+    assertEquals("redirect:/partido/" + idPartido + "/sala-de-espera", vista);
+  }
+
+  @Test
+  public void rechazarEstadisticasCuandoNoEstaAutorizadoDeberiaRedirigirARevisarConError() {
+    Long idPartido = 1L;
+    Usuario usuario = givenUsuario(10L);
+    givenSesion(usuario);
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+
+    doThrow(new RechazarEstadisticasNoPermitida("No estas autorizado para rechazar estas estadisticas."))
+            .when(servicioEstadisticaMock)
+            .rechazarEstadisticas(idPartido, usuario);
+
+    String vista = partidosController.rechazarEstadisticas(
+            idPartido,
+            requestMock,
+            redirectAttributesMock
+    );
+
+    verify(redirectAttributesMock, times(1))
+            .addFlashAttribute("error", "No estas autorizado para rechazar estas estadisticas.");
+    assertEquals("redirect:/partido/" + idPartido + "/revisar-estadisticas", vista);
+  }
+
+
+  @Test
+  public void verResumenPartidoFinalizadoSinSesionDeberiaRedirigirAlLogin() {
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(null);
+
+    ModelAndView mav = partidosController.verResumenPartidoFinalizado(1L, requestMock);
+
+    assertEquals("redirect:/login?error=Debes+iniciar+sesion", mav.getViewName());
+    verify(servicioPartidoMock, never()).buscarPartidoPorId(anyLong());
+  }
+
+  @Test
+  public void verResumenPartidoFinalizadoCuandoNoExisteDeberiaRedirigirAPerfilConError() {
+    Usuario usuario = givenUsuario(1L);
+    givenSesion(usuario);
+    when(servicioPartidoMock.buscarPartidoPorId(99L)).thenReturn(null);
+
+    ModelAndView mav = partidosController.verResumenPartidoFinalizado(99L, requestMock);
+
+    assertEquals("redirect:/perfil?error=El+partido+no+existe", mav.getViewName());
+  }
+
+  @Test
+  public void verResumenPartidoFinalizadoExitosoDeberiaRetornarVistaResumenYMarcador() {
+    Long idPartido = 1L;
+    Usuario usuario = givenUsuario(1L);
+    Partido partidoMock = new Partido();
+    List<Estadistica> estadisticasMock = List.of(new Estadistica());
+    Map<String, Integer> marcadorMock = Map.of("local", 4, "visitante", 2);
+    Map<String, List<Estadistica>> separadasMock = Map.of(
+            "locales",
+            List.of(new Estadistica()),
+            "visitantes",
+            List.of(new Estadistica())
+    );
+
+    givenSesion(usuario);
+    when(servicioPartidoMock.buscarPartidoPorId(idPartido)).thenReturn(partidoMock);
+    when(servicioEstadisticaMock.obtenerEstadisticasPorPartido(partidoMock))
+            .thenReturn(estadisticasMock);
+    when(servicioEstadisticaMock.calcularMarcadorPartido(partidoMock, estadisticasMock))
+            .thenReturn(marcadorMock);
+    when(servicioEstadisticaMock.obtenerEstadisticasSeparadasPorEquipo(partidoMock, estadisticasMock))
+            .thenReturn(separadasMock);
+
+    ModelAndView mav = partidosController.verResumenPartidoFinalizado(idPartido, requestMock);
+
+    assertEquals("resumen-partido", mav.getViewName());
+    assertEquals(partidoMock, mav.getModel().get("partido"));
+    assertEquals(4, mav.getModel().get("golesLocal"));
+    assertEquals(2, mav.getModel().get("golesVisitante"));
+    assertNotNull(mav.getModel().get("estadisticasLocal"));
+    assertNotNull(mav.getModel().get("estadisticasVisitante"));
   }
 
   @Test
