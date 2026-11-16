@@ -340,6 +340,17 @@ public class PerfilController {
 
       datosPartido.put("fecha", partido.getFecha());
 
+      if (partido.getResultado() != null) {
+        String resultado =
+          partido.getResultado().getGolesLocal() +
+          " - " +
+          partido.getResultado().getGolesVisitante();
+
+        datosPartido.put("resultado", resultado);
+      } else {
+        datosPartido.put("resultado", "Sin resultado");
+      }
+
       for (Estadistica estadistica : estadisticasJugador) {
         if (
           estadistica.getPartido() != null &&
@@ -360,4 +371,6 @@ public class PerfilController {
 
     return historialPartidos;
   }
+  // Agregar si el partido fue ganado o perdido, por cuanto.
+
 }

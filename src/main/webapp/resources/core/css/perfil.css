@@ -867,11 +867,16 @@ a {
     overflow-x: auto;
 }
 
-.tabla-partidos-cabecera {
-    min-width: 460px;
+.tabla-partidos-cabecera,
+.tabla-partido-fila {
+    min-width: 580px;
     display: grid;
-    grid-template-columns: 1fr 2fr 1.3fr 0.5fr 0.5fr 0.8fr;
+    grid-template-columns: minmax(88px, 1fr) minmax(120px, 1.5fr) repeat(4, minmax(46px, 0.55fr)) minmax(76px, 0.8fr);
     gap: 10px;
+    align-items: center;
+}
+
+.tabla-partidos-cabecera {
     padding: 0 10px 8px;
     border-bottom: 1px solid #dde6e2;
     color: #536762;
@@ -881,15 +886,118 @@ a {
 }
 
 .tabla-partido-fila {
-    min-width: 460px;
-    display: grid;
-    grid-template-columns: 1fr 2fr 1.3fr 0.5fr 0.5fr 0.8fr;
-    gap: 10px;
-    align-items: center;
-    padding: 12px 10px;
+    padding: 11px 10px;
     border-bottom: 1px solid #e3ece8;
+    border-radius: 10px;
     font-size: 13px;
     color: #17332b;
+    transition: background-color 0.15s;
+}
+
+.tabla-partido-fila:hover {
+    background-color: #eef6f2;
+}
+
+.tabla-partido-fila:last-child {
+    border-bottom: 0;
+}
+
+/* goles, asistencias, tarjetas y puntaje van centrados bajo su título */
+
+.tabla-partidos-cabecera > span:nth-child(n+3),
+.tabla-partido-fila > span:nth-child(n+3) {
+    justify-self: center;
+    text-align: center;
+}
+
+.celda-fecha {
+    font-weight: bold;
+}
+
+.celda-num {
+    font-weight: bold;
+    color: #17332b;
+}
+
+/* Resultado: píldora con marco de color */
+
+.resultado-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    justify-self: start;
+    padding: 4px 11px;
+    border: 1px solid;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.resultado-chip::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: currentColor;
+}
+
+.resultado-chip.ganado {
+    background-color: #e1f5ea;
+    border-color: #a9dcc2;
+    color: #0b7a4b;
+}
+
+.resultado-chip.perdido {
+    background-color: #fde8ea;
+    border-color: #f3b3ba;
+    color: #c0283a;
+}
+
+.resultado-chip.empatado {
+    background-color: #fff4d6;
+    border-color: #f0d58b;
+    color: #8a6100;
+}
+
+.resultado-chip.sin-resultado {
+    background-color: #eef2f0;
+    border-color: #d3ddd8;
+    border-style: dashed;
+    color: #66786f;
+}
+
+/* Tarjetas: en 0 quedan apagadas, con valor se pintan */
+
+.celda-amarilla,
+.celda-roja {
+    min-width: 30px;
+    padding: 2px 9px;
+    border-radius: 8px;
+    color: #9aa9a3;
+}
+
+.celda-amarilla.activa {
+    background-color: #fff0a8;
+    color: #7a5d00;
+}
+
+.celda-roja.activa {
+    background-color: #fcd9dd;
+    color: #b3202f;
+}
+
+/* Puntaje: mismo estilo que los números de las estadísticas */
+
+.celda-puntaje b {
+    font-size: 16px;
+    font-weight: 800;
+    color: #006747;
+}
+
+.celda-puntaje small {
+    font-size: 11px;
+    color: #71827c;
 }
 
 .actividad-vacia {

@@ -13,7 +13,7 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <link rel="stylesheet" th:href="@{/css/perfil.css(v=20261103)}">
+    <link rel="stylesheet" th:href="@{/css/perfil.css(v=${#dates.createNow().time})}">
     <!-- Estilos del Fair Play (copia de perfil.css; borrar este bloque cuando perfil.css se sirva actualizado) -->
     <style>
     /* Fair Play: tarjetas de fútbol ilustradas (roja = expulsiones, amarilla = amonestaciones) */
@@ -961,9 +961,9 @@
                 </div>
 
                 <div class="tabla-scroll">
-
                     <div class="tabla-partidos-cabecera">
                         <span>FECHA</span>
+                        <span>RESULTADO</span>
                         <span>GOLES</span>
                         <span>ASIST.</span>
                         <span>AMAR.</span>
@@ -972,12 +972,27 @@
                     </div>
 
                     <div class="tabla-partido-fila" th:each="partido : ${historialPartidos}">
-                        <span th:text="${#temporals.format(partido['fecha'], 'dd/MM/yyyy')}"></span>
-                        <span th:text="${partido['goles']}"></span>
-                        <span th:text="${partido['asistencias']}"></span>
-                        <span th:text="${partido['amarillas']}"></span>
-                        <span th:text="${partido['rojas']}"></span>
-                        <span th:text="${partido['puntaje']}"></span>
+                        <span class="celda-fecha" th:text="${#temporals.format(partido['fecha'], 'dd/MM/yyyy')}"></span>
+
+                        <span class="resultado-chip"
+                              th:with="r=${#strings.toLowerCase(partido['resultado'])}"
+                              th:classappend="${#strings.contains(r, 'victoria') or #strings.contains(r, 'gan')} ? 'ganado' :
+                                              (${#strings.contains(r, 'derrota') or #strings.contains(r, 'perd')} ? 'perdido' :
+                                              (${#strings.contains(r, 'empat')} ? 'empatado' : 'sin-resultado'))"
+                              th:text="${partido['resultado']}"></span>
+
+                        <span class="celda-num" th:text="${partido['goles']}"></span>
+                        <span class="celda-num" th:text="${partido['asistencias']}"></span>
+
+                        <span class="celda-num celda-amarilla"
+                              th:classappend="${partido['amarillas'] != null and partido['amarillas'] > 0} ? 'activa'"
+                              th:text="${partido['amarillas']}"></span>
+
+                        <span class="celda-num celda-roja"
+                              th:classappend="${partido['rojas'] != null and partido['rojas'] > 0} ? 'activa'"
+                              th:text="${partido['rojas']}"></span>
+
+                        <span class="celda-puntaje"><b th:text="${partido['puntaje']}"></b> <small>pts</small></span>
                     </div>
 
                 </div>
