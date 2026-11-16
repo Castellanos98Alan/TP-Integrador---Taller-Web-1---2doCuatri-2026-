@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.Enumeration.CondicionJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
@@ -449,7 +450,7 @@ public class RepositorioEstadisticasTest {
 
     Estadistica estadistica = givenDadoQueTengoSusEstadisticas(2, 1, 0, 0, 8, jugador, partido);
 
-    estadistica.setCondicion(Estadistica.CondicionJugador.LOCAL);
+    estadistica.setCondicion(CondicionJugador.LOCAL);
 
     // When
 
@@ -459,10 +460,7 @@ public class RepositorioEstadisticasTest {
     // Then
     assertThat(estadisticasEncontradas.size(), equalTo(1));
 
-    assertThat(
-      estadisticasEncontradas.getFirst().getCondicion(),
-      equalTo(Estadistica.CondicionJugador.LOCAL)
-    );
+    assertThat(estadisticasEncontradas.getFirst().getCondicion(), equalTo(CondicionJugador.LOCAL));
   }
 
   private Estadistica givenDadoQueTengoSusEstadisticas(

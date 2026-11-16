@@ -20,6 +20,9 @@ public class Cancha {
   @Column(name = "longitud")
   private Double longitud;
 
+  @Column(name = "imagen_url")
+  private String imagenUrl;
+
   public Cancha() {}
 
   public Cancha(Long id, String nombre, String provincia, String localidad) {
@@ -76,5 +79,13 @@ public class Cancha {
 
   public void setLongitud(Double longitud) {
     this.longitud = longitud;
+  }
+
+  public String getImagenUrl() {
+    return this.imagenUrl;
+  }
+
+  public void setImagenUrl(String imagenUrl) {
+    this.imagenUrl = imagenUrl;
   }
 }

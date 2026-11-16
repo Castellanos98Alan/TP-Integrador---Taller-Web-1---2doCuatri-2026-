@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.repositorio;
 
+import com.tallerwebi.dominio.Enumeration.CondicionJugador;
 import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
@@ -14,10 +15,7 @@ public interface RepositorioEstadistica {
 
   public List<Estadistica> buscarTodasLasEstadisticasPorPartido(Partido partido);
 
-  List<Estadistica> buscarPorJugadorYCondicion(
-    Jugador jugador,
-    Estadistica.CondicionJugador condicion
-  );
+  List<Estadistica> buscarPorJugadorYCondicion(Jugador jugador, CondicionJugador condicion);
 
   public Estadistica buscarPorPartidoYJugador(Partido partido, Jugador jugador);
 }

@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.Enumeration.EstadoSolicitud;
 import com.tallerwebi.dominio.repositorio.RepositorioSolicitudAmistad;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
@@ -45,7 +46,7 @@ public class RepositorioSolicitudAmistadTest {
     SolicitudAmistad solicitudAmistad1 = givenDadoQueTengoUnaSolicitudDeAmistad(
       usuario1,
       usuario2,
-      SolicitudAmistad.EstadoSolicitud.PENDIENTE
+      EstadoSolicitud.PENDIENTE
     );
 
     //WHEN
@@ -69,22 +70,22 @@ public class RepositorioSolicitudAmistadTest {
     SolicitudAmistad solicitudAmistad1 = givenDadoQueTengoUnaSolicitudDeAmistad(
       Ivan,
       Pedro,
-      SolicitudAmistad.EstadoSolicitud.PENDIENTE
+      EstadoSolicitud.PENDIENTE
     );
     SolicitudAmistad solicitudAmistad2 = givenDadoQueTengoUnaSolicitudDeAmistad(
       Pedro,
       Juana,
-      SolicitudAmistad.EstadoSolicitud.ACEPTADA
+      EstadoSolicitud.ACEPTADA
     );
     SolicitudAmistad solicitudAmistad3 = givenDadoQueTengoUnaSolicitudDeAmistad(
       Juana,
       Pedro,
-      SolicitudAmistad.EstadoSolicitud.PENDIENTE
+      EstadoSolicitud.PENDIENTE
     );
     SolicitudAmistad solicitudAmistad4 = givenDadoQueTengoUnaSolicitudDeAmistad(
       Lean,
       Pedro,
-      SolicitudAmistad.EstadoSolicitud.ACEPTADA
+      EstadoSolicitud.ACEPTADA
     );
 
     //WHEN
@@ -125,10 +126,10 @@ public class RepositorioSolicitudAmistadTest {
     SolicitudAmistad solicitud = givenDadoQueTengoUnaSolicitudDeAmistad(
       juan,
       pedro,
-      SolicitudAmistad.EstadoSolicitud.PENDIENTE
+      EstadoSolicitud.PENDIENTE
     );
 
-    solicitud.setEstado(SolicitudAmistad.EstadoSolicitud.ACEPTADA);
+    solicitud.setEstado(EstadoSolicitud.ACEPTADA);
 
     // When
 
@@ -140,7 +141,7 @@ public class RepositorioSolicitudAmistadTest {
 
     // Then
 
-    assertThat(solicitudEncontrada.getEstado(), equalTo(SolicitudAmistad.EstadoSolicitud.ACEPTADA));
+    assertThat(solicitudEncontrada.getEstado(), equalTo(EstadoSolicitud.ACEPTADA));
   }
 
   @Transactional
@@ -153,9 +154,9 @@ public class RepositorioSolicitudAmistadTest {
     Usuario pedro = givenDadoQueTengoUnUsuario("pedro@gmail.com", true);
     Usuario lucas = givenDadoQueTengoUnUsuario("lucas@gmail.com", true);
 
-    givenDadoQueTengoUnaSolicitudDeAmistad(juan, pedro, SolicitudAmistad.EstadoSolicitud.ACEPTADA);
+    givenDadoQueTengoUnaSolicitudDeAmistad(juan, pedro, EstadoSolicitud.ACEPTADA);
 
-    givenDadoQueTengoUnaSolicitudDeAmistad(juan, lucas, SolicitudAmistad.EstadoSolicitud.ACEPTADA);
+    givenDadoQueTengoUnaSolicitudDeAmistad(juan, lucas, EstadoSolicitud.ACEPTADA);
 
     // When
 
@@ -177,15 +178,11 @@ public class RepositorioSolicitudAmistadTest {
     Usuario lucas = givenDadoQueTengoUnUsuario("lucas@gmail.com", true);
     Usuario martin = givenDadoQueTengoUnUsuario("martin@gmail.com", true);
 
-    givenDadoQueTengoUnaSolicitudDeAmistad(juan, pedro, SolicitudAmistad.EstadoSolicitud.ACEPTADA);
+    givenDadoQueTengoUnaSolicitudDeAmistad(juan, pedro, EstadoSolicitud.ACEPTADA);
 
-    givenDadoQueTengoUnaSolicitudDeAmistad(juan, lucas, SolicitudAmistad.EstadoSolicitud.PENDIENTE);
+    givenDadoQueTengoUnaSolicitudDeAmistad(juan, lucas, EstadoSolicitud.PENDIENTE);
 
-    givenDadoQueTengoUnaSolicitudDeAmistad(
-      juan,
-      martin,
-      SolicitudAmistad.EstadoSolicitud.RECHAZADA
-    );
+    givenDadoQueTengoUnaSolicitudDeAmistad(juan, martin, EstadoSolicitud.RECHAZADA);
 
     // When
 
@@ -207,7 +204,7 @@ public class RepositorioSolicitudAmistadTest {
     Usuario juan = givenDadoQueTengoUnUsuario("juan@gmail.com", true);
     Usuario pedro = givenDadoQueTengoUnUsuario("pedro@gmail.com", true);
 
-    givenDadoQueTengoUnaSolicitudDeAmistad(pedro, juan, SolicitudAmistad.EstadoSolicitud.ACEPTADA);
+    givenDadoQueTengoUnaSolicitudDeAmistad(pedro, juan, EstadoSolicitud.ACEPTADA);
 
     // When
 
@@ -240,7 +237,7 @@ public class RepositorioSolicitudAmistadTest {
   private SolicitudAmistad givenDadoQueTengoUnaSolicitudDeAmistad(
     Usuario emisor,
     Usuario receptor,
-    SolicitudAmistad.EstadoSolicitud estadoSolicitud
+    EstadoSolicitud estadoSolicitud
   ) {
     SolicitudAmistad solicitud = new SolicitudAmistad(emisor, receptor, estadoSolicitud);
 

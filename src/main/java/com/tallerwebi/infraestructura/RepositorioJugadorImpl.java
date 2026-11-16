@@ -1,5 +1,6 @@
 package com.tallerwebi.infraestructura;
 
+import com.tallerwebi.dominio.Enumeration.EstadoSolicitud;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.SolicitudAmistad;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
@@ -107,7 +108,7 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
         .createQuery(query, Jugador.class)
         .setParameter(PARAM_NIVEL, nivel)
         .setParameter(PARAM_POSICION, posicion)
-        .setParameter(PARAM_ESTADO, SolicitudAmistad.EstadoSolicitud.ACEPTADA)
+        .setParameter(PARAM_ESTADO, EstadoSolicitud.ACEPTADA)
         .setParameter(PARAM_USUARIO_ID, usuarioId)
         .getResultList();
     }
@@ -117,7 +118,7 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
         .getCurrentSession()
         .createQuery(query, Jugador.class)
         .setParameter(PARAM_NIVEL, nivel)
-        .setParameter(PARAM_ESTADO, SolicitudAmistad.EstadoSolicitud.ACEPTADA)
+        .setParameter(PARAM_ESTADO, EstadoSolicitud.ACEPTADA)
         .setParameter(PARAM_USUARIO_ID, usuarioId)
         .getResultList();
     }
@@ -127,7 +128,7 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
         .getCurrentSession()
         .createQuery(query, Jugador.class)
         .setParameter(PARAM_POSICION, posicion)
-        .setParameter(PARAM_ESTADO, SolicitudAmistad.EstadoSolicitud.ACEPTADA)
+        .setParameter(PARAM_ESTADO, EstadoSolicitud.ACEPTADA)
         .setParameter(PARAM_USUARIO_ID, usuarioId)
         .getResultList();
     }
@@ -135,7 +136,7 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
     return sessionFactory
       .getCurrentSession()
       .createQuery(query, Jugador.class)
-      .setParameter(PARAM_ESTADO, SolicitudAmistad.EstadoSolicitud.ACEPTADA)
+      .setParameter(PARAM_ESTADO, EstadoSolicitud.ACEPTADA)
       .setParameter(PARAM_USUARIO_ID, usuarioId)
       .getResultList();
   }

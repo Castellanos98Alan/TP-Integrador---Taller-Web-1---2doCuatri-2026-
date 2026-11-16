@@ -217,4 +217,23 @@ public class RepositorioPartidoImpl implements RepositorioPartido {
 
     return hql.toString();
   }
+
+  @Override
+  public List<Partido> buscarPartidosParaRecordatorio(LocalDateTime inicio, LocalDateTime fin) {
+    String hql =
+      "SELECT p FROM Partido p " +
+      "WHERE p.fecha >= :inicio " +
+      "AND p.fecha < :fin " +
+      "AND p.estado <> :cancelado " +
+      "AND p.estado <> :finalizado";
+
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(hql, Partido.class)
+      .setParameter("inicio", inicio)
+      .setParameter("fin", fin)
+      .setParameter("cancelado", Partido.EstadoPartido.CANCELADO)
+      .setParameter("finalizado", Partido.EstadoPartido.FINALIZADO)
+      .getResultList();
+  }
 }

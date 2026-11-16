@@ -42,4 +42,17 @@ public class CanchaTest {
     assertThat(cancha.getId(), equalTo(2L));
     assertThat(cancha.getNombre(), equalTo("El Monumentalito"));
   }
+
+  @Test
+  public void queSePuedaAsignarYObtenerLaUrlDeLaImagen() {
+    // Preparación
+    Cancha cancha = new Cancha();
+    String rutaEsperada = "uploads/canchas/cancha1.jpg";
+
+    // Ejecución
+    cancha.setImagenUrl(rutaEsperada);
+
+    // Validación
+    assertThat(cancha.getImagenUrl(), equalTo(rutaEsperada));
+  }
 }

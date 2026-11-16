@@ -1,5 +1,6 @@
 package com.tallerwebi.infraestructura;
 
+import com.tallerwebi.dominio.Enumeration.EstadoSolicitud;
 import com.tallerwebi.dominio.SolicitudAmistad;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.repositorio.RepositorioSolicitudAmistad;
@@ -50,7 +51,7 @@ public class RepositorioSolicitudAmistadImpl implements RepositorioSolicitudAmis
       .getCurrentSession()
       .createQuery(query, SolicitudAmistad.class)
       .setParameter("receptor", receptor)
-      .setParameter(PARAMETRO_ESTADO, SolicitudAmistad.EstadoSolicitud.PENDIENTE)
+      .setParameter(PARAMETRO_ESTADO, EstadoSolicitud.PENDIENTE)
       .getResultList();
   }
 
@@ -67,7 +68,7 @@ public class RepositorioSolicitudAmistadImpl implements RepositorioSolicitudAmis
       .createQuery(query, Long.class)
       .setParameter("emisor", emisor)
       .setParameter("receptor", receptor)
-      .setParameter(PARAMETRO_ESTADO, SolicitudAmistad.EstadoSolicitud.PENDIENTE)
+      .setParameter(PARAMETRO_ESTADO, EstadoSolicitud.PENDIENTE)
       .getSingleResult();
 
     return cantidad > 0;
@@ -84,7 +85,7 @@ public class RepositorioSolicitudAmistadImpl implements RepositorioSolicitudAmis
     return !sessionFactory
       .getCurrentSession()
       .createQuery(query, SolicitudAmistad.class)
-      .setParameter(PARAMETRO_ESTADO, SolicitudAmistad.EstadoSolicitud.ACEPTADA)
+      .setParameter(PARAMETRO_ESTADO, EstadoSolicitud.ACEPTADA)
       .setParameter("usuario1", usuario1)
       .setParameter("usuario2", usuario2)
       .getResultList()
@@ -102,7 +103,7 @@ public class RepositorioSolicitudAmistadImpl implements RepositorioSolicitudAmis
       .getCurrentSession()
       .createQuery(query, SolicitudAmistad.class)
       .setParameter("usuario", usuario)
-      .setParameter(PARAMETRO_ESTADO, SolicitudAmistad.EstadoSolicitud.ACEPTADA)
+      .setParameter(PARAMETRO_ESTADO, EstadoSolicitud.ACEPTADA)
       .getResultList();
   }
 }

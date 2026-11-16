@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 public class ServicioPartidoTest {
 
@@ -44,6 +45,8 @@ public class ServicioPartidoTest {
 
   private ServicioSolicitudAmistad servicioSolicitudAmistadMock;
   private ServicioInvitacionPartido servicioInvitacionPartidoMock;
+
+  private ValidadorInscripcionPartido validadorInscripcionPartido;
 
   private static final String FILTRO_TODOS = "TODOS";
 
@@ -65,6 +68,8 @@ public class ServicioPartidoTest {
 
     servicioSolicitudAmistadMock = mock(ServicioSolicitudAmistad.class);
 
+    validadorInscripcionPartido = new ValidadorInscripcionPartido(repositorioPartidoMock);
+
     servicioPartido =
       new ServicioPartidoImpl(
         repositorioPartidoMock,
@@ -74,7 +79,8 @@ public class ServicioPartidoTest {
         servicioBalanceoEquipoMock,
         servicioNotificacionMock,
         servicioSolicitudAmistadMock,
-        servicioInvitacionPartidoMock
+        servicioInvitacionPartidoMock,
+        validadorInscripcionPartido
       );
   }
 
@@ -184,7 +190,6 @@ public class ServicioPartidoTest {
     verify(repositorioPartidoMock, times(1)).modificar(partido);
   }
 
-  @Test
   public void queLanceExcepcionSiElPartidoNoExisteAlQuererUnirse() {
     Long partidoId = 99L;
 
@@ -197,7 +202,7 @@ public class ServicioPartidoTest {
       () -> servicioPartido.unirseAPartido(partidoId, jugador)
     );
 
-    assertEquals("El partido" + partidoId + " no existe.", exception.getMessage());
+    assertEquals("El partido " + partidoId + " no existe.", exception.getMessage());
   }
 
   @Test

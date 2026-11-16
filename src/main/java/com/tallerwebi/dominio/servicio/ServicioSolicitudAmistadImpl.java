@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Enumeration.EstadoSolicitud;
 import com.tallerwebi.dominio.SolicitudAmistad;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.SolicitudAmistadInvalida;
@@ -37,7 +38,7 @@ public class ServicioSolicitudAmistadImpl implements ServicioSolicitudAmistad {
 
     solicitud.setEmisor(emisor);
     solicitud.setReceptor(receptor);
-    solicitud.setEstado(SolicitudAmistad.EstadoSolicitud.PENDIENTE);
+    solicitud.setEstado(EstadoSolicitud.PENDIENTE);
 
     repositorioSolicitudAmistad.guardar(solicitud);
   }
@@ -55,7 +56,7 @@ public class ServicioSolicitudAmistadImpl implements ServicioSolicitudAmistad {
       throw new SolicitudAmistadInvalida("La solicitud no existe");
     }
 
-    solicitud.setEstado(SolicitudAmistad.EstadoSolicitud.ACEPTADA);
+    solicitud.setEstado(EstadoSolicitud.ACEPTADA);
 
     repositorioSolicitudAmistad.modificar(solicitud);
   }
@@ -68,7 +69,7 @@ public class ServicioSolicitudAmistadImpl implements ServicioSolicitudAmistad {
       throw new SolicitudAmistadInvalida("La solicitud no existe");
     }
 
-    solicitud.setEstado(SolicitudAmistad.EstadoSolicitud.RECHAZADA);
+    solicitud.setEstado(EstadoSolicitud.RECHAZADA);
 
     repositorioSolicitudAmistad.modificar(solicitud);
   }
