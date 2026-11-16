@@ -37,7 +37,7 @@ SELECT 'Cancha El Fortin', 'Ramos Mejia', -34.6460, -58.5600, 'uploads/canchas/c
 -- Perfil asociado al usuario Test.
 INSERT INTO Jugador (nombre, posicion1, posicion2, puntos, nivel, usuario_id,
                      partidosJugados, partidosGanados, partidosPerdidos)
-SELECT 'Jugador Test', 'Delantero', 'Mediocampista', 60, 'A', u.id, 3, 2, 1
+SELECT 'Jugador Test', 'DELANTERO', 'MEDIOCAMPISTA', 60, 'A', u.id, 3, 2, 1
 FROM Usuario u
 WHERE u.email = 'test@unlam.edu.ar'
   AND NOT EXISTS (SELECT 1 FROM Jugador j WHERE j.usuario_id = u.id);
@@ -81,28 +81,20 @@ INSERT INTO InscripcionPartido (
     fechaInscripcion,
     recordatorioEnviado
 )
-VALUES (
-           @partido_test,
-           @jugador_test,
-           @equipo_testers,
-           true,
-           true,
-           '2026-10-29 18:00:00',
-           false
-       );
-
-
--- Estadistica individual para el historial del partido, sin duplicarla.
-INSERT INTO Estadistica (
-    goles, asistencias, amarillas, rojas, puntaje, jugador_id, partido_id
-)
-SELECT 1, 1, 0, 0, 9, j.id, p.id
+SELECT
+    p.id,
+    j.id,
+    e.id,
+    true,
+    true,
+    '2026-10-29 18:00:00',
+    false
 FROM Partido p
-         JOIN Usuario u ON p.organizador_id = u.id
+         JOIN Usuario u ON p.organizador_id = u.id AND u.email = 'test@unlam.edu.ar'
          JOIN Jugador j ON j.usuario_id = u.id
-WHERE u.email = 'test@unlam.edu.ar'
-  AND p.fecha = '2026-10-30 20:00:00'
+         JOIN equipo e ON e.nombre = 'Los Testers'
+WHERE p.fecha = '2026-10-30 20:00:00'
   AND NOT EXISTS (
-    SELECT 1 FROM Estadistica es
-    WHERE es.jugador_id = j.id AND es.partido_id = p.id
+    SELECT 1 FROM InscripcionPartido ip
+    WHERE ip.partido_id = p.id AND ip.jugador_id = j.id
 );

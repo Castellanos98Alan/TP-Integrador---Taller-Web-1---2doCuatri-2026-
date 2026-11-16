@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import jakarta.transaction.Transactional;
@@ -55,7 +56,7 @@ public class ServicioRankingImp implements ServicioRanking {
   @Override
   public List<Jugador> obtenerRankingFiltrado(
     String nivel,
-    String posicion,
+    PosicionJugador posicion,
     String rango,
     String vista,
     Long usuarioId

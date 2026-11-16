@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
@@ -215,7 +216,6 @@ public class PerfilControllerTest {
   }
 
   // ---------- Tests: guardar perfil ----------
-
   @Test
   public void guardarPerfilDeberiaActualizarUsuarioYJugador() {
     iniciarSesion();
@@ -236,8 +236,10 @@ public class PerfilControllerTest {
     assertThat(usuario.getNickname(), equalToIgnoringCase("Santiago"));
     assertThat(usuario.getZona(), equalToIgnoringCase("Lafe"));
     assertThat(usuario.getBiografia(), equalToIgnoringCase("Naci para este deporte"));
-    assertThat(jugador.getPosicion1(), equalToIgnoringCase("delantero"));
-    assertThat(jugador.getPosicion2(), equalToIgnoringCase("arquero"));
+
+    assertEquals(PosicionJugador.DELANTERO, jugador.getPosicion1());
+    assertEquals(PosicionJugador.ARQUERO, jugador.getPosicion2());
+
     assertThat(modelAndView.getViewName(), equalToIgnoringCase(REDIRECT_PERFIL));
   }
 

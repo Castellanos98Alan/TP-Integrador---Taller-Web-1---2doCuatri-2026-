@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.servicio.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -177,8 +178,8 @@ public class PerfilController {
   @PostMapping("/guardar-perfil")
   public ModelAndView guardarPerfil(
     @RequestParam("nickname") String nickname,
-    @RequestParam(value = "posicion1", required = false) String posicion,
-    @RequestParam(value = "posicion2", required = false) String posicion2,
+    @RequestParam(value = "posicion1", required = false) String posicionStr,
+    @RequestParam(value = "posicion2", required = false) String posicion2Str,
     @RequestParam("zona") String zona,
     @RequestParam("biografia") String biografia,
     HttpServletRequest request
@@ -195,15 +196,25 @@ public class PerfilController {
     usuario.setZona(zona);
     servicioLogin.modificar(usuario);
 
+    PosicionJugador posicion1 = null;
+    if (posicionStr != null && !posicionStr.trim().isEmpty()) {
+      posicion1 = PosicionJugador.valueOf(posicionStr.toUpperCase(Locale.ROOT));
+    }
+
+    PosicionJugador posicion2 = null;
+    if (posicion2Str != null && !posicion2Str.trim().isEmpty()) {
+      posicion2 = PosicionJugador.valueOf(posicion2Str.toUpperCase(Locale.ROOT));
+    }
+
     Jugador jugador = servicioJugador.buscarPorUsuarioId(usuario.getId());
 
     if (jugador == null) {
-      jugador = new Jugador(nickname, posicion, posicion2, "D");
+      jugador = new Jugador(nickname, posicion1, posicion2, "D");
       jugador.setUsuario(usuario);
       servicioJugador.guardar(jugador);
     } else {
-      jugador.setPosicion1(posicion != null && !posicion.isEmpty() ? posicion : null);
-      jugador.setPosicion2(posicion2 != null && !posicion2.isEmpty() ? posicion2 : null);
+      jugador.setPosicion1(posicion1);
+      jugador.setPosicion2(posicion2);
       servicioJugador.modificar(jugador);
     }
 

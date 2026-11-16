@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
@@ -80,31 +81,31 @@ public class RepositorioJugadorImplTest {
   @Rollback
   public void queSePuedaBuscarRankingPorPosicion() {
     Jugador j1 = new Jugador();
-    j1.setPosicion1("Defensor");
+    j1.setPosicion1(PosicionJugador.DEFENSOR);
     j1.setPuntos(30);
     sessionFactory.getCurrentSession().persist(j1);
 
     Jugador j2 = new Jugador();
-    j2.setPosicion1("Delantero");
+    j2.setPosicion1(PosicionJugador.DELANTERO);
     j2.setPuntos(40);
     sessionFactory.getCurrentSession().persist(j2);
 
     Jugador j3 = new Jugador();
-    j3.setPosicion1("Defensor");
+    j3.setPosicion1(PosicionJugador.DEFENSOR);
     j3.setPuntos(20);
     sessionFactory.getCurrentSession().persist(j3);
 
     List<Jugador> ranking = repositorioJugador.buscarRankingFiltrado(
       null,
-      "Defensor",
+      PosicionJugador.DEFENSOR,
       null,
       null,
       null
     );
 
     assertThat(ranking.size(), equalTo(2));
-    assertThat(ranking.get(0).getPosicion1(), equalTo("Defensor"));
-    assertThat(ranking.get(1).getPosicion1(), equalTo("Defensor"));
+    assertThat(ranking.get(0).getPosicion1(), equalTo(PosicionJugador.DEFENSOR));
+    assertThat(ranking.get(1).getPosicion1(), equalTo(PosicionJugador.DEFENSOR));
   }
 
   @Test
@@ -113,25 +114,25 @@ public class RepositorioJugadorImplTest {
   public void queSePuedaBuscarRankingPorPosicionYNivel() {
     Jugador j1 = new Jugador();
     j1.setNivel("B");
-    j1.setPosicion1("Defensor");
+    j1.setPosicion1(PosicionJugador.DEFENSOR);
     j1.setPuntos(40);
     sessionFactory.getCurrentSession().persist(j1);
 
     Jugador j2 = new Jugador();
     j2.setNivel("B");
-    j2.setPosicion1("Delantero");
+    j2.setPosicion1(PosicionJugador.DELANTERO);
     j2.setPuntos(35);
     sessionFactory.getCurrentSession().persist(j2);
 
     Jugador j3 = new Jugador();
     j3.setNivel("A");
-    j3.setPosicion1("Defensor");
+    j3.setPosicion1(PosicionJugador.DEFENSOR);
     j3.setPuntos(60);
     sessionFactory.getCurrentSession().persist(j3);
 
     List<Jugador> ranking = repositorioJugador.buscarRankingFiltrado(
       "B",
-      "Defensor",
+      PosicionJugador.DEFENSOR,
       null,
       null,
       null
@@ -139,7 +140,7 @@ public class RepositorioJugadorImplTest {
 
     assertThat(ranking.size(), equalTo(1));
     assertThat(ranking.get(0).getNivel(), equalTo("B"));
-    assertThat(ranking.get(0).getPosicion1(), equalTo("Defensor"));
+    assertThat(ranking.get(0).getPosicion1(), equalTo(PosicionJugador.DEFENSOR));
   }
 
   @Test
@@ -238,39 +239,40 @@ public class RepositorioJugadorImplTest {
   public void queSePuedaBuscarRankingPorRangoYPosicion() {
     Jugador j1 = new Jugador();
     j1.setNivel("B");
-    j1.setPosicion1("Defensor");
+    j1.setPosicion1(PosicionJugador.DEFENSOR);
     j1.setPuntos(40);
     sessionFactory.getCurrentSession().persist(j1);
 
     Jugador j2 = new Jugador();
     j2.setNivel("A");
-    j2.setPosicion1("Defensor");
+    j2.setPosicion1(PosicionJugador.DEFENSOR);
     j2.setPuntos(60);
     sessionFactory.getCurrentSession().persist(j2);
 
     Jugador j3 = new Jugador();
     j3.setNivel("C");
-    j3.setPosicion1("Defensor");
+    j3.setPosicion1(PosicionJugador.DEFENSOR);
     j3.setPuntos(20);
     sessionFactory.getCurrentSession().persist(j3);
 
     Jugador j4 = new Jugador();
     j4.setNivel("B");
-    j4.setPosicion1("Delantero");
+    j4.setPosicion1(PosicionJugador.DEFENSOR);
     j4.setPuntos(45);
     sessionFactory.getCurrentSession().persist(j4);
 
     List<Jugador> ranking = repositorioJugador.buscarRankingFiltrado(
       null,
-      "Defensor",
+      PosicionJugador.DEFENSOR,
       "intermedio",
       null,
       null
     );
 
-    assertThat(ranking.size(), equalTo(2));
-    assertThat(ranking.get(0).getPosicion1(), equalTo("Defensor"));
-    assertThat(ranking.get(1).getPosicion1(), equalTo("Defensor"));
+    assertThat(ranking.size(), equalTo(3));
+    assertThat(ranking.get(0).getPosicion1(), equalTo(PosicionJugador.DEFENSOR));
+    assertThat(ranking.get(1).getPosicion1(), equalTo(PosicionJugador.DEFENSOR));
+    assertThat(ranking.get(2).getPosicion1(), equalTo(PosicionJugador.DEFENSOR));
   }
 
   @Test

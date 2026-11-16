@@ -3,8 +3,10 @@ package com.tallerwebi.dominio;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
@@ -47,7 +49,12 @@ public class ServicioEstadisticaTest {
   public void obtenerEstadisticasPorJugador() {
     //Given
 
-    Jugador jugador1 = givenDadoQueTengoUnjugador("Juan", "Delantero", "Arquero", "C");
+    Jugador jugador1 = givenDadoQueTengoUnjugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.ARQUERO,
+      "C"
+    );
     Partido partido1 = givenDadoQueTengoUnPartido(
       "C",
       false,
@@ -85,7 +92,12 @@ public class ServicioEstadisticaTest {
 
   @Test
   public void obtenerEstadisticasGenerales() {
-    Jugador jugador1 = givenDadoQueTengoUnjugador("Juan", "Delantero", "Arquero", "C");
+    Jugador jugador1 = givenDadoQueTengoUnjugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.ARQUERO,
+      "C"
+    );
     Partido partido1 = givenDadoQueTengoUnPartido(
       "C",
       false,
@@ -118,8 +130,18 @@ public class ServicioEstadisticaTest {
 
   @Test
   public void obtenerEstadisticasPorPartido() {
-    Jugador jugador1 = givenDadoQueTengoUnjugador("Juan", "Delantero", "Arquero", "C");
-    Jugador jugador2 = givenDadoQueTengoUnjugador("Juan", "Delantero", "Arquero", "C");
+    Jugador jugador1 = givenDadoQueTengoUnjugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.ARQUERO,
+      "C"
+    );
+    Jugador jugador2 = givenDadoQueTengoUnjugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.ARQUERO,
+      "C"
+    );
     Partido partido1 = givenDadoQueTengoUnPartido(
       "C",
       false,
@@ -155,7 +177,12 @@ public class ServicioEstadisticaTest {
   @Test
   public void registrarEstadisticaDePartido() {
     // Given
-    Jugador jugador1 = givenDadoQueTengoUnjugador("Juan", "Delantero", "Arquero", "C");
+    Jugador jugador1 = givenDadoQueTengoUnjugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.ARQUERO,
+      "C"
+    );
 
     Partido partido1 = givenDadoQueTengoUnPartido(
       "C",
@@ -192,8 +219,8 @@ public class ServicioEstadisticaTest {
 
   private Jugador givenDadoQueTengoUnjugador(
     String nombre,
-    String posicion1,
-    String posicion2,
+    PosicionJugador posicion1,
+    PosicionJugador posicion2,
     String nivel
   ) {
     Jugador jugador = new Jugador(nombre, posicion1, posicion2, nivel);
