@@ -476,11 +476,21 @@
                                      class="avatar-jugador" alt="Foto">
                                 <div th:unless="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}" class="avatar-jugador avatar-sin-foto">⚽</div>
                                 <div>
-                                    <a th:href="@{/perfil(id=${ins.jugador.usuario.id})}" class="text-decoration-none">
+                                    <a th:href="@{/perfil/{id}(id=${ins.jugador.usuario.id})}"
+                                       class="text-decoration-none">
                                         <strong class="d-block text-dark" style="font-size: 13px;" th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
                                     </a>
                                     <div class="d-flex gap-1 mt-1">
                                         <span class="badge-posicion">Titular</span>
+                                        <span class="badge-posicion"
+                                              th:if="${ins.jugador.posicion1 != null}"
+                                              th:text="${ins.jugador.posicion1}">
+                                        </span>
+
+                                        <span class="badge-posicion"
+                                              th:if="${ins.jugador.posicion2 != null}"
+                                              th:text="${ins.jugador.posicion2}">
+                                        </span>
                                         <span th:if="${ins.esCapitan}" class="badge bg-warning text-dark" style="font-size: 10px;">
                                             <i class="fa-solid fa-crown me-1"></i> Capitán
                                         </span>
@@ -506,7 +516,8 @@
                                      class="avatar-jugador" alt="Foto">
                                 <div th:unless="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}" class="avatar-jugador avatar-sin-foto">⚽</div>
                                 <div>
-                                    <a th:href="@{/perfil(id=${ins.jugador.usuario.id})}" class="text-decoration-none">
+                                    <a th:href="@{/perfil/{id}(id=${ins.jugador.usuario.id})}"
+                                       class="text-decoration-none">
                                         <strong class="d-block text-dark" style="font-size: 13px;" th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
                                     </a>
                                     <div class="d-flex gap-1 mt-1">
