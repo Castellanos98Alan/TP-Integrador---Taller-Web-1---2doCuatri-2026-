@@ -3,8 +3,10 @@ package com.tallerwebi.dominio;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
@@ -80,7 +82,7 @@ public class ServicioLoginTest {
     when(repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
       .thenReturn(null);
 
-    servicioLogin.registrar(usuario, "Juan", "Defensor", null);
+    servicioLogin.registrar(usuario, "Juan", PosicionJugador.DELANTERO, PosicionJugador.ARQUERO);
 
     verify(repositorioUsuarioMock).guardar(usuario);
 
@@ -89,7 +91,7 @@ public class ServicioLoginTest {
         argThat(jugador ->
           jugador != null &&
           "Juan".equals(jugador.getNombre()) &&
-          "Defensor".equals(jugador.getPosicion1()) &&
+          PosicionJugador.DELANTERO.equals(jugador.getPosicion1()) &&
           "D".equals(jugador.getNivel()) &&
           jugador.getUsuario() == usuario
         )

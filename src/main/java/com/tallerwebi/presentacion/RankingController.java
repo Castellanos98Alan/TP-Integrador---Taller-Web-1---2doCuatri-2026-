@@ -1,10 +1,12 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.servicio.ServicioRanking;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,7 +29,7 @@ public class RankingController {
   @RequestMapping(path = "/ranking", method = RequestMethod.GET)
   public ModelAndView mostrarRanking(
     @RequestParam(value = "nivel", required = false) String nivel,
-    @RequestParam(value = "posicion", required = false) String posicion,
+    @RequestParam(value = "posicion", required = false) String posicionStr,
     @RequestParam(value = "rango", required = false) String rango,
     @RequestParam(value = "vista", required = false) String vista,
     HttpServletRequest request
@@ -42,9 +44,14 @@ public class RankingController {
       usuarioId = usuarioLogueado.getId();
     }
 
+    PosicionJugador posicionEnum = null;
+    if (posicionStr != null && !posicionStr.trim().isEmpty()) {
+      posicionEnum = PosicionJugador.valueOf(posicionStr.toUpperCase(Locale.ROOT));
+    }
+
     List<Jugador> ranking = servicioRanking.obtenerRankingFiltrado(
       nivel,
-      posicion,
+      posicionEnum,
       rango,
       vista,
       usuarioId
@@ -53,7 +60,7 @@ public class RankingController {
     modelo.put("ranking", ranking);
 
     modelo.put("nivelSeleccionado", nivel);
-    modelo.put("posicionSeleccionada", posicion);
+    modelo.put("posicionSeleccionada", posicionStr);
     modelo.put("rangoSeleccionado", rango);
     modelo.put("vistaSeleccionada", vista);
 

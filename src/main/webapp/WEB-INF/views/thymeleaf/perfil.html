@@ -473,13 +473,13 @@
                 <div class="datos-hero">
 
                     <div class="dato-hero"
-                         th:if="${posicion1 != null and !posicion1.isEmpty()}">
+                         th:if="${posicion1 != null}">
                         <i class="fa-solid fa-futbol"></i>
                         <span th:text="${posicion1}">Posición principal</span>
                     </div>
 
                     <div class="dato-hero"
-                         th:if="${posicion2 != null and !posicion2.isEmpty()}">
+                         th:if="${posicion2 != null}">
                         <i class="fa-solid fa-futbol"></i>
                         <span th:text="${posicion2}">Posición secundaria</span>
                     </div>

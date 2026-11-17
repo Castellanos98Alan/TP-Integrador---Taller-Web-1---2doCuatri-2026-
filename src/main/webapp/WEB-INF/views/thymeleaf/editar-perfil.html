@@ -523,19 +523,19 @@
                         <label for="posicion1">Posición principal</label>
                         <select id="posicion1" name="posicion1">
                             <option value=""
-                                    th:selected="${posicion1 == null or posicion1 == ''}">
+                                    th:selected="${posicion1 == null}">
                                 Seleccioná tu posición
                             </option>
-                            <option value="Arquero"
-                                    th:selected="${posicion1 == 'Arquero'}">Arquero</option>
-                            <option value="Defensor"
-                                    th:selected="${posicion1 == 'Defensor'}">Defensor</option>
-                            <option value="Mediocampista"
-                                    th:selected="${posicion1 == 'Mediocampista'}">Mediocampista</option>
-                            <option value="Delantero"
-                                    th:selected="${posicion1 == 'Delantero'}">Delantero</option>
-                            <option value="Polifuncional"
-                                    th:selected="${posicion1 == 'Polifuncional'}">Polifuncional</option>
+                            <option value="ARQUERO"
+                                    th:selected="${posicion1 != null and posicion1.name() == 'ARQUERO'}">Arquero</option>
+                            <option value="DEFENSOR"
+                                    th:selected="${posicion1 != null and posicion1.name() == 'DEFENSOR'}">Defensor</option>
+                            <option value="MEDIOCAMPISTA"
+                                    th:selected="${posicion1 != null and posicion1.name() == 'MEDIOCAMPISTA'}">Mediocampista</option>
+                            <option value="DELANTERO"
+                                    th:selected="${posicion1 != null and posicion1.name() == 'DELANTERO'}">Delantero</option>
+                            <option value="POLIFUNCIONAL"
+                                    th:selected="${posicion1 != null and posicion1.name() == 'POLIFUNCIONAL'}">Polifuncional</option>
                         </select>
                     </div>
 
@@ -543,19 +543,19 @@
                         <label for="posicion2">Posición secundaria</label>
                         <select id="posicion2" name="posicion2">
                             <option value=""
-                                    th:selected="${posicion2 == null or posicion2 == ''}">
+                                    th:selected="${posicion2 == null}">
                                 Sin posición secundaria
                             </option>
-                            <option value="Arquero"
-                                    th:selected="${posicion2 == 'Arquero'}">Arquero</option>
-                            <option value="Defensor"
-                                    th:selected="${posicion2 == 'Defensor'}">Defensor</option>
-                            <option value="Mediocampista"
-                                    th:selected="${posicion2 == 'Mediocampista'}">Mediocampista</option>
-                            <option value="Delantero"
-                                    th:selected="${posicion2 == 'Delantero'}">Delantero</option>
-                            <option value="Polifuncional"
-                                    th:selected="${posicion2 == 'Polifuncional'}">Polifuncional</option>
+                            <option value="ARQUERO"
+                                    th:selected="${posicion2 != null and posicion2.name() == 'ARQUERO'}">Arquero</option>
+                            <option value="DEFENSOR"
+                                    th:selected="${posicion2 != null and posicion2.name() == 'DEFENSOR'}">Defensor</option>
+                            <option value="MEDIOCAMPISTA"
+                                    th:selected="${posicion2 != null and posicion2.name() == 'MEDIOCAMPISTA'}">Mediocampista</option>
+                            <option value="DELANTERO"
+                                    th:selected="${posicion2 != null and posicion2.name() == 'DELANTERO'}">Delantero</option>
+                            <option value="POLIFUNCIONAL"
+                                    th:selected="${posicion2 != null and posicion2.name() == 'POLIFUNCIONAL'}">Polifuncional</option>
                         </select>
                     </div>
 
