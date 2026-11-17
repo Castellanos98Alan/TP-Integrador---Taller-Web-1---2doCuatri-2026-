@@ -45,12 +45,12 @@ public class PerfilController {
 
   @Autowired
   public PerfilController(
-    ServicioLogin servicioLogin,
-    ServicioJugador servicioJugador,
-    ServicioRanking servicioRanking,
-    ServicioEstadistica servicioEstadistica,
-    ServicioSolicitudAmistad servicioSolicitudAmistad,
-    ServicioPartido servicioPartido
+          ServicioLogin servicioLogin,
+          ServicioJugador servicioJugador,
+          ServicioRanking servicioRanking,
+          ServicioEstadistica servicioEstadistica,
+          ServicioSolicitudAmistad servicioSolicitudAmistad,
+          ServicioPartido servicioPartido
   ) {
     this.servicioLogin = servicioLogin;
     this.servicioJugador = servicioJugador;
@@ -115,10 +115,10 @@ public class PerfilController {
 
   @PostMapping("/guardar-foto")
   public ModelAndView guardarFoto(
-    @RequestParam(value = "fotoBase64", required = false) String fotoBase64,
-    @RequestParam(value = "fotoPosicionX", defaultValue = "50") Integer fotoPosicionX,
-    @RequestParam(value = "fotoPosicionY", defaultValue = "50") Integer fotoPosicionY,
-    HttpServletRequest request
+          @RequestParam(value = "fotoBase64", required = false) String fotoBase64,
+          @RequestParam(value = "fotoPosicionX", defaultValue = "50") Integer fotoPosicionX,
+          @RequestParam(value = "fotoPosicionY", defaultValue = "50") Integer fotoPosicionY,
+          HttpServletRequest request
   ) {
     Usuario usuario = (Usuario) request.getSession().getAttribute(USUARIO);
 
@@ -172,19 +172,19 @@ public class PerfilController {
     }
 
     return ResponseEntity
-      .ok()
-      .contentType(MediaTypeFactory.getMediaType(nombre).orElse(MediaType.APPLICATION_OCTET_STREAM))
-      .body(Files.readAllBytes(archivo));
+            .ok()
+            .contentType(MediaTypeFactory.getMediaType(nombre).orElse(MediaType.APPLICATION_OCTET_STREAM))
+            .body(Files.readAllBytes(archivo));
   }
 
   @PostMapping("/guardar-perfil")
   public ModelAndView guardarPerfil(
-    @RequestParam("nickname") String nickname,
-    @RequestParam(value = "posicion1", required = false) String posicion,
-    @RequestParam(value = "posicion2", required = false) String posicion2,
-    @RequestParam("zona") String zona,
-    @RequestParam("biografia") String biografia,
-    HttpServletRequest request
+          @RequestParam("nickname") String nickname,
+          @RequestParam(value = "posicion1", required = false) String posicion,
+          @RequestParam(value = "posicion2", required = false) String posicion2,
+          @RequestParam("zona") String zona,
+          @RequestParam("biografia") String biografia,
+          HttpServletRequest request
   ) {
     HttpSession session = request.getSession();
     Usuario usuario = (Usuario) session.getAttribute(USUARIO);
@@ -234,10 +234,10 @@ public class PerfilController {
 
   @GetMapping("/perfil/{idUsuario}")
   public ModelAndView verPerfilJugador(
-    @PathVariable("idUsuario") Long idUsuario,
-    @RequestParam(value = "solicitudEnviada", required = false) Boolean solicitudEnviada,
-    @RequestParam(value = "errorAmistad", required = false) Boolean errorAmistad,
-    HttpServletRequest request
+          @PathVariable("idUsuario") Long idUsuario,
+          @RequestParam(value = "solicitudEnviada", required = false) Boolean solicitudEnviada,
+          @RequestParam(value = "errorAmistad", required = false) Boolean errorAmistad,
+          HttpServletRequest request
   ) {
     HttpSession session = request.getSession();
     Usuario usuarioLogueado = (Usuario) session.getAttribute(USUARIO);
@@ -282,9 +282,9 @@ public class PerfilController {
   }
 
   private Map<String, Object> cargarDatosDelJugador(
-    Usuario usuario,
-    Jugador jugador,
-    Estadistica estadisticas
+          Usuario usuario,
+          Jugador jugador,
+          Estadistica estadisticas
   ) {
     Map<String, Object> model = new ModelMap();
 
@@ -320,7 +320,7 @@ public class PerfilController {
     List<Partido> partidosJugador = servicioPartido.buscarPartidosPorJugador(jugador.getId());
 
     List<Estadistica> estadisticasJugador = servicioEstadistica.obtenerEstadisticasPorJugador(
-      jugador
+            jugador
     );
 
     model.put("partidosJugador", partidosJugador);
@@ -333,8 +333,8 @@ public class PerfilController {
   }
 
   private List<Map> armarHistorialPartidos(
-    List<Partido> partidosJugador,
-    List<Estadistica> estadisticasJugador
+          List<Partido> partidosJugador,
+          List<Estadistica> estadisticasJugador
   ) {
     List<Map> historialPartidos = new ArrayList<>();
 
@@ -342,236 +342,236 @@ public class PerfilController {
       if (partido.getEstado() == EstadoPartido.FINALIZADO) {
         historialPartidos.add(construirDatosPartido(partido, estadisticasJugador));
 
-      Map<String, Object> datosPartido = new ModelMap();
+        Map<String, Object> datosPartido = new ModelMap();
 
-      datosPartido.put("fecha", partido.getFecha());
+        datosPartido.put("fecha", partido.getFecha());
 
-      if (partido.getResultado() != null) {
-        int golesLocal = partido.getResultado().getGolesLocal();
-        int golesVisitante = partido.getResultado().getGolesVisitante();
+        if (partido.getResultado() != null) {
+          int golesLocal = partido.getResultado().getGolesLocal();
+          int golesVisitante = partido.getResultado().getGolesVisitante();
 
-        String resultado = golesLocal + " - " + golesVisitante;
-        String condicion;
+          String resultado = golesLocal + " - " + golesVisitante;
+          String condicion;
 
-        if (golesLocal > golesVisitante) {
-          condicion = "Victoria";
-        } else if (golesLocal < golesVisitante) {
-          condicion = "Derrota";
+          if (golesLocal > golesVisitante) {
+            condicion = "Victoria";
+          } else if (golesLocal < golesVisitante) {
+            condicion = "Derrota";
+          } else {
+            condicion = "Empate";
+          }
+
+          datosPartido.put("resultado", resultado);
+          datosPartido.put("condicion", condicion);
         } else {
-          condicion = "Empate";
+          datosPartido.put("resultado", "Sin resultado");
+          datosPartido.put("condicion", "Sin resultado");
         }
 
-        datosPartido.put("resultado", resultado);
-        datosPartido.put("condicion", condicion);
-      } else {
-        datosPartido.put("resultado", "Sin resultado");
-        datosPartido.put("condicion", "Sin resultado");
+        for (Estadistica estadistica : estadisticasJugador) {
+          if (
+                  estadistica.getPartido() != null &&
+                          estadistica.getPartido().getId().equals(partido.getId())
+          ) {
+            datosPartido.put("goles", estadistica.getGoles());
+            datosPartido.put("asistencias", estadistica.getAsistencias());
+            datosPartido.put("amarillas", estadistica.getAmarillas());
+            datosPartido.put("rojas", estadistica.getRojas());
+            datosPartido.put("puntaje", estadistica.getPuntaje());
+
+            break;
+          }
+
+        }
       }
 
+      return historialPartidos;
+    }
+
+    private Map<String, Object> construirDatosPartido (
+            Partido partido,
+            List < Estadistica > estadisticasJugador
+  ){
+      Map<String, Object> datosPartido = new ModelMap();
+      datosPartido.put("idPartido", partido.getId());
+      datosPartido.put("fecha", partido.getFecha());
+      datosPartido.put("goles", 0);
+      datosPartido.put("asistencias", 0);
+      datosPartido.put("amarillas", 0);
+      datosPartido.put("rojas", 0);
+      datosPartido.put("puntaje", 0);
+
+      Estadistica estadistica = buscarEstadisticaDePartido(partido.getId(), estadisticasJugador);
+      if (estadistica != null) {
+        datosPartido.put("goles", valorONullACero(estadistica.getGoles()));
+        datosPartido.put("asistencias", valorONullACero(estadistica.getAsistencias()));
+        datosPartido.put("amarillas", valorONullACero(estadistica.getAmarillas()));
+        datosPartido.put("rojas", valorONullACero(estadistica.getRojas()));
+        datosPartido.put("puntaje", valorONullACero(estadistica.getPuntaje()));
+      }
+
+      return datosPartido;
+    }
+
+    private Estadistica buscarEstadisticaDePartido (
+            Long idPartido,
+            List < Estadistica > estadisticasJugador
+  ){
       for (Estadistica estadistica : estadisticasJugador) {
-        if (
-          estadistica.getPartido() != null &&
-          estadistica.getPartido().getId().equals(partido.getId())
-        ) {
-          datosPartido.put("goles", estadistica.getGoles());
-          datosPartido.put("asistencias", estadistica.getAsistencias());
-          datosPartido.put("amarillas", estadistica.getAmarillas());
-          datosPartido.put("rojas", estadistica.getRojas());
-          datosPartido.put("puntaje", estadistica.getPuntaje());
+        if (estadistica.getPartido() != null && estadistica.getPartido().getId().equals(idPartido)) {
+          return estadistica;
+        }
+      }
+      return null;
+    }
 
-          break;
+    private int valorONullACero (Integer valor){
+      return valor != null ? valor : 0;
+
+      private Map<String, Object> armarDatosEvolucion (List < Estadistica > estadisticas) {
+        Map<String, Object> datos = new ModelMap();
+
+        Integer anio = obtenerAnioMasReciente(estadisticas);
+        Map<Integer, List<Integer>> puntajesPorMes = new HashMap<>();
+
+        if (anio != null) {
+          puntajesPorMes = agruparPuntajesPorMes(estadisticas, anio);
         }
 
+        int escala = calcularEscala(puntajesPorMes);
+
+        List<Map<String, Object>> puntos = armarPuntosEvolucion(puntajesPorMes, escala);
+
+        datos.put("hayDatosEvolucion", !puntos.isEmpty());
+        datos.put("anioEvolucion", anio);
+        datos.put("escalaEvolucion", escala);
+        datos.put("puntosEvolucion", puntos);
+        datos.put("lineaEvolucion", armarLineaEvolucion(puntos));
+
+        return datos;
+      }
+
+      private Integer obtenerAnioMasReciente (List < Estadistica > estadisticas) {
+        Integer anio = null;
+
+        for (Estadistica estadistica : estadisticas) {
+          if (
+                  estadistica.getPartido() == null ||
+                          estadistica.getPartido().getFecha() == null ||
+                          estadistica.getPuntaje() == null
+          ) {
+            continue;
+          }
+
+          int anioPartido = estadistica.getPartido().getFecha().getYear();
+
+          if (anio == null || anioPartido > anio) {
+            anio = anioPartido;
+          }
+        }
+
+        return anio;
+      }
+
+      private Map<Integer, List<Integer>> agruparPuntajesPorMes (
+              List < Estadistica > estadisticas,
+              Integer anio
+  ){
+        Map<Integer, List<Integer>> puntajesPorMes = new HashMap<>();
+
+        for (Estadistica estadistica : estadisticas) {
+          if (
+                  estadistica.getPartido() == null ||
+                          estadistica.getPartido().getFecha() == null ||
+                          estadistica.getPuntaje() == null ||
+                          estadistica.getPartido().getFecha().getYear() != anio
+          ) {
+            continue;
+          }
+
+          int mes = estadistica.getPartido().getFecha().getMonthValue();
+
+          if (!puntajesPorMes.containsKey(mes)) {
+            puntajesPorMes.put(mes, new ArrayList<>());
+          }
+
+          puntajesPorMes.get(mes).add(estadistica.getPuntaje());
+        }
+
+        return puntajesPorMes;
+      }
+
+      private int calcularEscala (Map < Integer, List < Integer >> puntajesPorMes){
+        double puntajeMaximo = 0;
+
+        for (List<Integer> puntajes : puntajesPorMes.values()) {
+          int suma = 0;
+
+          for (Integer puntaje : puntajes) {
+            suma += puntaje;
+          }
+
+          double promedio = (double) suma / puntajes.size();
+
+          if (promedio > puntajeMaximo) {
+            puntajeMaximo = promedio;
+          }
+        }
+
+        int escala = (int) Math.ceil(puntajeMaximo / ESCALA_MINIMA) * ESCALA_MINIMA;
+
+        if (escala < ESCALA_MINIMA) {
+          escala = ESCALA_MINIMA;
+        }
+
+        return escala;
+      }
+
+      private List<Map<String, Object>> armarPuntosEvolucion (
+              Map < Integer, List < Integer >> puntajesPorMes,
+      int escala
+  ){
+        List<Map<String, Object>> puntos = new ArrayList<>();
+
+        for (int mes = 1; mes <= 12; mes++) {
+          List<Integer> puntajes = puntajesPorMes.get(mes);
+
+          if (puntajes == null || puntajes.isEmpty()) {
+            continue;
+          }
+
+          int suma = 0;
+
+          for (Integer puntaje : puntajes) {
+            suma += puntaje;
+          }
+
+          double promedio = (double) suma / puntajes.size();
+
+          Map<String, Object> punto = new ModelMap();
+
+          punto.put("x", 56 + (mes - 1) * 39);
+          punto.put("y", 150 - (promedio / escala) * 130);
+          punto.put("puntaje", promedio);
+
+          puntos.add(punto);
+        }
+
+        return puntos;
+      }
+
+      private String armarLineaEvolucion (List < Map < String, Object >> puntos){
+        String linea = "";
+
+        for (Map<String, Object> punto : puntos) {
+          if (!linea.isEmpty()) {
+            linea += " ";
+          }
+
+          linea += punto.get("x") + "," + punto.get("y");
+        }
+
+        return linea;
+
       }
     }
-
-    return historialPartidos;
-  }
-
-  private Map<String, Object> construirDatosPartido(
-    Partido partido,
-    List<Estadistica> estadisticasJugador
-  ) {
-    Map<String, Object> datosPartido = new ModelMap();
-    datosPartido.put("idPartido", partido.getId());
-    datosPartido.put("fecha", partido.getFecha());
-    datosPartido.put("goles", 0);
-    datosPartido.put("asistencias", 0);
-    datosPartido.put("amarillas", 0);
-    datosPartido.put("rojas", 0);
-    datosPartido.put("puntaje", 0);
-
-    Estadistica estadistica = buscarEstadisticaDePartido(partido.getId(), estadisticasJugador);
-    if (estadistica != null) {
-      datosPartido.put("goles", valorONullACero(estadistica.getGoles()));
-      datosPartido.put("asistencias", valorONullACero(estadistica.getAsistencias()));
-      datosPartido.put("amarillas", valorONullACero(estadistica.getAmarillas()));
-      datosPartido.put("rojas", valorONullACero(estadistica.getRojas()));
-      datosPartido.put("puntaje", valorONullACero(estadistica.getPuntaje()));
-    }
-
-    return datosPartido;
-  }
-
-  private Estadistica buscarEstadisticaDePartido(
-    Long idPartido,
-    List<Estadistica> estadisticasJugador
-  ) {
-    for (Estadistica estadistica : estadisticasJugador) {
-      if (estadistica.getPartido() != null && estadistica.getPartido().getId().equals(idPartido)) {
-        return estadistica;
-      }
-    }
-    return null;
-  }
-
-  private int valorONullACero(Integer valor) {
-    return valor != null ? valor : 0;
-
-  private Map<String, Object> armarDatosEvolucion(List<Estadistica> estadisticas) {
-    Map<String, Object> datos = new ModelMap();
-
-    Integer anio = obtenerAnioMasReciente(estadisticas);
-    Map<Integer, List<Integer>> puntajesPorMes = new HashMap<>();
-
-    if (anio != null) {
-      puntajesPorMes = agruparPuntajesPorMes(estadisticas, anio);
-    }
-
-    int escala = calcularEscala(puntajesPorMes);
-
-    List<Map<String, Object>> puntos = armarPuntosEvolucion(puntajesPorMes, escala);
-
-    datos.put("hayDatosEvolucion", !puntos.isEmpty());
-    datos.put("anioEvolucion", anio);
-    datos.put("escalaEvolucion", escala);
-    datos.put("puntosEvolucion", puntos);
-    datos.put("lineaEvolucion", armarLineaEvolucion(puntos));
-
-    return datos;
-  }
-
-  private Integer obtenerAnioMasReciente(List<Estadistica> estadisticas) {
-    Integer anio = null;
-
-    for (Estadistica estadistica : estadisticas) {
-      if (
-        estadistica.getPartido() == null ||
-        estadistica.getPartido().getFecha() == null ||
-        estadistica.getPuntaje() == null
-      ) {
-        continue;
-      }
-
-      int anioPartido = estadistica.getPartido().getFecha().getYear();
-
-      if (anio == null || anioPartido > anio) {
-        anio = anioPartido;
-      }
-    }
-
-    return anio;
-  }
-
-  private Map<Integer, List<Integer>> agruparPuntajesPorMes(
-    List<Estadistica> estadisticas,
-    Integer anio
-  ) {
-    Map<Integer, List<Integer>> puntajesPorMes = new HashMap<>();
-
-    for (Estadistica estadistica : estadisticas) {
-      if (
-        estadistica.getPartido() == null ||
-        estadistica.getPartido().getFecha() == null ||
-        estadistica.getPuntaje() == null ||
-        estadistica.getPartido().getFecha().getYear() != anio
-      ) {
-        continue;
-      }
-
-      int mes = estadistica.getPartido().getFecha().getMonthValue();
-
-      if (!puntajesPorMes.containsKey(mes)) {
-        puntajesPorMes.put(mes, new ArrayList<>());
-      }
-
-      puntajesPorMes.get(mes).add(estadistica.getPuntaje());
-    }
-
-    return puntajesPorMes;
-  }
-
-  private int calcularEscala(Map<Integer, List<Integer>> puntajesPorMes) {
-    double puntajeMaximo = 0;
-
-    for (List<Integer> puntajes : puntajesPorMes.values()) {
-      int suma = 0;
-
-      for (Integer puntaje : puntajes) {
-        suma += puntaje;
-      }
-
-      double promedio = (double) suma / puntajes.size();
-
-      if (promedio > puntajeMaximo) {
-        puntajeMaximo = promedio;
-      }
-    }
-
-    int escala = (int) Math.ceil(puntajeMaximo / ESCALA_MINIMA) * ESCALA_MINIMA;
-
-    if (escala < ESCALA_MINIMA) {
-      escala = ESCALA_MINIMA;
-    }
-
-    return escala;
-  }
-
-  private List<Map<String, Object>> armarPuntosEvolucion(
-    Map<Integer, List<Integer>> puntajesPorMes,
-    int escala
-  ) {
-    List<Map<String, Object>> puntos = new ArrayList<>();
-
-    for (int mes = 1; mes <= 12; mes++) {
-      List<Integer> puntajes = puntajesPorMes.get(mes);
-
-      if (puntajes == null || puntajes.isEmpty()) {
-        continue;
-      }
-
-      int suma = 0;
-
-      for (Integer puntaje : puntajes) {
-        suma += puntaje;
-      }
-
-      double promedio = (double) suma / puntajes.size();
-
-      Map<String, Object> punto = new ModelMap();
-
-      punto.put("x", 56 + (mes - 1) * 39);
-      punto.put("y", 150 - (promedio / escala) * 130);
-      punto.put("puntaje", promedio);
-
-      puntos.add(punto);
-    }
-
-    return puntos;
-  }
-
-  private String armarLineaEvolucion(List<Map<String, Object>> puntos) {
-    String linea = "";
-
-    for (Map<String, Object> punto : puntos) {
-      if (!linea.isEmpty()) {
-        linea += " ";
-      }
-
-      linea += punto.get("x") + "," + punto.get("y");
-    }
-
-    return linea;
-
-  }
-}
