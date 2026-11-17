@@ -332,56 +332,15 @@ public class PerfilController {
     return model;
   }
 
-  private List<Map> armarHistorialPartidos(
+  private List<Map<String, Object>> armarHistorialPartidos(
     List<Partido> partidosJugador,
     List<Estadistica> estadisticasJugador
   ) {
-    List<Map> historialPartidos = new ArrayList<>();
+    List<Map<String, Object>> historialPartidos = new ArrayList<>();
 
     for (Partido partido : partidosJugador) {
       if (partido.getEstado() == EstadoPartido.FINALIZADO) {
         historialPartidos.add(construirDatosPartido(partido, estadisticasJugador));
-
-      Map<String, Object> datosPartido = new ModelMap();
-
-      datosPartido.put("fecha", partido.getFecha());
-
-      if (partido.getResultado() != null) {
-        int golesLocal = partido.getResultado().getGolesLocal();
-        int golesVisitante = partido.getResultado().getGolesVisitante();
-
-        String resultado = golesLocal + " - " + golesVisitante;
-        String condicion;
-
-        if (golesLocal > golesVisitante) {
-          condicion = "Victoria";
-        } else if (golesLocal < golesVisitante) {
-          condicion = "Derrota";
-        } else {
-          condicion = "Empate";
-        }
-
-        datosPartido.put("resultado", resultado);
-        datosPartido.put("condicion", condicion);
-      } else {
-        datosPartido.put("resultado", "Sin resultado");
-        datosPartido.put("condicion", "Sin resultado");
-      }
-
-      for (Estadistica estadistica : estadisticasJugador) {
-        if (
-          estadistica.getPartido() != null &&
-          estadistica.getPartido().getId().equals(partido.getId())
-        ) {
-          datosPartido.put("goles", estadistica.getGoles());
-          datosPartido.put("asistencias", estadistica.getAsistencias());
-          datosPartido.put("amarillas", estadistica.getAmarillas());
-          datosPartido.put("rojas", estadistica.getRojas());
-          datosPartido.put("puntaje", estadistica.getPuntaje());
-
-          break;
-        }
-
       }
     }
 
@@ -393,15 +352,33 @@ public class PerfilController {
     List<Estadistica> estadisticasJugador
   ) {
     Map<String, Object> datosPartido = new ModelMap();
+
     datosPartido.put("idPartido", partido.getId());
     datosPartido.put("fecha", partido.getFecha());
+
     datosPartido.put("goles", 0);
     datosPartido.put("asistencias", 0);
     datosPartido.put("amarillas", 0);
     datosPartido.put("rojas", 0);
     datosPartido.put("puntaje", 0);
 
+    if (partido.getResultado() != null) {
+      int golesLocal = partido.getResultado().getGolesLocal();
+      int golesVisitante = partido.getResultado().getGolesVisitante();
+
+      String resultado = golesLocal + " - " + golesVisitante;
+      String[] condiciones = { "Derrota", "Empate", "Victoria" };
+      String condicion = condiciones[Integer.compare(golesLocal, golesVisitante) + 1];
+
+      datosPartido.put("resultado", resultado);
+      datosPartido.put("condicion", condicion);
+    } else {
+      datosPartido.put("resultado", "Sin resultado");
+      datosPartido.put("condicion", "Sin resultado");
+    }
+
     Estadistica estadistica = buscarEstadisticaDePartido(partido.getId(), estadisticasJugador);
+
     if (estadistica != null) {
       datosPartido.put("goles", valorONullACero(estadistica.getGoles()));
       datosPartido.put("asistencias", valorONullACero(estadistica.getAsistencias()));
@@ -417,16 +394,18 @@ public class PerfilController {
     Long idPartido,
     List<Estadistica> estadisticasJugador
   ) {
-    for (Estadistica estadistica : estadisticasJugador) {
-      if (estadistica.getPartido() != null && estadistica.getPartido().getId().equals(idPartido)) {
-        return estadistica;
-      }
-    }
-    return null;
+    return estadisticasJugador
+      .stream()
+      .filter(estadistica ->
+        estadistica.getPartido() != null && estadistica.getPartido().getId().equals(idPartido)
+      )
+      .findFirst()
+      .orElse(null);
   }
 
   private int valorONullACero(Integer valor) {
     return valor != null ? valor : 0;
+  }
 
   private Map<String, Object> armarDatosEvolucion(List<Estadistica> estadisticas) {
     Map<String, Object> datos = new ModelMap();
@@ -491,11 +470,7 @@ public class PerfilController {
 
       int mes = estadistica.getPartido().getFecha().getMonthValue();
 
-      if (!puntajesPorMes.containsKey(mes)) {
-        puntajesPorMes.put(mes, new ArrayList<>());
-      }
-
-      puntajesPorMes.get(mes).add(estadistica.getPuntaje());
+      puntajesPorMes.computeIfAbsent(mes, clave -> new ArrayList<>()).add(estadistica.getPuntaje());
     }
 
     return puntajesPorMes;
@@ -513,9 +488,7 @@ public class PerfilController {
 
       double promedio = (double) suma / puntajes.size();
 
-      if (promedio > puntajeMaximo) {
-        puntajeMaximo = promedio;
-      }
+      puntajeMaximo = Math.max(puntajeMaximo, promedio);
     }
 
     int escala = (int) Math.ceil(puntajeMaximo / ESCALA_MINIMA) * ESCALA_MINIMA;
@@ -561,17 +534,9 @@ public class PerfilController {
   }
 
   private String armarLineaEvolucion(List<Map<String, Object>> puntos) {
-    String linea = "";
-
-    for (Map<String, Object> punto : puntos) {
-      if (!linea.isEmpty()) {
-        linea += " ";
-      }
-
-      linea += punto.get("x") + "," + punto.get("y");
-    }
-
-    return linea;
-
+    return puntos
+      .stream()
+      .map(punto -> punto.get("x") + "," + punto.get("y"))
+      .collect(java.util.stream.Collectors.joining(" "));
   }
 }
