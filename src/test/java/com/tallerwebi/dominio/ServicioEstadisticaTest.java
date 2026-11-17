@@ -3,7 +3,11 @@ package com.tallerwebi.dominio;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
+import com.tallerwebi.dominio.Enumeration.EstadoEstadisticas;
 
 import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
@@ -47,7 +51,12 @@ public class ServicioEstadisticaTest {
   public void obtenerEstadisticasPorJugador() {
     //Given
 
-    Jugador jugador1 = givenDadoQueTengoUnjugador("Juan", "Delantero", "Arquero", "C");
+    Jugador jugador1 = givenDadoQueTengoUnjugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.ARQUERO,
+      "C"
+    );
     Partido partido1 = givenDadoQueTengoUnPartido(
       "C",
       false,
@@ -85,7 +94,12 @@ public class ServicioEstadisticaTest {
 
   @Test
   public void obtenerEstadisticasGenerales() {
-    Jugador jugador1 = givenDadoQueTengoUnjugador("Juan", "Delantero", "Arquero", "C");
+    Jugador jugador1 = givenDadoQueTengoUnjugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.ARQUERO,
+      "C"
+    );
     Partido partido1 = givenDadoQueTengoUnPartido(
       "C",
       false,
@@ -118,8 +132,18 @@ public class ServicioEstadisticaTest {
 
   @Test
   public void obtenerEstadisticasPorPartido() {
-    Jugador jugador1 = givenDadoQueTengoUnjugador("Juan", "Delantero", "Arquero", "C");
-    Jugador jugador2 = givenDadoQueTengoUnjugador("Juan", "Delantero", "Arquero", "C");
+    Jugador jugador1 = givenDadoQueTengoUnjugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.ARQUERO,
+      "C"
+    );
+    Jugador jugador2 = givenDadoQueTengoUnjugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.ARQUERO,
+      "C"
+    );
     Partido partido1 = givenDadoQueTengoUnPartido(
       "C",
       false,
@@ -155,7 +179,12 @@ public class ServicioEstadisticaTest {
   @Test
   public void registrarEstadisticaDePartido() {
     // Given
-    Jugador jugador1 = givenDadoQueTengoUnjugador("Juan", "Delantero", "Arquero", "C");
+    Jugador jugador1 = givenDadoQueTengoUnjugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.ARQUERO,
+      "C"
+    );
 
     Partido partido1 = givenDadoQueTengoUnPartido(
       "C",
@@ -192,8 +221,8 @@ public class ServicioEstadisticaTest {
 
   private Jugador givenDadoQueTengoUnjugador(
     String nombre,
-    String posicion1,
-    String posicion2,
+    PosicionJugador posicion1,
+    PosicionJugador posicion2,
     String nivel
   ) {
     Jugador jugador = new Jugador(nombre, posicion1, posicion2, nivel);
@@ -224,7 +253,7 @@ public class ServicioEstadisticaTest {
 
     verify(repositorioEstadisticaMock, times(1)).guardar(any(Estadistica.class));
 
-    verify(partidoMock, times(1)).setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    verify(partidoMock, times(1)).setEstadoEstadisticas(EstadoEstadisticas.EN_REVISION);
     verify(repositorioPartidoMock, times(1)).guardar(partidoMock);
 
     verify(servicioNotificacionMock, times(1))
@@ -245,7 +274,7 @@ public class ServicioEstadisticaTest {
 
     Partido partido = new Partido();
     partido.setId(1L);
-    partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.EN_REVISION);
     partido.setOrganizador(usuarioOrganizador);
     partido.setEquipo1(equipoLocal);
     partido.setEquipo2(equipoVisitante);
@@ -281,7 +310,7 @@ public class ServicioEstadisticaTest {
 
     Partido partido = new Partido();
     partido.setId(1L);
-    partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.EN_REVISION);
     partido.setOrganizador(usuarioOrganizador);
     partido.setEquipo1(equipoLocal);
     partido.setEquipo2(equipoVisitante);
@@ -332,7 +361,7 @@ public class ServicioEstadisticaTest {
 
     Partido partido = new Partido();
     partido.setId(1L);
-    partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.EN_REVISION);
     partido.setOrganizador(usuarioOrganizador);
     partido.setEquipo1(equipoLocal);
     partido.setEquipo2(equipoVisitante);

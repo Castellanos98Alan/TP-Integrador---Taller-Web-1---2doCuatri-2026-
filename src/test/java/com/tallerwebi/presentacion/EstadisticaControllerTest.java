@@ -39,9 +39,7 @@ public class EstadisticaControllerTest {
           .param("estadisticas[0].rojas", "0")
       )
       .andExpect(status().is3xxRedirection())
-      .andExpect(
-        redirectedUrl("/partido/1/sala-de-espera?exito=Estadisticas+guardadas+correctamente")
-      );
+      .andExpect(redirectedUrl("/partido/1/sala-de-espera"));
   }
 
   @Test

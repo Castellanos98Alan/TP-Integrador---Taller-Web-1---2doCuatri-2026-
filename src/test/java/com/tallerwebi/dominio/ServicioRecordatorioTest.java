@@ -3,6 +3,7 @@ package com.tallerwebi.dominio;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.servicio.ServicioEmail;
 import com.tallerwebi.dominio.servicio.ServicioRecordatorio;
@@ -41,7 +42,7 @@ public class ServicioRecordatorioTest {
 
     Partido partido = new Partido();
     partido.setFecha(fechaPartido);
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(EstadoPartido.ACTIVO);
 
     InscripcionPartido inscripcion = new InscripcionPartido(partido, jugador);
 
@@ -79,7 +80,7 @@ public class ServicioRecordatorioTest {
 
     Partido partido = new Partido();
     partido.setFecha(fechaPartido);
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(EstadoPartido.ACTIVO);
 
     InscripcionPartido inscripcion = new InscripcionPartido(partido, jugador);
 
@@ -115,7 +116,7 @@ public class ServicioRecordatorioTest {
 
     Partido partido = new Partido();
     partido.setFecha(fechaPartido);
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(EstadoPartido.ACTIVO);
 
     InscripcionPartido inscripcion = new InscripcionPartido(partido, jugador);
 

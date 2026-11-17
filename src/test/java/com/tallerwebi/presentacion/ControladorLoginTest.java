@@ -3,8 +3,10 @@ package com.tallerwebi.presentacion;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import com.tallerwebi.dominio.servicio.ServicioLogin;
@@ -67,10 +69,12 @@ public class ControladorLoginTest {
   @Test
   public void registrarmeSiUsuarioNoExisteDeberiaCrearUsuarioYVolverAlLogin()
     throws UsuarioExistente {
-    ModelAndView modelAndView = controladorLogin.registrarme(usuarioMock, "Dami", "Defensor", null);
+    ModelAndView modelAndView = controladorLogin.registrarme(usuarioMock, "Dami", "DEFENSOR", null);
 
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
-    verify(servicioLoginMock, times(1)).registrar(usuarioMock, "Dami", "Defensor", null);
+    // Verificamos que el controlador lo haya convertido correctamente al Enum para el servicio
+    verify(servicioLoginMock, times(1))
+      .registrar(usuarioMock, "Dami", PosicionJugador.DEFENSOR, null);
   }
 
   // MODIFICADO: se simula el usuario existente usando la nueva firma.
@@ -79,9 +83,9 @@ public class ControladorLoginTest {
     throws UsuarioExistente {
     doThrow(UsuarioExistente.class)
       .when(servicioLoginMock)
-      .registrar(usuarioMock, "Dami", "Defensor", null);
+      .registrar(usuarioMock, "Dami", PosicionJugador.DEFENSOR, null);
 
-    ModelAndView modelAndView = controladorLogin.registrarme(usuarioMock, "Dami", "Defensor", null);
+    ModelAndView modelAndView = controladorLogin.registrarme(usuarioMock, "Dami", "DEFENSOR", null);
 
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-usuario"));
     assertThat(
@@ -95,9 +99,9 @@ public class ControladorLoginTest {
   public void errorEnRegistrarmeDeberiaVolverAFormularioYMostrarError() throws UsuarioExistente {
     doThrow(RuntimeException.class)
       .when(servicioLoginMock)
-      .registrar(usuarioMock, "Dami", "Defensor", null);
+      .registrar(usuarioMock, "Dami", PosicionJugador.DEFENSOR, null);
 
-    ModelAndView modelAndView = controladorLogin.registrarme(usuarioMock, "Dami", "Defensor", null);
+    ModelAndView modelAndView = controladorLogin.registrarme(usuarioMock, "Dami", "DEFENSOR", null);
 
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-usuario"));
     assertThat(

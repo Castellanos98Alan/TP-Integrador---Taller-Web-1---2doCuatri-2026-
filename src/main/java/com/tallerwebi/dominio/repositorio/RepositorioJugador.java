@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.repositorio;
 
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Jugador;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface RepositorioJugador {
 
   List<Jugador> buscarRankingFiltrado(
     String nivel,
-    String posicion,
+    PosicionJugador posicion,
     String rango,
     String vista,
     Long usuarioId

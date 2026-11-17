@@ -1,10 +1,10 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.Cancha;
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import com.tallerwebi.dominio.InscripcionPartido;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.Partido.EstadoPartido;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
@@ -74,7 +74,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
 
     validarCanchaDisponible(cancha, datos.getFechaHora());
-    validarRangoParaCrearPartido(datos.getNivel(), creador); //nuevo
+    Jugador jugadorCreador = validarRangoParaCrearPartido(datos.getNivel(), creador);
 
     Partido partido = new Partido();
 
@@ -89,10 +89,17 @@ public class ServicioPartidoImpl implements ServicioPartido {
       partido.setCodigoDeAcceso(obtenerCodigoParaPartido(datos.getCodigoDeAcceso()));
     }
 
+    // El organizador se inscribe automaticamente al partido que crea
+    InscripcionPartido inscripcionOrganizador = new InscripcionPartido(partido, jugadorCreador);
+    inscripcionOrganizador.setFechaInscripcion(LocalDateTime.now());
+
+    partido.getInscripciones().add(inscripcionOrganizador);
+    partido.setCantJugadores(partido.getInscripciones().size());
+
     repositorioPartido.guardar(partido);
   }
 
-  private void validarRangoParaCrearPartido(String nivelPartido, Usuario creador) {
+  private Jugador validarRangoParaCrearPartido(String nivelPartido, Usuario creador) {
     Jugador jugador = servicioJugador.buscarPorUsuarioId(creador.getId());
 
     if (jugador == null) {
@@ -115,6 +122,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
         "No podes crear un partido de un rango diferente al tuyo."
       );
     }
+
+    return jugador;
   }
 
   private String obtenerCategoriaRango(String nivel) {
@@ -205,7 +214,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
       throw new RuntimeException("No estas autorizado para cancelar este partido.");
     }
 
-    if (partido.getEstado() == Partido.EstadoPartido.FINALIZADO) {
+    if (partido.getEstado() == EstadoPartido.FINALIZADO) {
       throw new RuntimeException("No se puede cancelar un partido que ya finalizo.");
     }
 

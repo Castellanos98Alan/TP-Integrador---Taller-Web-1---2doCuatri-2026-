@@ -1,8 +1,8 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.Partido.EstadoPartido;
 import com.tallerwebi.dominio.excepcion.CupoMaximoAlcanzado;
 import com.tallerwebi.dominio.excepcion.DiferenciaHoraria;
 import com.tallerwebi.dominio.excepcion.EstadoPartidoInvalido;
