@@ -317,3 +317,6 @@ UPDATE Partido
 SET resultado_id = @resultado_test_3
 WHERE id = @partido_test_3
   AND resultado_id IS NULL;
+
+
+ALTER TABLE Partido MODIFY COLUMN estadoEstadisticas ENUM('PENDIENTE_DE_CARGA', 'EN_REVISION', 'CONFIRMADA', 'RECHAZADA') DEFAULT 'PENDIENTE_DE_CARGA';

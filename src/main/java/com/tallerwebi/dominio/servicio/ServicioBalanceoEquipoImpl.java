@@ -121,7 +121,7 @@ public class ServicioBalanceoEquipoImpl implements ServicioBalanceoEquipo {
       }
     }
 
-    //Regla 3: si hay empate se asiga al jugador aquel equipo con menor puntos. 
+    //Regla 3: si hay empate se asiga al jugador aquel equipo con menor puntos.
     return ptsLocal <= ptsVis;
   }
 
