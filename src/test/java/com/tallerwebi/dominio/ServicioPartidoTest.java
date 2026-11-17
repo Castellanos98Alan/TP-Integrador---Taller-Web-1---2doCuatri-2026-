@@ -450,13 +450,20 @@ public class ServicioPartidoTest {
   @Test
   public void deberiaGuardarElPartidoAlCrearPartido() {
     Cancha cancha = new Cancha();
-
     cancha.setId(1L);
+
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    Jugador jugador = new Jugador();
+    jugador.setNivel("B");
 
     when(repositorioCanchaMock.buscarPorNombre("Cancha Los Leones")).thenReturn(cancha);
 
     when(repositorioPartidoMock.buscarPartidosEnRango(any(), any(), any()))
       .thenReturn(new ArrayList<>());
+
+    when(servicioJugadorMock.buscarPorUsuarioId(1L)).thenReturn(jugador);
 
     DatosCrearPartido datos = new DatosCrearPartido(
       "Cancha Los Leones",
@@ -465,7 +472,7 @@ public class ServicioPartidoTest {
       "INTERMEDIO"
     );
 
-    servicioPartido.crearPartido(datos, new Usuario());
+    servicioPartido.crearPartido(datos, usuario);
 
     verify(repositorioPartidoMock).guardar(any(Partido.class));
   }
