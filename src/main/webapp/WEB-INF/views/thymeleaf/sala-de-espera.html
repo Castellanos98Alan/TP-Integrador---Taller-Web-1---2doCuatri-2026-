@@ -186,7 +186,7 @@
 
                 <div th:each="notificacion : ${notificaciones}" class="border-bottom py-2">
                     <div th:if="${notificacion.tipoDeNotificacion.name() == 'INVITACION_PARTIDO'}">
-                        <strong>⚽ Invitación a partido</strong>
+                        <strong> Invitación a partido</strong>
                         <p class="mb-1" th:text="${notificacion.mensaje}"></p>
                         <form th:action="@{/notificacion/marcar-leida}" method="post">
                             <input type="hidden" name="idNotificacion" th:value="${notificacion.id}">
@@ -196,7 +196,7 @@
                     </div>
 
                     <div th:if="${notificacion.tipoDeNotificacion.name() == 'PARTIDO_CANCELADO'}">
-                        <strong>❌ Partido cancelado</strong>
+                        <strong> Partido cancelado</strong>
                         <p class="mb-1" th:text="${notificacion.mensaje}"></p>
                         <form th:action="@{/notificacion/marcar-leida}" method="post">
                             <input type="hidden" name="idNotificacion" th:value="${notificacion.id}">
