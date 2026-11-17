@@ -337,14 +337,16 @@
 
                     <div class="ms-auto d-flex flex-wrap gap-2 align-items-center">
                         <!-- Botón Cancelar (Solo organizador) -->
-                        <!-- Botón Cancelar (Solo organizador) -->
                         <form th:if="${session.USUARIO != null and partido.organizador != null and partido.organizador.id == session.USUARIO.id}"
                               th:action="@{/partido/{id}(id=${partido.id})}"
                               method="post"
                               class="m-0">
-                            <button type="submit" class="btn btn-danger fw-bold px-3 py-2" style="border-radius: 12px;">
+                            <!-- Botón Cancelar (Solo organizador) abre el Modal -->
+                            <div th:if="${session.USUARIO != null and partido.organizador != null and partido.organizador.id == session.USUARIO.id}">
+                            <button type="button" class="btn btn-danger fw-bold px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalCancelarPartido" style="border-radius: 12px;">
                                 <i class="fa-solid fa-ban me-1"></i> Cancelar Partido
                             </button>
+                        </div>
                         </form>
 
                         <!-- Botón Invitar Amigos (Solo participantes) -->
@@ -423,13 +425,16 @@
 
                     <div class="d-flex align-items-center gap-2">
                         <span class="badge-puntos">OK</span>
-                        <!-- Botón de Expulsar (Solo organizador y no a sí mismo) -->
-                        <form th:if="${session.USUARIO != null and partido.organizador != null and partido.organizador.id == session.USUARIO.id and ins.jugador.usuario.id != session.USUARIO.id}"
-                              th:action="@{/partido/{id}/expulsar/{idJugador}(id=${partido.id}, idJugador=${ins.jugador.id})}" method="post" class="m-0">
-                            <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Expulsar jugador">
+                        <!-- Botón de Expulsar (Solo organizador y no a sí mismo) abre el Modal dinámico -->
+                        <div th:if="${session.USUARIO != null and partido.organizador != null and partido.organizador.id == session.USUARIO.id and ins.jugador.usuario.id != session.USUARIO.id}">
+                            <button type="button" class="btn btn-sm btn-outline-danger border-0 btn-expulsar"
+                                    title="Expulsar jugador"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalExpulsarJugador"
+                                    th:attr="data-id-jugador=${ins.jugador.id}, data-nombre-jugador=${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">
                                 <i class="fa-solid fa-user-minus"></i>
                             </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -623,7 +628,82 @@
     </div>
 </div>
 
+<!-- MODAL CANCELAR PARTIDO -->
+<div class="modal fade" id="modalCancelarPartido" tabindex="-1" aria-labelledby="tituloCancelarPartido" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center pt-0 pb-4">
+                <i class="fa-solid fa-triangle-exclamation text-danger mb-3" style="font-size: 50px;"></i>
+                <h4 class="fw-bold mb-3" id="tituloCancelarPartido">¿Estás seguro?</h4>
+                <p class="text-muted mb-4">Esta acción no se puede deshacer. Se notificará a todos los inscriptos y la sala se cerrará permanentemente.</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius: 10px;">Volver</button>
+                    
+                    <form th:action="@{/partido/{id}(id=${partido.id})}" method="post" class="m-0">
+                        <button type="submit" class="btn btn-danger fw-bold px-4" style="border-radius: 10px;">Sí, cancelar partido</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EXPULSAR JUGADOR -->
+<div class="modal fade" id="modalExpulsarJugador" tabindex="-1" aria-labelledby="tituloExpulsarJugador" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center pt-0 pb-4">
+                <i class="fa-solid fa-user-xmark text-danger mb-3" style="font-size: 50px;"></i>
+                <h4 class="fw-bold mb-3" id="tituloExpulsarJugador">Expulsar jugador</h4>
+                <p class="text-muted mb-4">¿Estás seguro de que querés expulsar a <strong id="nombreJugadorModal" class="text-dark">este jugador</strong> de la sala?</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius: 10px;">Cancelar</button>
+                    
+                    <form id="formExpulsarJugador" action="" method="post" class="m-0">
+                        <button type="submit" class="btn btn-danger fw-bold px-4" style="border-radius: 10px;">Expulsar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const idPartido = /*[[${partido.id}]]*/ 0;
+        
+        // Seleccionamos todos los botones que abren el modal de expulsar
+        const botonesExpulsar = document.querySelectorAll('.btn-expulsar');
+        
+        botonesExpulsar.forEach(boton => {
+            boton.addEventListener('click', function() {
+                // Obtenemos los datos desde los atributos "data-" del botón clickeado
+                const idJugador = this.getAttribute('data-id-jugador');
+                const nombreJugador = this.getAttribute('data-nombre-jugador');
+                
+                // Actualizamos el nombre en el texto del modal
+                document.getElementById('nombreJugadorModal').textContent = nombreJugador;
+                
+                // Actualizamos el atributo action del formulario con los IDs correctos
+                const formularioExpulsar = document.getElementById('formExpulsarJugador');
+                formularioExpulsar.action = '/spring/partido/' + idPartido + '/expulsar/' + idJugador;
+                
+                // Nota: Si la aplicación no corre bajo el contexto "/spring", 
+                // asegurate de ajustar la ruta anterior (ej: '/' + 'partido/' + idPartido...)
+            });
+        });
+    });
+</script>
+
 </body>
 </html>
