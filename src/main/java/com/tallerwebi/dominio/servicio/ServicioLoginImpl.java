@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
@@ -41,8 +42,12 @@ public class ServicioLoginImpl implements ServicioLogin {
   }
 
   @Override
-  public void registrar(Usuario usuario, String nombreJugador, String posicion1, String posicion2)
-    throws UsuarioExistente {
+  public void registrar(
+    Usuario usuario,
+    String nombreJugador,
+    PosicionJugador posicion1,
+    PosicionJugador posicion2
+  ) throws UsuarioExistente {
     validarUsuarioNuevo(usuario);
     repositorioUsuario.guardar(usuario);
 

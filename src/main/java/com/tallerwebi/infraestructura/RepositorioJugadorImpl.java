@@ -1,8 +1,8 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Enumeration.EstadoSolicitud;
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Jugador;
-import com.tallerwebi.dominio.SolicitudAmistad;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import java.util.List;
 import org.hibernate.SessionFactory;
@@ -46,7 +46,6 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
   @Override
   public List<Jugador> buscarRanking() {
     String query = "SELECT j FROM Jugador j ORDER BY j.puntos DESC";
-
     return sessionFactory.getCurrentSession().createQuery(query, Jugador.class).getResultList();
   }
 
@@ -82,7 +81,7 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
   @Override
   public List<Jugador> buscarRankingFiltrado(
     String nivel,
-    String posicion,
+    PosicionJugador posicion, // Ya recibe el Enum
     String rango,
     String vista,
     Long usuarioId
@@ -99,10 +98,10 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
   private List<Jugador> ejecutarConsultaAmigos(
     String query,
     String nivel,
-    String posicion,
+    PosicionJugador posicion, // Actualizado a PosicionJugador
     Long usuarioId
   ) {
-    if (nivel != null && !nivel.isEmpty() && posicion != null && !posicion.isEmpty()) {
+    if (nivel != null && !nivel.isEmpty() && posicion != null) {
       return sessionFactory
         .getCurrentSession()
         .createQuery(query, Jugador.class)
@@ -123,7 +122,7 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
         .getResultList();
     }
 
-    if (posicion != null && !posicion.isEmpty()) {
+    if (posicion != null) {
       return sessionFactory
         .getCurrentSession()
         .createQuery(query, Jugador.class)
@@ -141,7 +140,7 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
       .getResultList();
   }
 
-  private String getQuery(String nivel, String posicion, String rango, String vista) {
+  private String getQuery(String nivel, PosicionJugador posicion, String rango, String vista) { // Actualizado a PosicionJugador
     String query = "SELECT j FROM Jugador j WHERE 1 = 1 ";
 
     query += getFiltroNivel(nivel);
@@ -158,15 +157,13 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
     if (nivel != null && !nivel.isEmpty()) {
       return "AND j.nivel = :nivel ";
     }
-
     return "";
   }
 
-  private String getFiltroPosicion(String posicion) {
-    if (posicion != null && !posicion.isEmpty()) {
+  private String getFiltroPosicion(PosicionJugador posicion) { // Actualizado a PosicionJugador
+    if (posicion != null) { // Cambiado: los enums no tienen .isEmpty()
       return "AND j.posicion1 = :posicion ";
     }
-
     return "";
   }
 
@@ -206,12 +203,15 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
         ") "
       );
     }
-
     return "";
   }
 
-  private List<Jugador> ejecutarConsultaRanking(String query, String nivel, String posicion) {
-    if (nivel != null && !nivel.isEmpty() && posicion != null && !posicion.isEmpty()) {
+  private List<Jugador> ejecutarConsultaRanking(
+    String query,
+    String nivel,
+    PosicionJugador posicion
+  ) { // Actualizado a PosicionJugador
+    if (nivel != null && !nivel.isEmpty() && posicion != null) {
       return sessionFactory
         .getCurrentSession()
         .createQuery(query, Jugador.class)
@@ -228,7 +228,7 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
         .getResultList();
     }
 
-    if (posicion != null && !posicion.isEmpty()) {
+    if (posicion != null) {
       return sessionFactory
         .getCurrentSession()
         .createQuery(query, Jugador.class)

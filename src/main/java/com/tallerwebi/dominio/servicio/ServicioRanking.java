@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Jugador;
 import java.util.List;
 
@@ -9,7 +10,7 @@ public interface ServicioRanking {
   String calcularNivel(Integer puntos);
   List<Jugador> obtenerRankingFiltrado(
     String nivel,
-    String posicion,
+    PosicionJugador posicion,
     String rango,
     String vista,
     Long usuarioId
