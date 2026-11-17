@@ -406,8 +406,20 @@
                                         th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
                             </a>
                             <span class="badge-posicion">Confirmado</span>
+
+                            <span class="badge-posicion"
+                                  th:if="${ins.jugador.posicion1 != null}"
+                                  th:text="${ins.jugador.posicion1}">
+                                </span>
+
+                            <span class="badge-posicion"
+                                  th:if="${ins.jugador.posicion2 != null}"
+                                  th:text="${ins.jugador.posicion2}">
+                                </span>
                         </div>
                     </div>
+
+
 
                     <div class="d-flex align-items-center gap-2">
                         <span class="badge-puntos">OK</span>
