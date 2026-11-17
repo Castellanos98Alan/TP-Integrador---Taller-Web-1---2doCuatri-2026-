@@ -13,6 +13,7 @@ import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
 import com.tallerwebi.presentacion.DatosCrearPartido;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,6 +74,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
     }
 
     validarCanchaDisponible(cancha, datos.getFechaHora());
+    Jugador jugadorCreador = validarRangoParaCrearPartido(datos.getNivel(), creador);
 
     Partido partido = new Partido();
 
@@ -87,7 +89,77 @@ public class ServicioPartidoImpl implements ServicioPartido {
       partido.setCodigoDeAcceso(obtenerCodigoParaPartido(datos.getCodigoDeAcceso()));
     }
 
+    // El organizador se inscribe automaticamente al partido que crea
+    InscripcionPartido inscripcionOrganizador = new InscripcionPartido(partido, jugadorCreador);
+    inscripcionOrganizador.setFechaInscripcion(LocalDateTime.now());
+
+    partido.getInscripciones().add(inscripcionOrganizador);
+    partido.setCantJugadores(partido.getInscripciones().size());
+
     repositorioPartido.guardar(partido);
+  }
+
+  private Jugador validarRangoParaCrearPartido(String nivelPartido, Usuario creador) {
+    Jugador jugador = servicioJugador.buscarPorUsuarioId(creador.getId());
+
+    if (jugador == null) {
+      throw new RangoJugadorIncompatibleException(
+        "Debes tener un perfil de jugador para crear un partido."
+      );
+    }
+
+    String rangoJugador = obtenerCategoriaRango(jugador.getNivel());
+    String rangoPartido = obtenerCategoriaRango(nivelPartido);
+
+    if (rangoJugador == null || rangoPartido == null) {
+      throw new RangoJugadorIncompatibleException(
+        "El rango del jugador o del partido no es válido."
+      );
+    }
+
+    if (!rangoJugador.equals(rangoPartido)) {
+      throw new RangoJugadorIncompatibleException(
+        "No podes crear un partido de un rango diferente al tuyo."
+      );
+    }
+
+    return jugador;
+  }
+
+  private String obtenerCategoriaRango(String nivel) {
+    if (nivel == null) {
+      return null;
+    }
+
+    String rango = nivel.trim().toUpperCase(Locale.ROOT);
+
+    if (esRangoAvanzado(rango)) {
+      return "AVANZADO";
+    }
+
+    if (esRangoIntermedio(rango)) {
+      return "INTERMEDIO";
+    }
+
+    if (esRangoBajo(rango)) {
+      return "BAJO";
+    }
+
+    return null;
+  }
+
+  private boolean esRangoAvanzado(String rango) {
+    return "SS".equals(rango) || "S".equals(rango) || "AVANZADO".equals(rango);
+  }
+
+  private boolean esRangoIntermedio(String rango) {
+    return "A".equals(rango) || "B".equals(rango) || "INTERMEDIO".equals(rango);
+  }
+
+  private boolean esRangoBajo(String rango) {
+    return (
+      "C".equals(rango) || "D".equals(rango) || "BAJO".equals(rango) || "PRINCIPIANTE".equals(rango)
+    );
   }
 
   private String obtenerCodigoParaPartido(String codigoIngresado) {
@@ -100,7 +172,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
 
   @Override
   public String generarCodigoAcceso() {
-    return UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase(Locale.ROOT);
+    return UUID.randomUUID().toString().substring(0, 8).toUpperCase(Locale.ROOT);
   }
 
   private void validarCanchaDisponible(Cancha cancha, LocalDateTime fechaHora) {
@@ -212,7 +284,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
       partido,
       usuario,
       codigoAcceso,
-      () -> servicioNotificacion.existeInvitacionParaPartido(usuario.getId(), partido.getId())
+      usuario != null &&
+      servicioNotificacion.existeInvitacionParaPartido(usuario.getId(), partido.getId())
     );
   }
 
@@ -227,9 +300,8 @@ public class ServicioPartidoImpl implements ServicioPartido {
     return ControlAccesoPartido.tieneAcceso(
       partido,
       usuario,
-      () ->
-        usuario != null &&
-        servicioNotificacion.existeInvitacionParaPartido(usuario.getId(), partido.getId())
+      usuario != null &&
+      servicioNotificacion.existeInvitacionParaPartido(usuario.getId(), partido.getId())
     );
   }
 
