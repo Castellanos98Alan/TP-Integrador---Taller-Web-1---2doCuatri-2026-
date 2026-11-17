@@ -224,6 +224,14 @@
             line-height: 1.6;
         }
 
+        .pregunta .lista-puntaje {
+            margin: 10px 0 0;
+            padding-left: 20px;
+            color: #71827c;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
         /* MENSAJE FINAL */
         .contacto-ayuda {
             text-align: center;
@@ -742,44 +750,55 @@
                 </section>
             </div>
 
-            <!-- PAGOS -->
+
+            <!-- SISTEMA DE PUNTAJE -->
             <div class="col-md-6 categoria-ayuda">
 
                 <section class="tarjeta-ayuda">
 
                     <div class="icono-categoria">
-                        <i class="fa-solid fa-credit-card"></i>
+                        <i class="fa-solid fa-star"></i>
                     </div>
 
-                    <h3>Pagos y señas</h3>
+                    <h3>Sistema de Puntaje</h3>
 
                     <details class="pregunta">
-                        <summary>¿Para qué sirve la seña?</summary>
+                        <summary>¿Cómo funciona el sistema de puntaje?</summary>
                         <p>
-                            Es un pago anticipado que permite confirmar
-                            la creación y reserva del partido.
+                            Cada partido suma o resta puntos según tu
+                            rendimiento individual y el resultado del encuentro.
                         </p>
                     </details>
 
                     <details class="pregunta">
-                        <summary>¿Cómo puedo realizar el pago?</summary>
-                        <p>
-                            El sistema utiliza Mercado Pago.
-                            Al crear un partido, podrás continuar
-                            al proceso de pago.
-                        </p>
+                        <summary>¿Cuántos puntos gano por un gol o asistencia?</summary>
+                        <ul class="lista-puntaje">
+                            <li><strong>Gol:</strong> +2 puntos</li>
+                            <li><strong>Asistencia:</strong> +1 punto</li>
+                        </ul>
                     </details>
 
                     <details class="pregunta">
-                        <summary>¿Puedo crear un partido sin pagar?</summary>
-                        <p>
-                            No. Es necesario completar el pago de la
-                            seña para finalizar la creación del partido.
-                        </p>
+                        <summary>¿Cómo afectan las tarjetas?</summary>
+                        <ul class="lista-puntaje">
+                            <li><strong>Tarjeta amarilla:</strong> -1 punto</li>
+                            <li><strong>Tarjeta roja:</strong> -2 puntos</li>
+                        </ul>
+                    </details>
+
+                    <details class="pregunta">
+                        <summary>¿Cuántos puntos obtengo según el resultado?</summary>
+                        <ul class="lista-puntaje">
+                            <li><strong>Victoria:</strong> +4 puntos</li>
+                            <li><strong>Empate:</strong> +2 puntos</li>
+                            <li><strong>Derrota:</strong> -1 punto</li>
+                        </ul>
                     </details>
 
                 </section>
             </div>
+
+
 
             <!-- NOTIFICACIONES -->
             <div class="col-md-6 categoria-ayuda">
@@ -870,9 +889,7 @@
 
 </main>
 
-<footer class="footer-ayuda">
-    <p>© 2026 ArmoLaCancha - Todos los derechos reservados.</p>
-</footer>
+<div th:replace="~{footer :: footer}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
