@@ -1,10 +1,10 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.Cancha;
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import com.tallerwebi.dominio.InscripcionPartido;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.Partido.EstadoPartido;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.repositorio.RepositorioCancha;
@@ -214,7 +214,7 @@ public class ServicioPartidoImpl implements ServicioPartido {
       throw new RuntimeException("No estas autorizado para cancelar este partido.");
     }
 
-    if (partido.getEstado() == Partido.EstadoPartido.FINALIZADO) {
+    if (partido.getEstado() == EstadoPartido.FINALIZADO) {
       throw new RuntimeException("No se puede cancelar un partido que ya finalizo.");
     }
 

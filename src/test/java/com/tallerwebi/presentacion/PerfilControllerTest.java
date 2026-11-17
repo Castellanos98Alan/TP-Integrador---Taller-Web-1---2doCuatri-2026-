@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
@@ -193,6 +194,7 @@ public class PerfilControllerTest {
       .thenReturn(List.of(estadistica));
     when(servicioPartido.buscarPartidosPorJugador(jugador.getId())).thenReturn(List.of(partido));
     when(partido.getId()).thenReturn(1L);
+    when(partido.getEstado()).thenReturn(EstadoPartido.FINALIZADO);
 
     ModelAndView modelAndView = controlador.mostrarFormulario(request);
 

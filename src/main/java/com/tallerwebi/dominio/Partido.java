@@ -4,6 +4,8 @@ package com.tallerwebi.dominio;
 //import jakarta.persistence.ManyToOne;
 //import jakarta.persistence.OneToMany;
 
+import com.tallerwebi.dominio.Enumeration.EstadoEstadisticas;
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,20 +14,6 @@ import java.util.List;
 @Entity
 @SuppressWarnings("PMD.TooManyFields")
 public class Partido {
-
-  public enum EstadoPartido {
-    ACTIVO,
-    FINALIZADO,
-    CANCELADO,
-    PENDIENTE,
-    ABIERTO,
-  }
-
-  public enum EstadoEstadisticas {
-    PENDIENTE_DE_CARGA,
-    EN_REVISION,
-    CONFIRMADA,
-  }
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

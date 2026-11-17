@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import com.tallerwebi.dominio.servicio.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -331,13 +332,16 @@ public class PerfilController {
     return model;
   }
 
-  private List<Map<String, Object>> armarHistorialPartidos(
+  private List<Map> armarHistorialPartidos(
     List<Partido> partidosJugador,
     List<Estadistica> estadisticasJugador
   ) {
-    List<Map<String, Object>> historialPartidos = new ArrayList<>();
+    List<Map> historialPartidos = new ArrayList<>();
 
     for (Partido partido : partidosJugador) {
+      if (partido.getEstado() == EstadoPartido.FINALIZADO) {
+        historialPartidos.add(construirDatosPartido(partido, estadisticasJugador));
+
       Map<String, Object> datosPartido = new ModelMap();
 
       datosPartido.put("fecha", partido.getFecha());
@@ -377,13 +381,52 @@ public class PerfilController {
 
           break;
         }
-      }
 
-      historialPartidos.add(datosPartido);
+      }
     }
 
     return historialPartidos;
   }
+
+  private Map<String, Object> construirDatosPartido(
+    Partido partido,
+    List<Estadistica> estadisticasJugador
+  ) {
+    Map<String, Object> datosPartido = new ModelMap();
+    datosPartido.put("idPartido", partido.getId());
+    datosPartido.put("fecha", partido.getFecha());
+    datosPartido.put("goles", 0);
+    datosPartido.put("asistencias", 0);
+    datosPartido.put("amarillas", 0);
+    datosPartido.put("rojas", 0);
+    datosPartido.put("puntaje", 0);
+
+    Estadistica estadistica = buscarEstadisticaDePartido(partido.getId(), estadisticasJugador);
+    if (estadistica != null) {
+      datosPartido.put("goles", valorONullACero(estadistica.getGoles()));
+      datosPartido.put("asistencias", valorONullACero(estadistica.getAsistencias()));
+      datosPartido.put("amarillas", valorONullACero(estadistica.getAmarillas()));
+      datosPartido.put("rojas", valorONullACero(estadistica.getRojas()));
+      datosPartido.put("puntaje", valorONullACero(estadistica.getPuntaje()));
+    }
+
+    return datosPartido;
+  }
+
+  private Estadistica buscarEstadisticaDePartido(
+    Long idPartido,
+    List<Estadistica> estadisticasJugador
+  ) {
+    for (Estadistica estadistica : estadisticasJugador) {
+      if (estadistica.getPartido() != null && estadistica.getPartido().getId().equals(idPartido)) {
+        return estadistica;
+      }
+    }
+    return null;
+  }
+
+  private int valorONullACero(Integer valor) {
+    return valor != null ? valor : 0;
 
   private Map<String, Object> armarDatosEvolucion(List<Estadistica> estadisticas) {
     Map<String, Object> datos = new ModelMap();
@@ -529,5 +572,6 @@ public class PerfilController {
     }
 
     return linea;
+
   }
 }

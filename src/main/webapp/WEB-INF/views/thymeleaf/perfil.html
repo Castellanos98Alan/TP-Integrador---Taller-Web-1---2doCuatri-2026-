@@ -991,6 +991,8 @@
 
         <!-- Últimos partidos -->
 
+        <!-- Últimos partidos -->
+
         <div class="pg-partidos" id="partidos">
 
             <div class="panel">
@@ -1013,6 +1015,18 @@
                         <span>ROJAS</span>
                         <span>PUNTAJE</span>
                     </div>
+
+                    <a class="tabla-partido-fila text-decoration-none text-dark"
+                       style="cursor: pointer;"
+                       th:each="partido : ${historialPartidos}"
+                       th:href="@{/partido/{id}/resumen(id=${partido['idPartido']})}">
+                        <span th:text="${#temporals.format(partido['fecha'], 'dd/MM/yyyy')}"></span>
+                        <span th:text="${partido['goles']}"></span>
+                        <span th:text="${partido['asistencias']}"></span>
+                        <span th:text="${partido['amarillas']}"></span>
+                        <span th:text="${partido['rojas']}"></span>
+                        <span class="fw-bold text-success" th:text="${partido['puntaje']}"></span>
+                    </a>
 
                     <div class="tabla-partido-fila" th:each="partido : ${historialPartidos}">
                         <span class="celda-fecha" th:text="${#temporals.format(partido['fecha'], 'dd/MM/yyyy')}"></span>
@@ -1038,6 +1052,7 @@
                         <span class="celda-puntaje"><b th:text="${partido['puntaje']}"></b> <small>pts</small></span>
                     </div>
 
+
                 </div>
 
                 <div class="actividad-vacia" th:if="${#lists.isEmpty(historialPartidos)}">
@@ -1049,6 +1064,8 @@
                 </div>
 
             </div>
+
+        </div>
 
         </div>
 
