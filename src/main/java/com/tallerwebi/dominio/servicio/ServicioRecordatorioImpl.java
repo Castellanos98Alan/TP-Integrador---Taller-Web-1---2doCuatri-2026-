@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import com.tallerwebi.dominio.InscripcionPartido;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
@@ -39,8 +40,8 @@ public class ServicioRecordatorioImpl implements ServicioRecordatorio {
 
   private void procesarPartido(Partido partido) {
     if (
-      partido.getEstado() == Partido.EstadoPartido.CANCELADO ||
-      partido.getEstado() == Partido.EstadoPartido.FINALIZADO
+      partido.getEstado() == EstadoPartido.CANCELADO ||
+      partido.getEstado() == EstadoPartido.FINALIZADO
     ) {
       return;
     }

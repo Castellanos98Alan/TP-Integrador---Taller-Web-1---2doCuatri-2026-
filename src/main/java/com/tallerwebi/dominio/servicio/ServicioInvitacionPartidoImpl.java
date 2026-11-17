@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import com.tallerwebi.dominio.Partido;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
@@ -56,7 +57,7 @@ public class ServicioInvitacionPartidoImpl implements ServicioInvitacionPartido 
   }
 
   private void validarPartidoActivo(Partido partido) throws InvitacionAlPartidoException {
-    if (partido.getEstado() != Partido.EstadoPartido.PENDIENTE) {
+    if (partido.getEstado() != EstadoPartido.PENDIENTE) {
       throw new InvitacionAlPartidoException("El partido no admite invitaciones");
     }
   }
