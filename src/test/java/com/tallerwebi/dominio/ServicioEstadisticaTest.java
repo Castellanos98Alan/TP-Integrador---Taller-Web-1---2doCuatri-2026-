@@ -6,9 +6,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Enumeration.EstadoEstadisticas;
-
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;

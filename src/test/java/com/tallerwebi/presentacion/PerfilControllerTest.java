@@ -8,9 +8,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
-import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Enumeration.EstadoPartido;
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Estadistica;
 import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.Partido;
