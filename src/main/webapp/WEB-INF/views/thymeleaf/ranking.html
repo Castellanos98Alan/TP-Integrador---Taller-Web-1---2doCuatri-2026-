@@ -764,6 +764,11 @@
             + Crear partido
         </a>
 
+        <a class="boton-logout" th:if="${esMiPerfil}" th:href="@{/login}"
+           title="Cerrar sesión" aria-label="Cerrar sesión">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </a>
+
     </div>
 
 </nav>

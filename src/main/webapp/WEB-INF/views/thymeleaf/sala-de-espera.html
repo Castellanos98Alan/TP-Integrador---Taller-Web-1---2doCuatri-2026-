@@ -522,6 +522,15 @@
                                     </a>
                                     <div class="d-flex gap-1 mt-1">
                                         <span class="badge-posicion">Titular</span>
+                                        <span class="badge-posicion"
+                                              th:if="${ins.jugador.posicion1 != null}"
+                                              th:text="${ins.jugador.posicion1}">
+                                        </span>
+
+                                        <span class="badge-posicion"
+                                              th:if="${ins.jugador.posicion2 != null}"
+                                              th:text="${ins.jugador.posicion2}">
+                                        </span>
                                         <span th:if="${ins.esCapitan}" class="badge bg-warning text-dark" style="font-size: 10px;">
                                             <i class="fa-solid fa-crown me-1"></i> Capitán
                                         </span>
