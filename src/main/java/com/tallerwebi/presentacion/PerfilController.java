@@ -39,6 +39,8 @@ public class PerfilController {
   private static final String FOTO = "foto";
   private static final int LONGITUD_CABECERA = 12;
   private static final String CARPETA_FOTOS = "src/main/webapp/uploads/perfiles";
+  private static final int INTERVALO_ESCALA = 5;
+  private static final int ESCALA_MINIMA = 5;
 
   @Autowired
   public PerfilController(
@@ -323,8 +325,8 @@ public class PerfilController {
     model.put("partidosJugador", partidosJugador);
     model.put("estadisticasJugador", estadisticasJugador);
     model.put("historialPartidos", armarHistorialPartidos(partidosJugador, estadisticasJugador));
-
-    model.put("estadisticasJugador", estadisticasJugador);
+    Map<String, Object> evolucion = armarDatosEvolucion(estadisticasJugador);
+    model.putAll(evolucion);
 
     return model;
   }
@@ -339,6 +341,28 @@ public class PerfilController {
       Map<String, Object> datosPartido = new ModelMap();
 
       datosPartido.put("fecha", partido.getFecha());
+
+      if (partido.getResultado() != null) {
+        int golesLocal = partido.getResultado().getGolesLocal();
+        int golesVisitante = partido.getResultado().getGolesVisitante();
+
+        String resultado = golesLocal + " - " + golesVisitante;
+        String condicion;
+
+        if (golesLocal > golesVisitante) {
+          condicion = "Victoria";
+        } else if (golesLocal < golesVisitante) {
+          condicion = "Derrota";
+        } else {
+          condicion = "Empate";
+        }
+
+        datosPartido.put("resultado", resultado);
+        datosPartido.put("condicion", condicion);
+      } else {
+        datosPartido.put("resultado", "Sin resultado");
+        datosPartido.put("condicion", "Sin resultado");
+      }
 
       for (Estadistica estadistica : estadisticasJugador) {
         if (
@@ -359,5 +383,151 @@ public class PerfilController {
     }
 
     return historialPartidos;
+  }
+
+  private Map<String, Object> armarDatosEvolucion(List<Estadistica> estadisticas) {
+    Map<String, Object> datos = new ModelMap();
+
+    Integer anio = obtenerAnioMasReciente(estadisticas);
+    Map<Integer, List<Integer>> puntajesPorMes = new HashMap<>();
+
+    if (anio != null) {
+      puntajesPorMes = agruparPuntajesPorMes(estadisticas, anio);
+    }
+
+    int escala = calcularEscala(puntajesPorMes);
+
+    List<Map<String, Object>> puntos = armarPuntosEvolucion(puntajesPorMes, escala);
+
+    datos.put("hayDatosEvolucion", !puntos.isEmpty());
+    datos.put("anioEvolucion", anio);
+    datos.put("escalaEvolucion", escala);
+    datos.put("puntosEvolucion", puntos);
+    datos.put("lineaEvolucion", armarLineaEvolucion(puntos));
+
+    return datos;
+  }
+
+  private Integer obtenerAnioMasReciente(List<Estadistica> estadisticas) {
+    Integer anio = null;
+
+    for (Estadistica estadistica : estadisticas) {
+      if (
+        estadistica.getPartido() == null ||
+        estadistica.getPartido().getFecha() == null ||
+        estadistica.getPuntaje() == null
+      ) {
+        continue;
+      }
+
+      int anioPartido = estadistica.getPartido().getFecha().getYear();
+
+      if (anio == null || anioPartido > anio) {
+        anio = anioPartido;
+      }
+    }
+
+    return anio;
+  }
+
+  private Map<Integer, List<Integer>> agruparPuntajesPorMes(
+    List<Estadistica> estadisticas,
+    Integer anio
+  ) {
+    Map<Integer, List<Integer>> puntajesPorMes = new HashMap<>();
+
+    for (Estadistica estadistica : estadisticas) {
+      if (
+        estadistica.getPartido() == null ||
+        estadistica.getPartido().getFecha() == null ||
+        estadistica.getPuntaje() == null ||
+        estadistica.getPartido().getFecha().getYear() != anio
+      ) {
+        continue;
+      }
+
+      int mes = estadistica.getPartido().getFecha().getMonthValue();
+
+      if (!puntajesPorMes.containsKey(mes)) {
+        puntajesPorMes.put(mes, new ArrayList<>());
+      }
+
+      puntajesPorMes.get(mes).add(estadistica.getPuntaje());
+    }
+
+    return puntajesPorMes;
+  }
+
+  private int calcularEscala(Map<Integer, List<Integer>> puntajesPorMes) {
+    double puntajeMaximo = 0;
+
+    for (List<Integer> puntajes : puntajesPorMes.values()) {
+      int suma = 0;
+
+      for (Integer puntaje : puntajes) {
+        suma += puntaje;
+      }
+
+      double promedio = (double) suma / puntajes.size();
+
+      if (promedio > puntajeMaximo) {
+        puntajeMaximo = promedio;
+      }
+    }
+
+    int escala = (int) Math.ceil(puntajeMaximo / ESCALA_MINIMA) * ESCALA_MINIMA;
+
+    if (escala < ESCALA_MINIMA) {
+      escala = ESCALA_MINIMA;
+    }
+
+    return escala;
+  }
+
+  private List<Map<String, Object>> armarPuntosEvolucion(
+    Map<Integer, List<Integer>> puntajesPorMes,
+    int escala
+  ) {
+    List<Map<String, Object>> puntos = new ArrayList<>();
+
+    for (int mes = 1; mes <= 12; mes++) {
+      List<Integer> puntajes = puntajesPorMes.get(mes);
+
+      if (puntajes == null || puntajes.isEmpty()) {
+        continue;
+      }
+
+      int suma = 0;
+
+      for (Integer puntaje : puntajes) {
+        suma += puntaje;
+      }
+
+      double promedio = (double) suma / puntajes.size();
+
+      Map<String, Object> punto = new ModelMap();
+
+      punto.put("x", 56 + (mes - 1) * 39);
+      punto.put("y", 150 - (promedio / escala) * 130);
+      punto.put("puntaje", promedio);
+
+      puntos.add(punto);
+    }
+
+    return puntos;
+  }
+
+  private String armarLineaEvolucion(List<Map<String, Object>> puntos) {
+    String linea = "";
+
+    for (Map<String, Object> punto : puntos) {
+      if (!linea.isEmpty()) {
+        linea += " ";
+      }
+
+      linea += punto.get("x") + "," + punto.get("y");
+    }
+
+    return linea;
   }
 }

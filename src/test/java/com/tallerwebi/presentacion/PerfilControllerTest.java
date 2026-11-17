@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,18 @@ public class PerfilControllerTest {
   private void configurarEstadisticasVacias(Jugador jugador) {
     when(servicioEstadistica.obtenerEstadisticasGenerales(jugador))
       .thenReturn(crearEstadisticas(0, 0, 0, 0, 0, jugador));
+  }
+
+  private Estadistica crearEstadisticaConFecha(Integer puntaje, int anio, int mes) {
+    Partido partido = mock(Partido.class);
+
+    when(partido.getFecha()).thenReturn(LocalDateTime.of(anio, mes, 15, 12, 0));
+
+    Estadistica estadistica = crearEstadisticas(0, 0, 0, 0, puntaje, jugador);
+
+    estadistica.setPartido(partido);
+
+    return estadistica;
   }
 
   // ---------- Tests: perfil ----------
@@ -315,5 +328,90 @@ public class PerfilControllerTest {
         Files.deleteIfExists(Path.of("src/main/webapp/" + jugador.getFoto()));
       }
     }
+  }
+
+  @Test
+  public void evolucionDeberiaCalcularPromedioMensual() {
+    iniciarSesion();
+
+    when(servicioJugador.buscarPorUsuarioId(usuario.getId())).thenReturn(jugador);
+    when(servicioRanking.calcularNivel(0)).thenReturn("D");
+
+    configurarEstadisticasVacias(jugador);
+
+    List<Estadistica> estadisticas = List.of(
+      crearEstadisticaConFecha(9, 2026, 10),
+      crearEstadisticaConFecha(7, 2026, 10)
+    );
+
+    when(servicioEstadistica.obtenerEstadisticasPorJugador(jugador)).thenReturn(estadisticas);
+
+    when(servicioPartido.buscarPartidosPorJugador(jugador.getId())).thenReturn(List.of());
+
+    ModelAndView modelAndView = controlador.mostrarFormulario(request);
+
+    @SuppressWarnings("unchecked")
+    List<Map<String, Object>> puntos = (List<Map<String, Object>>) modelAndView
+      .getModel()
+      .get("puntosEvolucion");
+
+    assertEquals(1, puntos.size());
+    assertEquals(8.0, puntos.get(0).get("puntaje"));
+  }
+
+  @Test
+  public void evolucionDeberiaMostrarSoloElAnioMasReciente() {
+    iniciarSesion();
+
+    when(servicioJugador.buscarPorUsuarioId(usuario.getId())).thenReturn(jugador);
+    when(servicioRanking.calcularNivel(0)).thenReturn("D");
+
+    configurarEstadisticasVacias(jugador);
+
+    List<Estadistica> estadisticas = List.of(
+      crearEstadisticaConFecha(9, 2025, 12),
+      crearEstadisticaConFecha(7, 2026, 1)
+    );
+
+    when(servicioEstadistica.obtenerEstadisticasPorJugador(jugador)).thenReturn(estadisticas);
+
+    when(servicioPartido.buscarPartidosPorJugador(jugador.getId())).thenReturn(List.of());
+
+    ModelAndView modelAndView = controlador.mostrarFormulario(request);
+
+    @SuppressWarnings("unchecked")
+    List<Map<String, Object>> puntos = (List<Map<String, Object>>) modelAndView
+      .getModel()
+      .get("puntosEvolucion");
+
+    assertEquals(2026, modelAndView.getModel().get("anioEvolucion"));
+    assertEquals(1, puntos.size());
+    assertEquals(7.0, puntos.get(0).get("puntaje"));
+  }
+
+  @Test
+  public void evolucionSinEstadisticasDeberiaMostrarListaVacia() {
+    iniciarSesion();
+
+    when(servicioJugador.buscarPorUsuarioId(usuario.getId())).thenReturn(jugador);
+    when(servicioRanking.calcularNivel(0)).thenReturn("D");
+
+    configurarEstadisticasVacias(jugador);
+
+    when(servicioEstadistica.obtenerEstadisticasPorJugador(jugador)).thenReturn(List.of());
+
+    when(servicioPartido.buscarPartidosPorJugador(jugador.getId())).thenReturn(List.of());
+
+    ModelAndView modelAndView = controlador.mostrarFormulario(request);
+
+    @SuppressWarnings("unchecked")
+    List<Map<String, Object>> puntos = (List<Map<String, Object>>) modelAndView
+      .getModel()
+      .get("puntosEvolucion");
+
+    assertEquals(false, modelAndView.getModel().get("hayDatosEvolucion"));
+    assertEquals(5, modelAndView.getModel().get("escalaEvolucion"));
+    assertEquals(0, puntos.size());
+    assertEquals("", modelAndView.getModel().get("lineaEvolucion"));
   }
 }
