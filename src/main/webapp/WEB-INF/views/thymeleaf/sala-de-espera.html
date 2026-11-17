@@ -356,7 +356,7 @@
                         </button>
 
                         <!-- Botón Unirse al Partido -->
-                        <form th:action="@{/partido/{id}/unirse(id=${partido.id})}" method="post" class="m-0">
+                        <form th:if="${!esParticipante}" th:action="@{/partido/{id}/unirse(id=${partido.id})}" method="post" class="m-0">
                             <button type="submit" class="btn btn-warning fw-bold text-dark px-4 py-2" style="border-radius: 12px; background-color: #ffe600;">
                                 <i class="fa-solid fa-user-plus me-1"></i> ¡Unirme al Partido!
                             </button>
@@ -404,7 +404,7 @@
                              class="avatar-jugador avatar-sin-foto">⚽</div>
                         <div>
                             <!-- Enlace limpio al perfil del usuario (sin duplicaciones) -->
-                            <a th:href="@{/perfil(id=${ins.jugador.usuario.id})}" class="text-decoration-none">
+                            <a th:href="@{/perfil/{id}(id=${ins.jugador.usuario.id})}" class="text-decoration-none">
                                 <strong class="d-block text-dark" style="font-size: 14px;"
                                         th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
                             </a>
