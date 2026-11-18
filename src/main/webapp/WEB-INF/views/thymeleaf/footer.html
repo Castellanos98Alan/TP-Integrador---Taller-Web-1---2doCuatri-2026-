@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<footer th:fragment="footer" class="footer-sitio">
+
+    <style>
+        .footer-sitio {
+            background-color: #003c2e;
+            color: #dcece4;
+            padding: 50px 0 0;
+            margin-top: auto;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .footer-sitio .footer-marca {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .footer-sitio .footer-marca:hover {
+            color: white;
+        }
+
+        .footer-sitio .footer-lema {
+            color: #67e6ad;
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-size: 13px;
+            margin: 14px 0 6px;
+        }
+
+        .footer-sitio .footer-slogan {
+            color: #ffe600;
+            font-weight: bold;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .footer-sitio h5 {
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .footer-sitio ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-sitio li {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .footer-sitio a.footer-link {
+            color: #dcece4;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-sitio a.footer-link:hover {
+            color: #50e3a4;
+        }
+
+        .footer-sitio .boton-github {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 10px 18px;
+            background-color: #ffe600;
+            color: #18352c;
+            font-weight: bold;
+            font-size: 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .footer-sitio .boton-github:hover {
+            background-color: #f1d800;
+            color: #18352c;
+        }
+
+        .footer-sitio .footer-inferior {
+            margin-top: 40px;
+            padding: 18px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
+            font-size: 13px;
+        }
+    </style>
+
+    <div class="container">
+        <div class="row g-4">
+
+            <!-- MARCA Y LEMA -->
+            <div class="col-lg-4 col-md-6">
+                <a class="footer-marca" th:href="@{/home}">
+                    <i class="fa-solid fa-futbol"></i> Armo La Cancha
+                </a>
+                <p class="footer-lema">MÁS FÚTBOL. MÁS AMIGOS. MENOS LÍO.</p>
+                <p class="footer-slogan">TU EQUIPO, TU CANCHA</p>
+            </div>
+
+            <!-- NAVEGACIÓN -->
+            <div class="col-lg-2 col-md-6">
+                <h5>Navegación</h5>
+                <ul>
+                    <li><a class="footer-link" th:href="@{/home}">Inicio</a></li>
+                    <li><a class="footer-link" th:href="@{/partidos}">Partidos</a></li>
+                    <li><a class="footer-link" th:href="@{/crearPartido}">Crear partido</a></li>
+                    <li><a class="footer-link" th:href="@{/ranking}">Ranking</a></li>
+                    <li><a class="footer-link" th:href="@{/centro-ayuda}">Centro de ayuda</a></li>
+                    <li><a class="footer-link" th:href="@{/perfil}">Mi perfil</a></li>
+                </ul>
+            </div>
+
+            <!-- EQUIPO -->
+            <div class="col-lg-3 col-md-6">
+                <h5>Equipo 3</h5>
+                <ul>
+                    <li>Santiago Navarro</li>
+                    <li>Axel Gaete</li>
+                    <li>Alan Castellanos</li>
+                    <li>Juan Pablo Caldas</li>
+                    <li>Tomas Canosa</li>
+                </ul>
+            </div>
+
+            <!-- UNIVERSIDAD Y GITHUB -->
+            <div class="col-lg-3 col-md-6">
+                <h5>Universidad</h5>
+                <p style="font-size: 14px; margin-bottom: 0;">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    Universidad Nacional de La Matanza
+                </p>
+
+                <a class="boton-github"
+                   href="https://github.com/Castellanos98Alan/TP-Integrador---Taller-Web-1---2doCuatri-2026-/tree/main"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    <i class="fa-brands fa-github"></i> Ver repositorio
+                </a>
+            </div>
+
+        </div>
+
+        <div class="footer-inferior">
+            <p class="mb-0">© 2026 Armo La Cancha - Todos los derechos reservados.</p>
+        </div>
+    </div>
+
+</footer>
+
+</body>
+</html>
