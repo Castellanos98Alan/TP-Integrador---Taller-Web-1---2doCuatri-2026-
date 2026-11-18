@@ -35,6 +35,7 @@ public class PerfilController {
   private final ServicioEstadistica servicioEstadistica;
   private final ServicioSolicitudAmistad servicioSolicitudAmistad;
   private final ServicioPartido servicioPartido;
+  private final HistorialPartidosPerfil historialPartidosPerfil;
 
   private static final String USUARIO = "USUARIO";
   private static final String REDIRECT_LOGIN = "redirect:/login";
@@ -51,7 +52,8 @@ public class PerfilController {
     ServicioRanking servicioRanking,
     ServicioEstadistica servicioEstadistica,
     ServicioSolicitudAmistad servicioSolicitudAmistad,
-    ServicioPartido servicioPartido
+    ServicioPartido servicioPartido,
+    HistorialPartidosPerfil historialPartidosPerfil
   ) {
     this.servicioLogin = servicioLogin;
     this.servicioJugador = servicioJugador;
@@ -59,6 +61,7 @@ public class PerfilController {
     this.servicioEstadistica = servicioEstadistica;
     this.servicioSolicitudAmistad = servicioSolicitudAmistad;
     this.servicioPartido = servicioPartido;
+    this.historialPartidosPerfil = historialPartidosPerfil;
   }
 
   @GetMapping("/perfil")
@@ -310,112 +313,66 @@ public class PerfilController {
     model.put("nombreJugador", jugador.getNombre());
     model.put("posicion1", jugador.getPosicion1());
     model.put("posicion2", jugador.getPosicion2());
-    model.put("puntos", jugador.getPuntos());
 
-    model.put("nivel", servicioRanking.calcularNivel(jugador.getPuntos()));
+    model.put("puntos", estadisticas.getPuntaje());
+    model.put("nivel", servicioRanking.calcularNivel(estadisticas.getPuntaje()));
 
     model.put(FOTO, jugador.getFoto());
     model.put("fotoPosicionX", jugador.getFotoPosicionX());
     model.put("fotoPosicionY", jugador.getFotoPosicionY());
 
-    model.put("partidosJugados", jugador.getPartidosJugados());
-    model.put("victorias", jugador.getPartidosGanados());
-    model.put("derrotas", jugador.getPartidosPerdidos());
-
-    model.put("goles", estadisticas.getGoles());
-    model.put("asistencias", estadisticas.getAsistencias());
-    model.put("amarillas", estadisticas.getAmarillas());
-    model.put("rojas", estadisticas.getRojas());
-    model.put("puntajeTotal", estadisticas.getPuntaje());
-
+    // Obtener partidos y estadísticas reales del jugador.
     List<Partido> partidosJugador = servicioPartido.buscarPartidosPorJugador(jugador.getId());
 
     List<Estadistica> estadisticasJugador = servicioEstadistica.obtenerEstadisticasPorJugador(
       jugador
     );
 
+    // Construir el historial a partir de los partidos finalizados.
+    List<Map<String, Object>> historialPartidos = historialPartidosPerfil.armarHistorialPartidos(
+      partidosJugador,
+      estadisticasJugador,
+      jugador
+    );
+
+    // Calcular los resultados directamente desde el historial.
+    int partidosJugados = historialPartidos.size();
+
+    long victorias = historialPartidos
+      .stream()
+      .filter(partido -> "Victoria".equals(partido.get("condicion")))
+      .count();
+
+    long derrotas = historialPartidos
+      .stream()
+      .filter(partido -> "Derrota".equals(partido.get("condicion")))
+      .count();
+
+    long empates = historialPartidos
+      .stream()
+      .filter(partido -> "Empate".equals(partido.get("condicion")))
+      .count();
+
+    model.put("partidosJugados", partidosJugados);
+    model.put("victorias", victorias);
+    model.put("derrotas", derrotas);
+    model.put("empates", empates);
+
+    // Estadísticas individuales acumuladas.
+    model.put("goles", estadisticas.getGoles());
+    model.put("asistencias", estadisticas.getAsistencias());
+    model.put("amarillas", estadisticas.getAmarillas());
+    model.put("rojas", estadisticas.getRojas());
+    model.put("puntajeTotal", estadisticas.getPuntaje());
+
     model.put("partidosJugador", partidosJugador);
     model.put("estadisticasJugador", estadisticasJugador);
-    model.put("historialPartidos", armarHistorialPartidos(partidosJugador, estadisticasJugador));
+    model.put("historialPartidos", historialPartidos);
+
     Map<String, Object> evolucion = armarDatosEvolucion(estadisticasJugador);
     model.putAll(evolucion);
 
     return model;
-  }
-
-  private List<Map<String, Object>> armarHistorialPartidos(
-    List<Partido> partidosJugador,
-    List<Estadistica> estadisticasJugador
-  ) {
-    List<Map<String, Object>> historialPartidos = new ArrayList<>();
-
-    for (Partido partido : partidosJugador) {
-      if (partido.getEstado() == EstadoPartido.FINALIZADO) {
-        historialPartidos.add(construirDatosPartido(partido, estadisticasJugador));
-      }
-    }
-
-    return historialPartidos;
-  }
-
-  private Map<String, Object> construirDatosPartido(
-    Partido partido,
-    List<Estadistica> estadisticasJugador
-  ) {
-    Map<String, Object> datosPartido = new ModelMap();
-
-    datosPartido.put("idPartido", partido.getId());
-    datosPartido.put("fecha", partido.getFecha());
-
-    datosPartido.put("goles", 0);
-    datosPartido.put("asistencias", 0);
-    datosPartido.put("amarillas", 0);
-    datosPartido.put("rojas", 0);
-    datosPartido.put("puntaje", 0);
-
-    if (partido.getResultado() != null) {
-      int golesLocal = partido.getResultado().getGolesLocal();
-      int golesVisitante = partido.getResultado().getGolesVisitante();
-
-      String resultado = golesLocal + " - " + golesVisitante;
-      String[] condiciones = { "Derrota", "Empate", "Victoria" };
-      String condicion = condiciones[Integer.compare(golesLocal, golesVisitante) + 1];
-
-      datosPartido.put("resultado", resultado);
-      datosPartido.put("condicion", condicion);
-    } else {
-      datosPartido.put("resultado", "Sin resultado");
-      datosPartido.put("condicion", "Sin resultado");
-    }
-
-    Estadistica estadistica = buscarEstadisticaDePartido(partido.getId(), estadisticasJugador);
-
-    if (estadistica != null) {
-      datosPartido.put("goles", valorONullACero(estadistica.getGoles()));
-      datosPartido.put("asistencias", valorONullACero(estadistica.getAsistencias()));
-      datosPartido.put("amarillas", valorONullACero(estadistica.getAmarillas()));
-      datosPartido.put("rojas", valorONullACero(estadistica.getRojas()));
-      datosPartido.put("puntaje", valorONullACero(estadistica.getPuntaje()));
-    }
-
-    return datosPartido;
-  }
-
-  private Estadistica buscarEstadisticaDePartido(
-    Long idPartido,
-    List<Estadistica> estadisticasJugador
-  ) {
-    return estadisticasJugador
-      .stream()
-      .filter(estadistica ->
-        estadistica.getPartido() != null && estadistica.getPartido().getId().equals(idPartido)
-      )
-      .findFirst()
-      .orElse(null);
-  }
-
-  private int valorONullACero(Integer valor) {
-    return valor != null ? valor : 0;
   }
 
   private Map<String, Object> armarDatosEvolucion(List<Estadistica> estadisticas) {

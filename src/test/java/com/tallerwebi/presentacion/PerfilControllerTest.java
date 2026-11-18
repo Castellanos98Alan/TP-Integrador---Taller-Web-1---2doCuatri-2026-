@@ -49,6 +49,7 @@ public class PerfilControllerTest {
   private HttpSession session;
   private Usuario usuario;
   private Jugador jugador;
+  private HistorialPartidosPerfil historialPartidosPerfil;
 
   @BeforeEach
   public void setUp() {
@@ -58,6 +59,7 @@ public class PerfilControllerTest {
     servicioEstadistica = mock(ServicioEstadistica.class);
     servicioSolicitudAmistad = mock(ServicioSolicitudAmistad.class);
     servicioPartido = mock(ServicioPartido.class);
+    historialPartidosPerfil = new HistorialPartidosPerfil(servicioEstadistica);
 
     controlador =
       new PerfilController(
@@ -66,7 +68,8 @@ public class PerfilControllerTest {
         servicioRanking,
         servicioEstadistica,
         servicioSolicitudAmistad,
-        servicioPartido
+        servicioPartido,
+        historialPartidosPerfil
       );
 
     request = mock(HttpServletRequest.class);
@@ -196,6 +199,11 @@ public class PerfilControllerTest {
     when(servicioPartido.buscarPartidosPorJugador(jugador.getId())).thenReturn(List.of(partido));
     when(partido.getId()).thenReturn(1L);
     when(partido.getEstado()).thenReturn(EstadoPartido.FINALIZADO);
+    when(servicioEstadistica.obtenerEstadisticasPorPartido(partido))
+      .thenReturn(List.of(estadistica));
+
+    when(servicioEstadistica.calcularMarcadorPartido(partido, List.of(estadistica)))
+      .thenReturn(Map.of("local", 2, "visitante", 1));
 
     ModelAndView modelAndView = controlador.mostrarFormulario(request);
 
