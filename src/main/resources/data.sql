@@ -19,20 +19,20 @@ INSERT IGNORE INTO usuario (id, dni, email, nickname, password, rol, zona) VALUE
                                                                         (8, 39395728, 'juan7@gmail.com', 'Andisito', '1234', NULL, 'Laferrere'),
                                                                         (9, 38395728, 'juan8@gmail.com', 'Ezequielito', '1234', NULL, 'Laferrere'),
                                                                         (10, 37395728, 'juan9@gmail.com', 'Lucasito', '1234', NULL, 'Laferrere'),
-                                                                        (11, 36395728, 'juan9@gmail.com', 'Jorgito', '1234', NULL, 'Laferrere');
+                                                                        (11, 36395728, 'juan10@gmail.com', 'Jorgito', '1234', NULL, 'Laferrere');
 
 
 INSERT IGNORE INTO jugador (id, puntos, partidosGanados, partidosJugados, partidosPerdidos, fotoPosicionX, fotoPosicionY, nivel, nombre, posicion1, posicion2, usuario_id, foto) VALUES
-                                                                                                                                                                              (7, 50, 0, 0, 0, 50, 50, 'D', 'juan', 'MEDIOCAMPISTA', 'ARQUERO', 2, NULL),
-                                                                                                                                                                              (8, 50, 0, 0, 0, 50, 50, 'D', 'roberto', 'MEDIOCAMPISTA', 'ARQUERO', 3, NULL),
-                                                                                                                                                                              (9, 50, 0, 0, 0, 50, 50, 'D', 'tomas', 'MEDIOCAMPISTA', 'DEFENSOR', 4, NULL),
-                                                                                                                                                                              (10, 50, 0, 0, 0, 50, 50, 'D', 'alan', 'MEDIOCAMPISTA', 'DELANTERO', 5, NULL),
-                                                                                                                                                                              (11, 50, 0, 0, 0, 50, 50, 'D', 'axel', 'DELANTERO', 'MEDIOCAMPISTA', 6, NULL),
-                                                                                                                                                                              (12, 50, 0, 0, 0, 50, 50, 'D', 'santiago', 'DELANTERO', 'DEFENSOR', 7, NULL),
-                                                                                                                                                                              (13, 50, 0, 0, 0, 50, 50, 'D', 'andy', 'DELANTERO', 'DEFENSOR', 8, NULL),
-                                                                                                                                                                              (14, 50, 0, 0, 0, 50, 50, 'D', 'ezequiel', 'MEDIOCAMPISTA', 'DEFENSOR', 9, NULL),
-                                                                                                                                                                              (15, 50, 0, 0, 0, 50, 50, 'D', 'lucas', 'DELANTERO', 'ARQUERO', 10, NULL),
-                                                                                                                                                                              (16, 50, 0, 0, 0, 50, 50, 'D', 'lucas', 'DELANTERO', 'DEFENSOR', 11, NULL);
+                                                                                                                                                                              (7, 7, 0, 0, 0, 50, 50, 'D', 'juan', 'MEDIOCAMPISTA', 'ARQUERO', 2, NULL),
+                                                                                                                                                                              (8, 8, 0, 0, 0, 50, 50, 'D', 'roberto', 'MEDIOCAMPISTA', 'ARQUERO', 3, NULL),
+                                                                                                                                                                              (9, 3, 0, 0, 0, 50, 50, 'D', 'tomas', 'MEDIOCAMPISTA', 'DEFENSOR', 4, NULL),
+                                                                                                                                                                              (10, 0, 0, 0, 0, 50, 50, 'D', 'alan', 'MEDIOCAMPISTA', 'DELANTERO', 5, NULL),
+                                                                                                                                                                              (11, 12, 0, 0, 0, 50, 50, 'C', 'axel', 'DELANTERO', 'MEDIOCAMPISTA', 6, NULL),
+                                                                                                                                                                              (12, 16, 0, 0, 0, 50, 50, 'C', 'santiago', 'DELANTERO', 'DEFENSOR', 7, NULL),
+                                                                                                                                                                              (13, 1, 0, 0, 0, 50, 50, 'D', 'andy', 'DELANTERO', 'DEFENSOR', 8, NULL),
+                                                                                                                                                                              (14, 15, 0, 0, 0, 50, 50, 'C', 'ezequiel', 'MEDIOCAMPISTA', 'DEFENSOR', 9, NULL),
+                                                                                                                                                                              (15, 12, 0, 0, 0, 50, 50, 'C', 'lucas', 'DELANTERO', 'ARQUERO', 10, NULL),
+                                                                                                                                                                              (16, 14, 0, 0, 0, 50, 50, 'C', 'lucas', 'DELANTERO', 'DEFENSOR', 11, NULL);
 
 -- Canchas de ejemplo (no son usuarios).
 INSERT INTO Cancha (nombre, localidad, latitud, longitud, imagen_url)
