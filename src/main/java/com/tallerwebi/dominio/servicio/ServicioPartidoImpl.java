@@ -319,6 +319,18 @@ public class ServicioPartidoImpl implements ServicioPartido {
   @Override
   public void abandonarPartido(Long partidoId, Jugador jugador) {
     Partido partido = obtenerPartidoValidado(partidoId);
+
+    // El organizador no puede abandonar su propio partido.
+    if (
+      partido.getOrganizador() != null &&
+      jugador.getUsuario() != null &&
+      partido.getOrganizador().getId().equals(jugador.getUsuario().getId())
+    ) {
+      throw new OrganizadorNoPuedeAbandonarException(
+        "Como organizador, no puedes abandonar el partido. Si no quieres continuar, debes cancelarlo."
+      );
+    }
+
     validarPartidoModificable(
       partido,
       "No puedes abandonar un partido que ya está en curso o finalizado."

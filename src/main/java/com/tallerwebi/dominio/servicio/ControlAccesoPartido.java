@@ -10,7 +10,6 @@ public final class ControlAccesoPartido {
   private ControlAccesoPartido() {}
 
   static boolean tieneAcceso(Partido partido, Usuario usuario, boolean tieneInvitacion) {
-    // Si el partido es público, cualquiera puede entrar
     if (!Boolean.TRUE.equals(partido.getEsPrivado())) {
       return true;
     }
