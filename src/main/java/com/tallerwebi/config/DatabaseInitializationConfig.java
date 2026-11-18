@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.context.annotation.DependsOn;
 
 @Configuration
 public class DatabaseInitializationConfig {
@@ -15,6 +16,7 @@ public class DatabaseInitializationConfig {
   private DataSource dataSource;
 
   @Bean
+  @DependsOn("sessionFactory")
   public DataSourceInitializer dataSourceInitializer() {
     ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
     populator.addScript(new ClassPathResource("data.sql"));

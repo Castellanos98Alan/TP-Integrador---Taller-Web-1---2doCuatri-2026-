@@ -9,7 +9,7 @@ SELECT 'test@unlam.edu.ar', 'test', 'ADMIN', true
     SELECT 1 FROM Usuario WHERE email = 'test@unlam.edu.ar'
 );
 
-INSERT IGNORE INTO usuario (id, dni, email, nickname, password, rol, zona) VALUES
+INSERT IGNORE INTO Usuario (id, dni, email, nickname, password, rol, zona) VALUES
                                                                         (2, 45395728, 'juan@gmail.com', 'Juancito', '1234', NULL, 'Laferrere'),
                                                                         (3, 44395728, 'juan2@gmail.com', 'Robertito', '1234', NULL, 'Laferrere'),
                                                                         (4, 43395728, 'juan3@gmail.com', 'Tomasito', '1234', NULL, 'Laferrere'),
@@ -22,7 +22,7 @@ INSERT IGNORE INTO usuario (id, dni, email, nickname, password, rol, zona) VALUE
                                                                         (11, 36395728, 'juan10@gmail.com', 'Jorgito', '1234', NULL, 'Laferrere');
 
 
-INSERT IGNORE INTO jugador (id, puntos, partidosGanados, partidosJugados, partidosPerdidos, fotoPosicionX, fotoPosicionY, nivel, nombre, posicion1, posicion2, usuario_id, foto) VALUES
+INSERT IGNORE INTO Jugador (id, puntos, partidosGanados, partidosJugados, partidosPerdidos, fotoPosicionX, fotoPosicionY, nivel, nombre, posicion1, posicion2, usuario_id, foto) VALUES
                                                                                                                                                                               (7, 7, 0, 0, 0, 50, 50, 'D', 'juan', 'MEDIOCAMPISTA', 'ARQUERO', 2, NULL),
                                                                                                                                                                               (8, 8, 0, 0, 0, 50, 50, 'D', 'roberto', 'MEDIOCAMPISTA', 'ARQUERO', 3, NULL),
                                                                                                                                                                               (9, 3, 0, 0, 0, 50, 50, 'D', 'tomas', 'MEDIOCAMPISTA', 'DEFENSOR', 4, NULL),
