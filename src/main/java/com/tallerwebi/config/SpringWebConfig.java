@@ -38,6 +38,19 @@ public class SpringWebConfig implements WebMvcConfigurer {
 
     // Imágenes de las canchas y perfiles
     registry.addResourceHandler("/uploads/**").addResourceLocations("/uploads/");
+
+    registry
+      .addResourceHandler("/css/**")
+      .addResourceLocations("/resources/core/css/")
+      .setCachePeriod(86400);
+    registry
+      .addResourceHandler("/js/**")
+      .addResourceLocations("/resources/core/js/")
+      .setCachePeriod(86400);
+    registry
+      .addResourceHandler("/uploads/**")
+      .addResourceLocations("/uploads/")
+      .setCachePeriod(86400);
   }
 
   // https://www.thymeleaf.org/doc/tutorials/3.0/thymeleafspring.html

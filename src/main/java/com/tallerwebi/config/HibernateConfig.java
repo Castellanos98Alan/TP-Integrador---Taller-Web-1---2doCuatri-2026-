@@ -75,6 +75,8 @@ public class HibernateConfig {
     properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
     properties.setProperty("hibernate.show_sql", "false");
     properties.setProperty("hibernate.format_sql", "false");
+    properties.setProperty("hibernate.default_batch_fetch_size", "20");
+    properties.setProperty("hibernate.jdbc.batch_size", "20");
     properties.setProperty("hibernate.hbm2ddl.auto", "update");
     properties.setProperty("hibernate.hbm2ddl.import_files", "");
     properties.setProperty("hibernate.connection.characterEncoding", "utf8");

@@ -10,4 +10,5 @@ FROM tomcat:10.1-jdk25
 RUN rm -rf /usr/local/tomcat/webapps/*
 COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/spring.war
 EXPOSE 8080
+ENV JAVA_OPTS="-Xms128m -Xmx320m -XX:+UseSerialGC"
 CMD ["catalina.sh", "run"]
