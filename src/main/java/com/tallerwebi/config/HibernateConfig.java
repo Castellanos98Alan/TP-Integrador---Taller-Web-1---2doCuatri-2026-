@@ -1,5 +1,7 @@
 package com.tallerwebi.config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.util.Properties;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +33,7 @@ public class HibernateConfig {
     if (dbPassword == null) dbPassword = "";
 
     String dbSsl = System.getenv("DB_SSL");
-        if (dbSsl == null) dbSsl = "false";
+    if (dbSsl == null) dbSsl = "false";
 
     String url = String.format(
       "jdbc:mysql://%s:%s/%s?useSSL=%s&serverTimezone=America/Buenos_Aires&allowPublicKeyRetrieval=true",
@@ -41,11 +43,17 @@ public class HibernateConfig {
       dbSsl
     );
 
-    dataSource.setUrl(url);
-    dataSource.setUsername(dbUser);
-    dataSource.setPassword(dbPassword);
-    dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-    return dataSource;
+    HikariConfig config = new HikariConfig();
+    config.setJdbcUrl(url);
+    config.setUsername(dbUser);
+    config.setPassword(dbPassword);
+    config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+    config.setMaximumPoolSize(5); // Límite seguro para el plan Free de Aiven
+    config.setMinimumIdle(2);
+    config.setIdleTimeout(300000);
+    config.setMaxLifetime(600000);
+
+    return new HikariDataSource(config);
   }
 
   @Bean
@@ -65,8 +73,8 @@ public class HibernateConfig {
   private Properties hibernateProperties() {
     Properties properties = new Properties();
     properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-    properties.setProperty("hibernate.show_sql", "true");
-    properties.setProperty("hibernate.format_sql", "true");
+    properties.setProperty("hibernate.show_sql", "false");
+    properties.setProperty("hibernate.format_sql", "false");
     properties.setProperty("hibernate.hbm2ddl.auto", "update");
     properties.setProperty("hibernate.hbm2ddl.import_files", "");
     properties.setProperty("hibernate.connection.characterEncoding", "utf8");
