@@ -35,29 +35,29 @@ INSERT IGNORE INTO Jugador (id, puntos, partidosGanados, partidosJugados, partid
                                                                                                                                                                               (16, 14, 0, 0, 0, 50, 50, 'C', 'lucas', 'DELANTERO', 'DEFENSOR', 11, NULL);
 
 -- Canchas de ejemplo (no son usuarios).
-INSERT INTO Cancha (nombre, localidad, latitud, longitud, imagen_url)
+INSERT INTO cancha (nombre, localidad, latitud, longitud, imagen_url)
 SELECT 'Cancha Los Leones', 'San Justo', -34.6798, -58.5608, 'uploads/canchas/cancha1.jpg'
-    WHERE NOT EXISTS (SELECT 1 FROM Cancha WHERE nombre = 'Cancha Los Leones' AND localidad = 'San Justo');
+    WHERE NOT EXISTS (SELECT 1 FROM cancha WHERE nombre = 'Cancha Los Leones' AND localidad = 'San Justo');
 
-INSERT INTO Cancha (nombre, localidad, latitud, longitud, imagen_url)
+INSERT INTO cancha (nombre, localidad, latitud, longitud, imagen_url)
 SELECT 'Cancha 5', 'San Justo', -34.6810, -58.5580, 'uploads/canchas/cancha2.jpg'
-    WHERE NOT EXISTS (SELECT 1 FROM Cancha WHERE nombre = 'Cancha 5' AND localidad = 'San Justo');
+    WHERE NOT EXISTS (SELECT 1 FROM cancha WHERE nombre = 'Cancha 5' AND localidad = 'San Justo');
 
-INSERT INTO Cancha (nombre, localidad, latitud, longitud, imagen_url)
+INSERT INTO cancha (nombre, localidad, latitud, longitud, imagen_url)
 SELECT 'Cancha El Potrero', 'Laferrere', -34.7480, -58.5840, 'uploads/canchas/cancha3.jpg'
-    WHERE NOT EXISTS (SELECT 1 FROM Cancha WHERE nombre = 'Cancha El Potrero' AND localidad = 'Laferrere');
+    WHERE NOT EXISTS (SELECT 1 FROM cancha WHERE nombre = 'Cancha El Potrero' AND localidad = 'Laferrere');
 
-INSERT INTO Cancha (nombre, localidad, latitud, longitud, imagen_url)
+INSERT INTO cancha (nombre, localidad, latitud, longitud, imagen_url)
 SELECT 'Cancha Los Pibes', 'Laferrere', -34.7500, -58.5810, 'uploads/canchas/cancha4.jpg'
-    WHERE NOT EXISTS (SELECT 1 FROM Cancha WHERE nombre = 'Cancha Los Pibes' AND localidad = 'Laferrere');
+    WHERE NOT EXISTS (SELECT 1 FROM cancha WHERE nombre = 'Cancha Los Pibes' AND localidad = 'Laferrere');
 
-INSERT INTO Cancha (nombre, localidad, latitud, longitud, imagen_url)
+INSERT INTO cancha (nombre, localidad, latitud, longitud, imagen_url)
 SELECT 'Cancha La Quinta', 'Ramos Mejia', -34.6440, -58.5630, 'uploads/canchas/cancha5.jpg'
-    WHERE NOT EXISTS (SELECT 1 FROM Cancha WHERE nombre = 'Cancha La Quinta' AND localidad = 'Ramos Mejia');
+    WHERE NOT EXISTS (SELECT 1 FROM cancha WHERE nombre = 'Cancha La Quinta' AND localidad = 'Ramos Mejia');
 
-INSERT INTO Cancha (nombre, localidad, latitud, longitud, imagen_url)
+INSERT INTO cancha (nombre, localidad, latitud, longitud, imagen_url)
 SELECT 'Cancha El Fortin', 'Ramos Mejia', -34.6460, -58.5600, 'uploads/canchas/cancha6.jpg'
-    WHERE NOT EXISTS (SELECT 1 FROM Cancha WHERE nombre = 'Cancha El Fortin' AND localidad = 'Ramos Mejia');
+    WHERE NOT EXISTS (SELECT 1 FROM cancha WHERE nombre = 'Cancha El Fortin' AND localidad = 'Ramos Mejia');
 
 -- Perfil asociado al usuario Test.
 INSERT INTO Jugador (nombre, posicion1, posicion2, puntos, nivel, usuario_id,
@@ -83,11 +83,11 @@ WHERE usuario_id = (
 );
 
 -- Equipos del unico partido historico de ejemplo.
-INSERT INTO equipo (nombre)
+INSERT INTO Equipo (nombre)
 SELECT 'Los Testers'
     WHERE NOT EXISTS (SELECT 1 FROM equipo WHERE nombre = 'Los Testers');
 
-INSERT INTO equipo (nombre)
+INSERT INTO Equipo (nombre)
 SELECT 'Los Devs'
     WHERE NOT EXISTS (SELECT 1 FROM equipo WHERE nombre = 'Los Devs');
 
@@ -101,7 +101,7 @@ SELECT
     'A', false, '2026-10-30 20:00:00', c.id, 6, NULL,
     0, 6, 'FINALIZADO', 'CONFIRMADA', u.id, e1.id, e2.id
 FROM Usuario u
-         JOIN Cancha c ON c.nombre = 'Cancha Los Leones' AND c.localidad = 'San Justo'
+         JOIN cancha c ON c.nombre = 'Cancha Los Leones' AND c.localidad = 'San Justo'
          JOIN equipo e1 ON e1.nombre = 'Los Testers'
          JOIN equipo e2 ON e2.nombre = 'Los Devs'
 WHERE u.email = 'test@unlam.edu.ar'
@@ -120,7 +120,7 @@ SELECT
     'A', false, '2026-10-23 20:00:00', c.id, 6, NULL,
     0, 6, 'FINALIZADO', 'CONFIRMADA', u.id, e1.id, e2.id
 FROM Usuario u
-         JOIN Cancha c ON c.nombre = 'Cancha Los Leones' AND c.localidad = 'San Justo'
+         JOIN cancha c ON c.nombre = 'Cancha Los Leones' AND c.localidad = 'San Justo'
          JOIN equipo e1 ON e1.nombre = 'Los Testers'
          JOIN equipo e2 ON e2.nombre = 'Los Devs'
 WHERE u.email = 'test@unlam.edu.ar'
@@ -321,7 +321,7 @@ SELECT
     'A', false, '2026-11-06 20:00:00', c.id, 6, NULL,
     0, 6, 'FINALIZADO', 'CONFIRMADA', u.id, e1.id, e2.id
 FROM Usuario u
-         JOIN Cancha c ON c.nombre = 'Cancha Los Leones' AND c.localidad = 'San Justo'
+         JOIN cancha c ON c.nombre = 'Cancha Los Leones' AND c.localidad = 'San Justo'
          JOIN equipo e1 ON e1.nombre = 'Los Testers'
          JOIN equipo e2 ON e2.nombre = 'Los Devs'
 WHERE u.email = 'test@unlam.edu.ar'
