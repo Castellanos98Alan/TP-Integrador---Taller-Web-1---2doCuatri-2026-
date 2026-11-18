@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.Enumeration.CondicionJugador;
 import com.tallerwebi.dominio.Enumeration.EstadoEstadisticas;
 import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import com.tallerwebi.dominio.excepcion.ConfirmarEstadisticasNoPermitida;
+import com.tallerwebi.dominio.excepcion.EstadisticasNoGuardadas;
 import com.tallerwebi.dominio.excepcion.PartidoNoEncontrado;
 import com.tallerwebi.dominio.excepcion.RechazarEstadisticasNoPermitida;
 import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
@@ -27,6 +28,7 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
   private RepositorioPartido repositorioPartido;
   private RepositorioJugador repositorioJugador;
   private ServicioNotificacion servicioNotificacion;
+  private final ValidadorEstadisticas validadorEstadisticas = new ValidadorEstadisticas();
 
   @Autowired
   private HttpServletRequest request;
@@ -108,6 +110,8 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
     Long idPartido,
     List<DTOEstadisticaJugador> datosCargados
   ) {
+    validadorEstadisticas.validarLista(datosCargados);
+
     Partido partido = repositorioPartido.buscarPorId(idPartido);
 
     guardarOActualizarEstadisticas(partido, datosCargados);

@@ -86,6 +86,42 @@
         }
         .footer p { margin-bottom: 0; }
         .footer span { color: #50e3a4; margin: 0 8px; }
+
+/* Botón de cerrar sesión (universal) */
+        .navbar-acciones {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        a.boton-logout {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(80, 227, 164, 0.45);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #50e3a4;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+
+        a.boton-logout i {
+            color: inherit;
+        }
+
+        a.boton-logout:hover,
+        a.boton-logout:focus-visible {
+            background-color: #e83c43;
+            border-color: #e83c43;
+            color: white;
+            transform: translateY(-1px);
+            outline: none;
+        }
     </style>
 </head>
 
@@ -104,223 +140,21 @@
             <a class="nav-link" th:href="@{/centro-ayuda}">Centro de ayuda</a>
             <a class="nav-link" th:href="@{/perfil}">Mi Perfil</a>
         </div>
-        <div class="d-flex align-items-center">
-
-            <!-- CAMPANITA -->
-            <div class="dropdown me-3">
-
-                <button
-                        type="button"
-                        class="btn text-white position-relative"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false">
-
-                    <i class="fa-solid fa-bell"></i>
-
-                    <span
-                            th:if="${cantidadNotificaciones != null
-                             and cantidadNotificaciones > 0}"
-                            class="position-absolute top-0 start-100
-                            translate-middle badge rounded-pill bg-danger"
-                            th:text="${cantidadNotificaciones}">
-                                             0
-                    </span>
-
-                </button>
-
-
-                <div
-                        class="dropdown-menu dropdown-menu-end p-3"
-                        style="width: 340px;">
-
-                    <h6 class="fw-bold mb-3">
-                        Notificaciones
-                    </h6>
-
-                    <div
-                            th:each="notificacion : ${notificaciones}"
-                            class="border-bottom py-2">
-
-                        <div
-                                th:if="${notificacion.tipoDeNotificacion.name()
-                                    == 'INVITACION_PARTIDO'}">
-
-                            <strong> Invitación a partido</strong>
-
-                            <p
-                                    class="mb-1"
-                                    th:text="${notificacion.mensaje}">
-                            </p>
-
-                            <form th:action="@{/notificacion/marcar-leida}"
-                                  method="post">
-
-                                <input type="hidden"
-                                       name="idNotificacion"
-                                       th:value="${notificacion.id}">
-
-                                <input type="hidden"
-                                       name="volverA"
-                                       th:value="'/partido/' + ${notificacion.partido.id} + '/sala-de-espera'">
-
-                                <button type="submit"
-                                        class="btn btn-sm btn-success mt-1">
-                                    Ver partido
-                                </button>
-
-                            </form>
-
-                        </div>
-
-
-                        <div
-                                th:if="${notificacion.tipoDeNotificacion.name()
-                                    == 'PARTIDO_CANCELADO'}">
-
-                            <strong> Partido cancelado</strong>
-
-                            <p
-                                    class="mb-1"
-                                    th:text="${notificacion.mensaje}">
-                            </p>
-
-                            <form
-                                    th:action="@{/notificacion/marcar-leida}"
-                                    method="post">
-
-                                <input
-                                        type="hidden"
-                                        name="idNotificacion"
-                                        th:value="${notificacion.id}">
-
-                                <input
-                                        type="hidden"
-                                        name="volverA"
-                                        value="/partidos">
-
-                                <button
-                                        type="submit"
-                                        class="btn btn-sm btn-outline-secondary mt-1">
-
-                                    Marcar como leída
-                                </button>
-
-                            </form>
-
-                        </div>
-
-
-                        <div
-                                th:if="${notificacion.tipoDeNotificacion.name()
-                                    == 'FORMULARIO_COMPLETADO'}">
-
-                            <strong> Formulario completado</strong>
-
-                            <p
-                                    class="mb-1"
-                                    th:text="${notificacion.mensaje}">
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div
-                            th:if="${cantidadNotificaciones == 0}"
-                            class="text-muted text-center py-2">
-
-                        No tenés notificaciones.
-                    </div>
-
-
-                    <div
-                            th:if="${solicitudesPendientes != null}"
-                            th:each="solicitud : ${solicitudesPendientes}"
-                            class="border-bottom py-2">
-
-                        <div>
-
-                            <strong
-                                    th:text="${solicitud.emisor.nickname}">
-                                Usuario
-                            </strong>
-
-                            <span>
-                    quiere agregarte como amigo.
-                </span>
-
-                        </div>
-
-
-                        <div class="d-flex gap-2 mt-2">
-
-                            <form
-                                    th:action="@{/amistad/aceptar}"
-                                    method="post">
-
-                                <input type="hidden"
-                                       name="volverA"
-                                       value="/partidos">
-
-                                <input
-                                        type="hidden"
-                                        name="idSolicitud"
-                                        th:value="${solicitud.id}">
-
-                                <button
-                                        type="submit"
-                                        class="btn btn-success btn-sm">
-
-                                    Aceptar
-
-                                </button>
-
-                            </form>
-
-
-                            <form
-                                    th:action="@{/amistad/rechazar}"
-                                    method="post">
-
-                                <input type="hidden"
-                                       name="volverA"
-                                       value="/partidos">
-
-
-
-                                <input
-                                        type="hidden"
-                                        name="idSolicitud"
-                                        th:value="${solicitud.id}">
-
-                                <button
-                                        type="submit"
-                                        class="btn btn-outline-danger btn-sm">
-
-                                    Rechazar
-
-                                </button>
-
-                            </form>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
+        <div class="navbar-acciones">
+            <!-- CREAR PARTIDO -->
+            <a class="boton-crear" th:href="@{/crearPartido}">
+                + Crear partido
+            </a>
+
+            <!-- CERRAR SESIÓN -->
+            <a class="boton-logout" th:if="${session.USUARIO != null}" th:href="@{/logout}"
+            title="Cerrar sesión" aria-label="Cerrar sesión">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </a>
         </div>
 
-
-        <!-- CREAR PARTIDO -->
-        <a class="boton-crear" th:href="@{/crearPartido}">
-            + Crear partido
-        </a>
-
-
     </div>
+
 </nav>
 
 

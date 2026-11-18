@@ -135,11 +135,17 @@
         </a>
     </div>
 
+    <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fa-solid fa-circle-exclamation me-2"></i>
+        <span th:text="${error}">Error al guardar estadísticas</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+
     <div class="card card-custom">
         <div class="header-seccion d-flex justify-content-between align-items-center">
             <div>
                 <h4 class="fw-bold mb-1"><i class="fa-solid fa-clipboard-user me-2 text-success"></i> Carga de Estadísticas</h4>
-                <p class="text-muted mb-0 small">Registrá los goles, asistencias y tarjetas de ambos equipos para este partido.</p>
+                <p class="text-muted mb-0 small">Registrá los goles, asistencias y tarjetas de ambos equipos para este partido (máx. 2 amarillas = 1 roja automática).</p>
             </div>
             <span class="badge bg-success px-3 py-2 fs-6" th:text="${partido.cancha != null ? partido.cancha.nombre : 'Partido'}">Cancha</span>
         </div>
@@ -192,10 +198,10 @@
                                         <input type="number" class="form-control form-control-sm text-center fw-bold px-1" th:field="*{estadisticas[__${globalIndex}__].asistencias}" value="0" min="0" />
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm text-center fw-bold px-1" th:field="*{estadisticas[__${globalIndex}__].amarillas}" value="0" min="0" />
+                                        <input type="number" class="form-control form-control-sm text-center fw-bold px-1 input-amarillas" th:field="*{estadisticas[__${globalIndex}__].amarillas}" value="0" min="0" max="2" />
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm text-center fw-bold px-1" th:field="*{estadisticas[__${globalIndex}__].rojas}" value="0" min="0" />
+                                        <input type="number" class="form-control form-control-sm text-center fw-bold px-1 input-rojas" th:field="*{estadisticas[__${globalIndex}__].rojas}" value="0" min="0" max="1" />
                                     </td>
                                 </tr>
                                 </tbody>
@@ -247,10 +253,10 @@
                                         <input type="number" class="form-control form-control-sm text-center fw-bold px-1" th:field="*{estadisticas[__${globalIndex}__].asistencias}" value="0" min="0" />
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm text-center fw-bold px-1" th:field="*{estadisticas[__${globalIndex}__].amarillas}" value="0" min="0" />
+                                        <input type="number" class="form-control form-control-sm text-center fw-bold px-1 input-amarillas" th:field="*{estadisticas[__${globalIndex}__].amarillas}" value="0" min="0" max="2" />
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm text-center fw-bold px-1" th:field="*{estadisticas[__${globalIndex}__].rojas}" value="0" min="0" />
+                                        <input type="number" class="form-control form-control-sm text-center fw-bold px-1 input-rojas" th:field="*{estadisticas[__${globalIndex}__].rojas}" value="0" min="0" max="1" />
                                     </td>
                                 </tr>
                                 </tbody>
@@ -273,9 +279,48 @@
 
 </div>
 
-<div th:replace="~{footer :: footer}"></div>
-
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.querySelectorAll('tbody tr').forEach(function (fila) {
+        const inputAmarillas = fila.querySelector('.input-amarillas');
+        const inputRojas = fila.querySelector('.input-rojas');
+
+        if (!inputAmarillas || !inputRojas) return;
+
+        inputAmarillas.addEventListener('input', function () {
+            let amarillas = parseInt(inputAmarillas.value, 10) || 0;
+            if (amarillas < 0) amarillas = 0;
+            if (amarillas > 2) amarillas = 2;
+            inputAmarillas.value = amarillas;
+
+            if (amarillas === 2) {
+                inputRojas.value = 1;
+                inputRojas.readOnly = true;
+                inputRojas.classList.add('bg-danger', 'text-white');
+            } else {
+                if (inputRojas.readOnly) {
+                    inputRojas.value = 0;
+                }
+                inputRojas.readOnly = false;
+                inputRojas.classList.remove('bg-danger', 'text-white');
+            }
+        });
+
+        inputRojas.addEventListener('input', function () {
+            const amarillas = parseInt(inputAmarillas.value, 10) || 0;
+            if (amarillas === 2) {
+                inputRojas.value = 1;
+                return;
+            }
+
+            let rojas = parseInt(inputRojas.value, 10) || 0;
+            if (rojas < 0) rojas = 0;
+            if (rojas > 1) rojas = 1;
+            inputRojas.value = rojas;
+        });
+    });
+</script>
 </body>
 </html>

@@ -226,6 +226,44 @@
     .form-footer .acciones {
         margin-left: auto;
     }
+
+/* Botón de cerrar sesión (universal) */
+        .navbar-acciones {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        a.boton-logout {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(80, 227, 164, 0.45);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #50e3a4;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+
+        a.boton-logout i {
+            color: inherit;
+        }
+
+        a.boton-logout:hover,
+        a.boton-logout:focus-visible {
+            background-color: #e83c43;
+            border-color: #e83c43;
+            color: white;
+            transform: translateY(-1px);
+            outline: none;
+        }
+
+
     </style>
 </head>
 
@@ -467,15 +505,22 @@
             </div>
 
         </div>
+            <div class="navbar-acciones">
+            <!-- CREAR PARTIDO -->
+            <a class="boton-crear" th:href="@{/crearPartido}">
+                + Crear partido
+            </a>
+
+            <!-- CERRAR SESIÓN -->
+            <a class="boton-logout" th:if="${session.USUARIO != null}" th:href="@{/logout}"
+            title="Cerrar sesión" aria-label="Cerrar sesión">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </a>
+        </div>
     </div>
 
 
-    <!-- CREAR PARTIDO -->
-    <a class="boton-crear" th:href="@{/crearPartido}">
-        + Crear partido
-    </a>
-
-    </div>
+</div>
 </nav>
 
 <section class="hero-ranking">

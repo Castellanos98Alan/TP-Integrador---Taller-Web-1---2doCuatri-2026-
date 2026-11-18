@@ -342,7 +342,7 @@
         </a>
 
         <!-- CERRAR SESIÓN (solo en MI perfil) -->
-        <a class="boton-logout" th:if="${esMiPerfil}" th:href="@{/login}"
+        <a class="boton-logout" th:if="${esMiPerfil}" th:href="@{/logout}"
            title="Cerrar sesión" aria-label="Cerrar sesión">
             <i class="fa-solid fa-right-from-bracket"></i>
         </a>
@@ -638,6 +638,17 @@
                 <span class="stat-label">Derrotas</span>
                 <span class="stat-valor" th:text="${derrotas}">0</span>
                 <span class="stat-sub">Partidos perdidos</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icono empate">
+                <i class="fa-solid fa-handshake"></i>
+            </div>
+            <div>
+                <span class="stat-label">Empates</span>
+                <span class="stat-valor" th:text="${empates}">0</span>
+                <span class="stat-sub">Partidos empatados</span>
             </div>
         </div>
 
@@ -993,19 +1004,26 @@
 
         <!-- Últimos partidos -->
 
+
         <div class="pg-partidos" id="partidos">
 
             <div class="panel">
 
                 <div class="panel-encabezado">
-                    <span class="panel-icono"><i class="fa-solid fa-calendar-days"></i></span>
+            <span class="panel-icono">
+                <i class="fa-solid fa-calendar-days"></i>
+            </span>
+
                     <h5>Últimos partidos</h5>
+
                     <a class="panel-link" th:href="@{/partidos}">
                         Ver todos los partidos &rarr;
                     </a>
                 </div>
 
                 <div class="tabla-scroll">
+
+                    <!-- Encabezados -->
                     <div class="tabla-partidos-cabecera">
                         <span>FECHA</span>
                         <span>RESULTADO</span>
@@ -1016,64 +1034,86 @@
                         <span>PUNTAJE</span>
                     </div>
 
+                    <!-- Historial de partidos -->
                     <a class="tabla-partido-fila text-decoration-none text-dark"
                        style="cursor: pointer;"
                        th:each="partido : ${historialPartidos}"
                        th:href="@{/partido/{id}/resumen(id=${partido['idPartido']})}">
-                        <span th:text="${#temporals.format(partido['fecha'], 'dd/MM/yyyy')}"></span>
-                        <span th:text="${partido['goles']}"></span>
-                        <span th:text="${partido['asistencias']}"></span>
-                        <span th:text="${partido['amarillas']}"></span>
-                        <span th:text="${partido['rojas']}"></span>
-                        <span class="fw-bold text-success" th:text="${partido['puntaje']}"></span>
-                    </a>
 
-                    <div class="tabla-partido-fila" th:each="partido : ${historialPartidos}">
-                        <span class="celda-fecha" th:text="${#temporals.format(partido['fecha'], 'dd/MM/yyyy')}"></span>
+                        <!-- Fecha -->
+                        <span class="celda-fecha"
+                              th:text="${#temporals.format(partido['fecha'], 'dd/MM/yyyy')}">
+                </span>
 
+                        <!-- Resultado y condición -->
                         <div class="celda-resultado">
-                            <span class="celda-marcador" th:text="${partido['resultado']}"></span>
+
+                    <span class="celda-marcador"
+                          th:text="${partido['resultado']}">
+                    </span>
+
                             <span class="resultado-chip"
                                   th:classappend="${partido['condicion'] == 'Victoria' ? ' ganado' : (partido['condicion'] == 'Derrota' ? ' perdido' : (partido['condicion'] == 'Empate' ? ' empatado' : ' sin-resultado'))}"
-                                  th:text="${partido['condicion']}"></span>
+                                  th:text="${partido['condicion']}">
+                    </span>
+
                         </div>
 
-                        <span class="celda-num" th:text="${partido['goles']}"></span>
-                        <span class="celda-num" th:text="${partido['asistencias']}"></span>
+                        <!-- Goles -->
+                        <span class="celda-num"
+                              th:text="${partido['goles']}">
+                </span>
 
+                        <!-- Asistencias -->
+                        <span class="celda-num"
+                              th:text="${partido['asistencias']}">
+                </span>
+
+                        <!-- Tarjetas amarillas -->
                         <span class="celda-num celda-amarilla"
-                              th:classappend="${partido['amarillas'] != null and partido['amarillas'] > 0} ? 'activa'"
-                              th:text="${partido['amarillas']}"></span>
+                              th:classappend="${partido['amarillas'] != null and partido['amarillas'] > 0 ? ' activa' : ''}"
+                              th:text="${partido['amarillas']}">
+                </span>
 
+                        <!-- Tarjetas rojas -->
                         <span class="celda-num celda-roja"
-                              th:classappend="${partido['rojas'] != null and partido['rojas'] > 0} ? 'activa'"
-                              th:text="${partido['rojas']}"></span>
+                              th:classappend="${partido['rojas'] != null and partido['rojas'] > 0 ? ' activa' : ''}"
+                              th:text="${partido['rojas']}">
+                </span>
 
-                        <span class="celda-puntaje"><b th:text="${partido['puntaje']}"></b> <small>pts</small></span>
-                    </div>
+                        <!-- Puntaje -->
+                        <span class="celda-puntaje">
+                    <b th:text="${partido['puntaje']}"></b>
+                    <small>pts</small>
+                </span>
 
+                    </a>
 
                 </div>
 
-                <div class="actividad-vacia" th:if="${#lists.isEmpty(historialPartidos)}">
+                <!-- Mensaje cuando no existen partidos -->
+                <div class="actividad-vacia"
+                     th:if="${#lists.isEmpty(historialPartidos)}">
+
                     <div class="actividad-icono">
                         <i class="fa-solid fa-futbol"></i>
                     </div>
+
                     <h3>¡Tu próximo partido te espera!</h3>
-                    <p>Próximamente vas a poder visualizar tu actividad deportiva desde acá.</p>
+
+                    <p>
+                        Próximamente vas a poder visualizar tu actividad deportiva desde acá.
+                    </p>
+
                 </div>
 
             </div>
 
         </div>
 
-        </div>
 
-
-    </div>
-
-</div>
-
+    </div> <!-- Cierre de .perfil-grid -->
+</div> <!-- Cierre de .contenido-ranking -->
 
 <div th:replace="~{footer :: footer}"></div>
 
