@@ -1,0 +1,5 @@
+target/
+.git/
+.calidad-de-codigo/
+.idea/
+*.iml

@@ -30,11 +30,15 @@ public class HibernateConfig {
 
     if (dbPassword == null) dbPassword = "";
 
+    String dbSsl = System.getenv("DB_SSL");
+        if (dbSsl == null) dbSsl = "false";
+
     String url = String.format(
-      "jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=America/Buenos_Aires&allowPublicKeyRetrieval=true",
+      "jdbc:mysql://%s:%s/%s?useSSL=%s&serverTimezone=America/Buenos_Aires&allowPublicKeyRetrieval=true",
       dbHost,
       dbPort,
-      dbName
+      dbName,
+      dbSsl
     );
 
     dataSource.setUrl(url);
