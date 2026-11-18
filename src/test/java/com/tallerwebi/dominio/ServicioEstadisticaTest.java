@@ -17,6 +17,8 @@ import com.tallerwebi.dominio.servicio.ServicioNotificacion;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.tallerwebi.dominio.servicio.ServicioRanking;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +28,7 @@ public class ServicioEstadisticaTest {
   private RepositorioPartido repositorioPartidoMock;
   private RepositorioJugador repositorioJugadorMock;
   private ServicioNotificacion servicioNotificacionMock;
+  private ServicioRanking servicioRankingMock
 
   private ServicioEstadistica servicioEstadistica;
 
@@ -36,13 +39,15 @@ public class ServicioEstadisticaTest {
     this.repositorioJugadorMock = mock(RepositorioJugador.class);
     this.repositorioJugadorMock = mock(RepositorioJugador.class);
     this.servicioNotificacionMock = mock(ServicioNotificacion.class);
+    this.servicioRankingMock = mock(ServicioRanking.class);
 
     servicioEstadistica =
       new ServicioEstadisticasImpl(
         this.repositorioEstadisticaMock,
         this.repositorioPartidoMock,
         this.repositorioJugadorMock,
-        this.servicioNotificacionMock
+        this.servicioNotificacionMock,
+              this.servicioRankingMock
       );
   }
 

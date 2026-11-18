@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ServicioEstadisticasImpl implements ServicioEstadistica {
 
+  private ServicioRanking servicioRanking;
   private RepositorioEstadistica repositorioEstadisticas;
   private RepositorioPartido repositorioPartido;
   private RepositorioJugador repositorioJugador;
@@ -37,12 +38,14 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
     RepositorioEstadistica repositorioEstadistica,
     RepositorioPartido repositorioPartido,
     RepositorioJugador repositorioJugador,
-    ServicioNotificacion servicioNotificacion
+    ServicioNotificacion servicioNotificacion,
+    ServicioRanking servicioRanking
   ) {
     this.repositorioEstadisticas = repositorioEstadistica;
     this.repositorioPartido = repositorioPartido;
     this.repositorioJugador = repositorioJugador;
     this.servicioNotificacion = servicioNotificacion;
+    this.servicioRanking = servicioRanking;
   }
 
   @Override
@@ -383,6 +386,11 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
 
     jugador.setPartidosJugados(valorOZero(jugador.getPartidosJugados()) + 1);
     jugador.setPuntos(Math.max(0, valorOZero(jugador.getPuntos()) + puntajeTotalPartido));
+
+    String nuevoNivel = servicioRanking.calcularNivel(jugador.getPuntos());
+
+    jugador.setNivel(nuevoNivel);
+
     repositorioJugador.modificar(jugador);
   }
 
