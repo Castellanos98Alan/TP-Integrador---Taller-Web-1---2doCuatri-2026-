@@ -314,8 +314,9 @@ public class PerfilController {
     model.put("posicion1", jugador.getPosicion1());
     model.put("posicion2", jugador.getPosicion2());
 
-    model.put("puntos", estadisticas.getPuntaje());
-    model.put("nivel", servicioRanking.calcularNivel(estadisticas.getPuntaje()));
+    // Mantener puntos y nivel sincronizados con los datos usados por el ranking.
+    model.put("puntos", jugador.getPuntos());
+    model.put("nivel", servicioRanking.calcularNivel(jugador.getPuntos()));
 
     model.put(FOTO, jugador.getFoto());
     model.put("fotoPosicionX", jugador.getFotoPosicionX());
@@ -335,27 +336,16 @@ public class PerfilController {
       jugador
     );
 
-    // Calcular los resultados directamente desde el historial.
-    int partidosJugados = historialPartidos.size();
-
-    long victorias = historialPartidos
-      .stream()
-      .filter(partido -> "Victoria".equals(partido.get("condicion")))
-      .count();
-
-    long derrotas = historialPartidos
-      .stream()
-      .filter(partido -> "Derrota".equals(partido.get("condicion")))
-      .count();
-
+    // Mantener los contadores existentes de Jugador y calcular únicamente los empates
+    // desde el historial, ya que Jugador no almacena ese dato.
     long empates = historialPartidos
       .stream()
       .filter(partido -> "Empate".equals(partido.get("condicion")))
       .count();
 
-    model.put("partidosJugados", partidosJugados);
-    model.put("victorias", victorias);
-    model.put("derrotas", derrotas);
+    model.put("partidosJugados", jugador.getPartidosJugados());
+    model.put("victorias", jugador.getPartidosGanados());
+    model.put("derrotas", jugador.getPartidosPerdidos());
     model.put("empates", empates);
 
     // Estadísticas individuales acumuladas.
