@@ -28,7 +28,7 @@ public class ServicioEstadisticaTest {
   private RepositorioPartido repositorioPartidoMock;
   private RepositorioJugador repositorioJugadorMock;
   private ServicioNotificacion servicioNotificacionMock;
-  private ServicioRanking servicioRankingMock
+  private ServicioRanking servicioRankingMock;
 
   private ServicioEstadistica servicioEstadistica;
 
