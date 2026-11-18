@@ -83,11 +83,11 @@ WHERE usuario_id = (
 );
 
 -- Equipos del unico partido historico de ejemplo.
-INSERT INTO Equipo (nombre)
+INSERT INTO equipo (nombre)
 SELECT 'Los Testers'
     WHERE NOT EXISTS (SELECT 1 FROM equipo WHERE nombre = 'Los Testers');
 
-INSERT INTO Equipo (nombre)
+INSERT INTO equipo (nombre)
 SELECT 'Los Devs'
     WHERE NOT EXISTS (SELECT 1 FROM equipo WHERE nombre = 'Los Devs');
 
