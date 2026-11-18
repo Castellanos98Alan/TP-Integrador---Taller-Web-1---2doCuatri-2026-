@@ -88,6 +88,15 @@
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #50e3a4;
+            flex-shrink: 0;
+        }
+        .avatar-sin-foto {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #006747;
+            color: white;
+            font-size: 16px;
         }
         .contenedor-equipo {
             border: 1px solid #d1ded8;
@@ -186,24 +195,30 @@
                                     th:with="globalIndex=${partido.inscripciones.indexOf(ins)}">
                                     <td style="padding-left: 8px;">
                                         <div class="d-flex align-items-center gap-2 py-1">
-                                            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador" alt="Avatar">
+                                            <img th:if="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
+                                                 th:src="@{'/' + ${ins.jugador.foto}}"
+                                                 th:style="'object-position:' + ${ins.jugador.fotoPosicionX} + '% ' + ${ins.jugador.fotoPosicionY} + '%;'"
+                                                 class="avatar-jugador" alt="Foto de perfil">
+                                            <div th:unless="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
+                                                 class="avatar-jugador avatar-sin-foto">⚽</div>
                                             <div>
                                                 <input type="hidden" th:name="'estadisticas[' + ${globalIndex} + '].idJugador'" th:value="${ins.jugador.id}" />
 
                                                 <strong class="d-block text-dark text-start" style="font-size: 13px;" th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
 
-                                                <span th:if="${ins.esCapitan}" class="badge bg-dark text-white mt-1" style="font-size: 9px;">
-                                                    <i class="fa-solid fa-crown me-1 text-warning"></i> Capitán
-                                                </span>
-                                                <span class="badge-posicion"
-                                                      th:if="${ins.jugador.posicion1 != null}"
-                                                      th:text="${ins.jugador.posicion1}">
-    </span>
-
-                                                <span class="badge-posicion"
-                                                      th:if="${ins.jugador.posicion2 != null}"
-                                                      th:text="${ins.jugador.posicion2}">
-    </span>
+                                                <div class="d-flex flex-wrap gap-1 mt-1">
+                                                    <span th:if="${ins.esCapitan}" class="badge bg-dark text-white" style="font-size: 9px;">
+                                                        <i class="fa-solid fa-crown me-1 text-warning"></i> Capitán
+                                                    </span>
+                                                    <span class="badge-posicion"
+                                                          th:if="${ins.jugador.posicion1 != null}"
+                                                          th:text="${ins.jugador.posicion1}">
+                                                    </span>
+                                                    <span class="badge-posicion"
+                                                          th:if="${ins.jugador.posicion2 != null}"
+                                                          th:text="${ins.jugador.posicion2}">
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
@@ -250,25 +265,30 @@
                                     th:with="globalIndex=${partido.inscripciones.indexOf(ins)}">
                                     <td style="padding-left: 8px;">
                                         <div class="d-flex align-items-center gap-2 py-1">
-                                            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-jugador" alt="Avatar">
+                                            <img th:if="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
+                                                 th:src="@{'/' + ${ins.jugador.foto}}"
+                                                 th:style="'object-position:' + ${ins.jugador.fotoPosicionX} + '% ' + ${ins.jugador.fotoPosicionY} + '%;'"
+                                                 class="avatar-jugador" alt="Foto de perfil">
+                                            <div th:unless="${ins.jugador.foto != null and !ins.jugador.foto.isEmpty()}"
+                                                 class="avatar-jugador avatar-sin-foto">⚽</div>
                                             <div>
                                                 <input type="hidden" th:name="'estadisticas[' + ${globalIndex} + '].idJugador'" th:value="${ins.jugador.id}" />
 
                                                 <strong class="d-block text-dark text-start" style="font-size: 13px;" th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
 
-
-                                                <span th:if="${ins.esCapitan}" class="badge bg-dark text-white mt-1" style="font-size: 9px;">
-                                                    <i class="fa-solid fa-crown me-1 text-warning"></i> Capitán
-                                                </span>
-                                                <span class="badge-posicion"
-                                                      th:if="${ins.jugador.posicion1 != null}"
-                                                      th:text="${ins.jugador.posicion1}">
-    </span>
-
-                                                <span class="badge-posicion"
-                                                      th:if="${ins.jugador.posicion2 != null}"
-                                                      th:text="${ins.jugador.posicion2}">
-    </span>
+                                                <div class="d-flex flex-wrap gap-1 mt-1">
+                                                    <span th:if="${ins.esCapitan}" class="badge bg-dark text-white" style="font-size: 9px;">
+                                                        <i class="fa-solid fa-crown me-1 text-warning"></i> Capitán
+                                                    </span>
+                                                    <span class="badge-posicion"
+                                                          th:if="${ins.jugador.posicion1 != null}"
+                                                          th:text="${ins.jugador.posicion1}">
+                                                    </span>
+                                                    <span class="badge-posicion"
+                                                          th:if="${ins.jugador.posicion2 != null}"
+                                                          th:text="${ins.jugador.posicion2}">
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
@@ -326,25 +346,29 @@
                 inputRojas.readOnly = true;
                 inputRojas.classList.add('bg-danger', 'text-white');
             } else {
-                if (inputRojas.readOnly) {
+                if (inputRojas.readOnly && parseInt(inputRojas.value, 10) === 1) {
                     inputRojas.value = 0;
+                    inputRojas.readOnly = false;
+                    inputRojas.classList.remove('bg-danger', 'text-white');
                 }
-                inputRojas.readOnly = false;
-                inputRojas.classList.remove('bg-danger', 'text-white');
             }
         });
 
         inputRojas.addEventListener('input', function () {
-            const amarillas = parseInt(inputAmarillas.value, 10) || 0;
-            if (amarillas === 2) {
-                inputRojas.value = 1;
-                return;
-            }
-
             let rojas = parseInt(inputRojas.value, 10) || 0;
             if (rojas < 0) rojas = 0;
             if (rojas > 1) rojas = 1;
             inputRojas.value = rojas;
+
+            if (rojas === 1) {
+                inputAmarillas.value = 2;
+                inputRojas.readOnly = true;
+                inputRojas.classList.add('bg-danger', 'text-white');
+            } else {
+                inputRojas.readOnly = false;
+                inputRojas.classList.remove('bg-danger', 'text-white');
+                inputAmarillas.value = 0;
+            }
         });
     });
 </script>
