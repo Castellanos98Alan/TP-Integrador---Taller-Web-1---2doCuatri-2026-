@@ -14,11 +14,10 @@ import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.servicio.ServicioEstadistica;
 import com.tallerwebi.dominio.servicio.ServicioEstadisticasImpl;
 import com.tallerwebi.dominio.servicio.ServicioNotificacion;
+import com.tallerwebi.dominio.servicio.ServicioRanking;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.tallerwebi.dominio.servicio.ServicioRanking;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +46,7 @@ public class ServicioEstadisticaTest {
         this.repositorioPartidoMock,
         this.repositorioJugadorMock,
         this.servicioNotificacionMock,
-              this.servicioRankingMock
+        this.servicioRankingMock
       );
   }
 

@@ -226,7 +226,7 @@
 
 
                             <a
-                                    th:href="@{'/partido/' + ${notificacion.partido.id}}"
+                                    th:href="@{'/partido/' + ${notificacion.partido.id}+'/resumen'}"
                                     class="btn btn-sm btn-outline-success mt-1">
 
                                 Ver revisión
@@ -1115,6 +1115,52 @@
     </div> <!-- Cierre de .perfil-grid -->
 </div> <!-- Cierre de .contenido-ranking -->
 
+
+<!-- ANIMACIÓN DE ASCENSO: solo se renderiza en el perfil propio -->
+<div class="ascenso-overlay"
+     id="modalAscensoRango"
+     th:if="${esMiPerfil}"
+     th:data-jugador="${nickname != null and !nickname.isBlank() ? nickname : nombreJugador}"
+     th:data-rango-actual="${nivel}"
+     aria-hidden="true">
+    <div class="ascenso-confeti" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="ascenso-destello-fondo" aria-hidden="true"></div>
+    <div class="ascenso-rayos" aria-hidden="true"></div>
+
+    <section class="ascenso-modal"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="ascensoTitulo"
+             aria-describedby="ascensoDescripcion">
+        <div class="ascenso-destello" aria-hidden="true"></div>
+        <span class="ascenso-etiqueta">¡NUEVO RANGO DESBLOQUEADO!</span>
+        <h2 id="ascensoTitulo">¡FELICITACIONES!</h2>
+        <p id="ascensoDescripcion">Tu esfuerzo en la cancha tiene recompensa.</p>
+
+        <div class="ascenso-icono">
+            <i class="fa-solid fa-trophy"></i>
+        </div>
+
+        <span class="ascenso-cambio-label">TU ASCENSO</span>
+        <div class="ascenso-cambio">
+            <span class="ascenso-rango-anterior" id="ascensoRangoAnterior">D</span>
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            <span class="ascenso-rango-nuevo" id="ascensoRangoNuevo">C</span>
+        </div>
+
+        <p class="ascenso-mensaje">¡Subiste de categoría! Cada partido te acerca a tu mejor versión.</p>
+        <button type="button" class="ascenso-continuar" id="continuarAscenso">
+            Seguir creciendo <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </section>
+</div>
+
 <div th:replace="~{footer :: footer}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js">
@@ -1169,6 +1215,51 @@
             }
             requestAnimationFrame(tick);
         });
+    }
+
+
+    // Ascenso de rango: comparación local entre la última visita y la actual.
+    // Se ejecuta únicamente cuando Thymeleaf renderiza el modal en el perfil propio.
+    const ascensoModal = document.getElementById('modalAscensoRango');
+
+    if (ascensoModal) {
+        const rangoActual = (ascensoModal.dataset.rangoActual || '').trim().toUpperCase();
+        const jugador = (ascensoModal.dataset.jugador || 'jugador').trim().toLowerCase();
+        const claveRango = 'armolacancha.ultimoRango.' + encodeURIComponent(jugador);
+        const ordenRangos = ['D', 'C', 'B', 'A', 'S', 'SS'];
+
+        try {
+            const rangoAnterior = localStorage.getItem(claveRango);
+            const indiceAnterior = ordenRangos.indexOf(rangoAnterior);
+            const indiceActual = ordenRangos.indexOf(rangoActual);
+
+            // Primera visita: se guarda el punto de partida sin mostrar una felicitación.
+            if (indiceActual >= 0 && rangoAnterior === null) {
+                localStorage.setItem(claveRango, rangoActual);
+            } else if (indiceAnterior >= 0 && indiceActual > indiceAnterior) {
+                document.getElementById('ascensoRangoAnterior').textContent = rangoAnterior;
+                document.getElementById('ascensoRangoNuevo').textContent = rangoActual;
+
+                // La animación se muestra al entrar al perfil propio.
+                ascensoModal.classList.add('ascenso-visible');
+                ascensoModal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('ascenso-bloqueo-scroll');
+
+                const botonContinuar = document.getElementById('continuarAscenso');
+                botonContinuar.addEventListener('click', function () {
+                    localStorage.setItem(claveRango, rangoActual);
+                    ascensoModal.classList.remove('ascenso-visible');
+                    ascensoModal.setAttribute('aria-hidden', 'true');
+                    document.body.classList.remove('ascenso-bloqueo-scroll');
+                }, { once: true });
+            } else if (indiceActual >= 0 && indiceAnterior !== indiceActual) {
+                // Si el rango bajó, se actualiza la referencia sin celebrar un ascenso.
+                localStorage.setItem(claveRango, rangoActual);
+            }
+        } catch (error) {
+            // Si el navegador bloquea localStorage, el perfil sigue funcionando normalmente.
+            console.warn('No se pudo consultar el historial local de rango.', error);
+        }
     }
 
     const chart = document.querySelector('.grafico-evolucion');

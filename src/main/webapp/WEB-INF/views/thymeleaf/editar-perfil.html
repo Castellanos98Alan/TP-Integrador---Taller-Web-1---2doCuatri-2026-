@@ -413,7 +413,7 @@
                             <input
                                     type="hidden"
                                     name="idPartido"
-                                    th:value="${notificacion.partido.id}">
+                                    th:href="@{'/partido/' + ${notificacion.partido.id}+'/resumen'}">
 
                             <button
                                     type="submit"

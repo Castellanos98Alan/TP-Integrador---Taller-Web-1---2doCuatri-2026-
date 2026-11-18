@@ -2,6 +2,29 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+    <script>
+        // Evita repetir las animaciones de entrada cuando se actualiza el ranking
+        // mediante los filtros. La animación inicial se conserva al entrar a la página.
+        (function () {
+            try {
+                if (sessionStorage.getItem("rankingFiltroEnviado") === "true") {
+                    document.documentElement.classList.add("ranking-sin-entrada");
+                    sessionStorage.removeItem("rankingFiltroEnviado");
+                }
+            } catch (error) {
+                // Si el navegador bloquea sessionStorage, la página sigue funcionando.
+            }
+        })();
+
+        function enviarFiltroRanking(select) {
+            try {
+                sessionStorage.setItem("rankingFiltroEnviado", "true");
+            } catch (error) {
+                // El envío del formulario no depende de sessionStorage.
+            }
+            select.form.submit();
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -237,6 +260,23 @@
             );
 
             border: 1px solid #f3d76e;
+        }
+
+        /* Distinción visual de los tres puestos del podio */
+        .podio-card.segundo {
+            border: 1px solid #b8c2c7;
+            box-shadow: 0 0 9px rgba(174, 190, 198, .27), 0 0 16px rgba(174, 190, 198, .10);
+        }
+
+        .podio-card.primero {
+            border: 1px solid #f0c928;
+            box-shadow:
+                0 0 9px rgba(255, 214, 55, .46),
+                0 0 20px rgba(255, 214, 55, .25);
+        }
+
+        .podio-card.tercero {
+            border: 1px solid #bd7b3c;
         }
 
         .medalla {
@@ -572,6 +612,395 @@
 
         }
     
+    
+
+        /* ==========================================================
+           VIDA Y MOVIMIENTO · RANKING
+           Mantiene intacta la composición original.
+           Lenguaje visual compartido con perfil.css
+           ========================================================== */
+
+        @keyframes ranking-aparecer-subiendo {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes ranking-aparecer-izquierda {
+            from { opacity: 0; transform: translateX(-14px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes ranking-flotar-medalla {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50%      { transform: translateY(-4px) rotate(3deg); }
+        }
+
+        @keyframes ranking-brillo-primero {
+            0%, 100% {
+                box-shadow:
+                    0 0 9px rgba(255, 214, 55, .32),
+                    0 5px 18px rgba(232, 185, 0, .13);
+            }
+            50% {
+                box-shadow:
+                    0 0 13px rgba(255, 214, 55, .52),
+                    0 8px 25px rgba(232, 185, 0, .25);
+            }
+        }
+
+        @keyframes ranking-pulso-avatar {
+            0%   { box-shadow: 0 0 0 0 rgba(80, 227, 164, .32); }
+            70%  { box-shadow: 0 0 0 10px rgba(80, 227, 164, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(80, 227, 164, 0); }
+        }
+
+        /* Entrada de página: navbar, hero y contenido */
+        .navbar-ranking {
+            animation: ranking-aparecer-subiendo .5s cubic-bezier(.22, .7, .25, 1) both;
+        }
+
+        .hero-ranking > small {
+            display: inline-block;
+            animation: ranking-aparecer-izquierda .55s ease .08s both;
+        }
+
+        .hero-ranking h1 {
+            animation: ranking-aparecer-izquierda .65s cubic-bezier(.22, .7, .25, 1) .16s both;
+        }
+
+        .hero-ranking > p:nth-of-type(1) {
+            animation: ranking-aparecer-subiendo .55s ease .25s both;
+        }
+
+        .hero-ranking > p:nth-of-type(2) {
+            animation: ranking-aparecer-subiendo .55s ease .32s both;
+        }
+
+        .datos-hero .dato-hero {
+            animation: ranking-aparecer-subiendo .55s cubic-bezier(.22, .7, .25, 1) both;
+        }
+
+        .datos-hero .dato-hero:nth-child(1) { animation-delay: .38s; }
+        .datos-hero .dato-hero:nth-child(2) { animation-delay: .46s; }
+        .datos-hero .dato-hero:nth-child(3) { animation-delay: .54s; }
+
+        .contenido-ranking {
+            position: relative;
+            animation: ranking-aparecer-subiendo .65s cubic-bezier(.22, .7, .25, 1) .18s both;
+        }
+
+        /* Navegación y controles */
+        .navbar-ranking .nav-link {
+            transition: transform .2s ease, color .2s ease, opacity .2s ease;
+        }
+
+        .navbar-ranking .nav-link:hover {
+            transform: translateY(-2px);
+        }
+
+        .boton-crear,
+        .boton-logout,
+        .filtro select {
+            transition: transform .22s ease, box-shadow .22s ease,
+                        border-color .22s ease, background-color .22s ease;
+        }
+
+        .boton-crear:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 16px rgba(255, 230, 0, .20);
+        }
+
+        .filtro select:hover {
+            border-color: #9bcbb7;
+        }
+
+        .filtro select:focus {
+            border-color: #159765;
+            box-shadow: 0 0 0 3px rgba(21, 151, 101, .13);
+            outline: none;
+        }
+
+        /* Filtros: aparecen antes del podio */
+        .filtros {
+            animation: ranking-aparecer-subiendo .6s cubic-bezier(.22, .7, .25, 1) .28s both;
+            transition: box-shadow .25s ease, border-color .25s ease;
+        }
+
+        .filtros:focus-within {
+            box-shadow: 0 7px 20px rgba(18, 63, 47, .07);
+        }
+
+        /* Podio: entrada escalonada, sin alterar orden ni dimensiones */
+        .podio-card {
+            animation: ranking-aparecer-subiendo .65s cubic-bezier(.22, .7, .25, 1) both;
+            transition: transform .28s ease, box-shadow .28s ease,
+                        border-color .28s ease, background-color .28s ease;
+        }
+
+        .podio-card:nth-child(1) { animation-delay: .38s; }
+        .podio-card:nth-child(2) { animation-delay: .49s; }
+        .podio-card:nth-child(3) { animation-delay: .60s; }
+
+        .podio-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .podio-card.segundo:hover {
+            border-color: #aab7bd;
+            box-shadow: 0 8px 20px rgba(125, 145, 155, .24), 0 0 10px rgba(174, 190, 198, .15);
+        }
+
+        .podio-card.primero:hover {
+            border-color: #e8bd18;
+            box-shadow:
+                0 0 12px rgba(255, 214, 55, .56),
+                0 0 24px rgba(255, 214, 55, .30);
+        }
+
+        .podio-card.tercero:hover {
+            border-color: #bd7b3c;
+            box-shadow: 0 8px 19px rgba(189, 123, 60, .13);
+        }
+
+        .podio-card.primero {
+            animation-name: ranking-aparecer-subiendo, ranking-brillo-primero;
+            animation-duration: .65s, 3.4s;
+            animation-timing-function: cubic-bezier(.22, .7, .25, 1), ease-in-out;
+            animation-delay: .49s, 1.2s;
+            animation-iteration-count: 1, infinite;
+            animation-fill-mode: both, none;
+        }
+
+        .podio-card .medalla {
+            display: inline-block;
+            transform-origin: center;
+            transition: transform .25s ease;
+        }
+
+        .podio-card:hover .medalla {
+            transform: translateY(-3px) scale(1.12);
+        }
+
+        .podio-card.primero .medalla i {
+            display: inline-block;
+            animation: ranking-flotar-medalla 3s ease-in-out 1s infinite;
+        }
+
+        .podio-card .avatar {
+            transition: transform .3s ease, box-shadow .3s ease;
+            animation: ranking-pulso-avatar 3.2s ease-out 1.1s infinite;
+        }
+
+        .podio-card:hover .avatar {
+            transform: scale(1.06);
+        }
+
+        .nombre-jugador-link,
+        .nombre-podio {
+            transition: color .2s ease;
+        }
+
+        .nombre-jugador-link:hover {
+            color: #00875a;
+        }
+
+        .posicion-podio {
+            transition: background-color .2s ease, transform .2s ease;
+        }
+
+        .podio-card:hover .posicion-podio {
+            background-color: #d9f2e6;
+            transform: translateY(-1px);
+        }
+
+        /* Tabla: cabecera, filas y avatares */
+        .tabla-ranking {
+            animation: ranking-aparecer-subiendo .65s cubic-bezier(.22, .7, .25, 1) .62s both;
+            transition: box-shadow .25s ease, border-color .25s ease;
+        }
+
+        .tabla-ranking:hover {
+            border-color: #cfe5db;
+            box-shadow: 0 9px 24px rgba(18, 63, 47, .07);
+        }
+
+        .tabla-ranking tbody tr {
+            animation: ranking-aparecer-izquierda .45s ease both;
+            transition: background-color .22s ease, box-shadow .22s ease;
+        }
+
+        .tabla-ranking tbody tr:nth-child(1) { animation-delay: .66s; }
+        .tabla-ranking tbody tr:nth-child(2) { animation-delay: .72s; }
+        .tabla-ranking tbody tr:nth-child(3) { animation-delay: .78s; }
+        .tabla-ranking tbody tr:nth-child(4) { animation-delay: .84s; }
+        .tabla-ranking tbody tr:nth-child(5) { animation-delay: .90s; }
+        .tabla-ranking tbody tr:nth-child(6) { animation-delay: .96s; }
+        .tabla-ranking tbody tr:nth-child(n+7) { animation-delay: 1.02s; }
+
+        .tabla-ranking tbody tr:hover {
+            background-color: #eef7f2;
+            box-shadow: inset 3px 0 0 #159765;
+        }
+
+        .avatar-tabla {
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .tabla-ranking tbody tr:hover .avatar-tabla {
+            transform: scale(1.09);
+            box-shadow: 0 3px 9px rgba(0, 77, 56, .18);
+        }
+
+        .numero-posicion,
+        .puntos-tabla,
+        .posicion-juego {
+            transition: color .2s ease, transform .2s ease;
+        }
+
+        .tabla-ranking tbody tr:hover .numero-posicion {
+            color: #087653;
+            transform: translateX(2px);
+        }
+
+        .tabla-ranking tbody tr:hover .puntos-tabla {
+            color: #159765;
+        }
+
+        .posicion-juego {
+            transition: background-color .2s ease, border-color .2s ease,
+                        transform .2s ease;
+        }
+
+        .tabla-ranking tbody tr:hover .posicion-juego {
+            background-color: #dff5e9;
+            border-color: #b9dfcd;
+            transform: translateY(-1px);
+        }
+
+        /* Panel lateral y rangos: misma elevación sutil que los paneles del perfil */
+        .tarjeta-posicion,
+        .rangos {
+            animation: ranking-aparecer-subiendo .65s cubic-bezier(.22, .7, .25, 1) both;
+            transition: transform .25s ease, box-shadow .25s ease,
+                        border-color .25s ease;
+        }
+
+        .tarjeta-posicion { animation-delay: .42s; }
+        .rangos { animation-delay: .54s; }
+
+        .tarjeta-posicion:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(18, 63, 47, .15);
+        }
+
+        .tarjeta-posicion h5 i {
+            display: inline-block;
+            transition: transform .3s ease;
+        }
+
+        .tarjeta-posicion:hover h5 i {
+            transform: rotate(-9deg) scale(1.12);
+        }
+
+        .rangos:hover {
+            border-color: #cfe5db;
+            box-shadow: 0 8px 22px rgba(18, 63, 47, .07);
+        }
+
+        .rango {
+            transition: background-color .2s ease, padding-left .2s ease;
+        }
+
+        .rango:hover {
+            padding-left: 6px;
+            background-color: #f4f9f6;
+        }
+
+        .rango .letra-rango {
+            transition: transform .22s ease, box-shadow .22s ease;
+        }
+
+        .rango:hover .letra-rango {
+            transform: scale(1.08);
+            box-shadow: 0 3px 8px rgba(18, 63, 47, .14);
+        }
+
+        .ranking-vacio {
+            animation: ranking-aparecer-subiendo .6s ease .3s both;
+        }
+
+        /*
+         * Cuando el ranking vuelve del servidor por un cambio de filtro,
+         * se mantienen los elementos visibles y se evita reproducir la
+         * animación de entrada de toda la página.
+         */
+        .ranking-sin-entrada .navbar-ranking,
+        .ranking-sin-entrada .hero-ranking > small,
+        .ranking-sin-entrada .hero-ranking h1,
+        .ranking-sin-entrada .hero-ranking > p,
+        .ranking-sin-entrada .datos-hero .dato-hero,
+        .ranking-sin-entrada .contenido-ranking,
+        .ranking-sin-entrada .filtros,
+        .ranking-sin-entrada .podio-card,
+        .ranking-sin-entrada .podio-card.primero,
+        .ranking-sin-entrada .podio-card.primero .medalla i,
+        .ranking-sin-entrada .podio-card .avatar,
+        .ranking-sin-entrada .tabla-ranking,
+        .ranking-sin-entrada .tabla-ranking tbody tr,
+        .ranking-sin-entrada .tarjeta-posicion,
+        .ranking-sin-entrada .rangos,
+        .ranking-sin-entrada .ranking-vacio {
+            animation: none !important;
+        }
+
+        /* Foco visible y movimiento reducido */
+        .navbar-ranking a:focus-visible,
+        .boton-crear:focus-visible,
+        .nombre-jugador-link:focus-visible {
+            outline: 3px solid rgba(80, 227, 164, .75);
+            outline-offset: 3px;
+            border-radius: 5px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .navbar-ranking,
+            .hero-ranking > small,
+            .hero-ranking h1,
+            .hero-ranking > p,
+            .datos-hero .dato-hero,
+            .contenido-ranking,
+            .filtros,
+            .podio-card,
+            .podio-card.primero,
+            .podio-card.primero .medalla i,
+            .podio-card .avatar,
+            .tabla-ranking,
+            .tabla-ranking tbody tr,
+            .tarjeta-posicion,
+            .rangos,
+            .ranking-vacio {
+                animation: none !important;
+            }
+
+            .navbar-ranking .nav-link:hover,
+            .boton-crear:hover,
+            .podio-card:hover,
+            .podio-card:hover .avatar,
+            .tabla-ranking tbody tr:hover .avatar-tabla,
+            .tarjeta-posicion:hover,
+            .rango:hover,
+            .rango:hover .letra-rango {
+                transform: none !important;
+            }
+
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important;
+            }
+        }
+
     </style>
 </head>
 
@@ -915,7 +1344,7 @@
                         <span>Nivel</span>
 
                         <select name="nivel"
-                                onchange="this.form.submit()">
+                                onchange="enviarFiltroRanking(this)">
 
                             <option value=""
                                     th:selected="${nivelSeleccionado == null or nivelSeleccionado == ''}">
@@ -964,7 +1393,7 @@
                         <span>Posición</span>
 
                         <select name="posicion"
-                                onchange="this.form.submit()">
+                                onchange="enviarFiltroRanking(this)">
 
                             <option value=""
                                     th:selected="${posicionSeleccionada == null or posicionSeleccionada == ''}">
@@ -1003,7 +1432,7 @@
                         <span>Rango</span>
 
                         <select name="rango"
-                                onchange="this.form.submit()">
+                                onchange="enviarFiltroRanking(this)">
 
                             <option value=""
                                     th:selected="${rangoSeleccionado == null or rangoSeleccionado == ''}">
@@ -1037,7 +1466,7 @@
                         <span>Vista</span>
 
                         <select name="vista"
-                                onchange="this.form.submit()">
+                                onchange="enviarFiltroRanking(this)">
 
                             <option value="general"
                                     th:selected="${vistaSeleccionada == null
@@ -1076,7 +1505,7 @@
 
                     <!-- SEGUNDO -->
 
-                    <div class="podio-card"
+                    <div class="podio-card segundo"
                          th:if="${ranking.size() > 1}">
 
                         <div class="medalla segundo-puesto">
@@ -1194,7 +1623,7 @@
 
                     <!-- TERCERO -->
 
-                    <div class="podio-card"
+                    <div class="podio-card tercero"
                          th:if="${ranking.size() > 2}">
 
                         <div class="medalla tercer-puesto">

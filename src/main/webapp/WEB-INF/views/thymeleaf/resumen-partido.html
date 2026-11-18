@@ -29,6 +29,15 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.06);
             margin-bottom: 20px;
         }
+
+        .badge-posicion {
+            background-color: #f0f4f2;
+            color: #4a635a;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
         .header-seccion {
             background-color: #e8f7f0;
             color: #003c2e;
@@ -60,6 +69,15 @@
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #50e3a4;
+            flex-shrink: 0;
+        }
+        .avatar-sin-foto {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #006747;
+            color: white;
+            font-size: 16px;
         }
         .contenedor-equipo {
             border: 1px solid #d1ded8;
@@ -84,7 +102,7 @@
             letter-spacing: 2px;
         }
 
-/* Botón de cerrar sesión (universal) */
+        /* Botón de cerrar sesión (universal) */
         .navbar-acciones {
             display: flex;
             align-items: center;
@@ -119,7 +137,6 @@
             transform: translateY(-1px);
             outline: none;
         }
-
     </style>
 </head>
 <body>
@@ -142,12 +159,11 @@
 
             <!-- CERRAR SESIÓN -->
             <a class="boton-logout" th:if="${session.USUARIO != null}" th:href="@{/logout}"
-            title="Cerrar sesión" aria-label="Cerrar sesión">
+               title="Cerrar sesión" aria-label="Cerrar sesión">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </a>
         </div>
     </div>
-    
 </nav>
 
 <div class="container py-4">
@@ -203,9 +219,26 @@
                             <tr th:each="est : ${estadisticasLocal}">
                                 <td style="padding-left: 8px;">
                                     <div class="d-flex align-items-center gap-2 py-1">
-                                        <img th:src="${est.jugador.foto != null and !est.jugador.foto.isEmpty() ? '/' + est.jugador.foto : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" class="avatar-jugador" alt="Avatar">
-                                        <strong class="d-block text-dark text-start" style="font-size: 13px;"
-                                                th:text="${est.jugador.usuario != null && est.jugador.usuario.nickname != null && !est.jugador.usuario.nickname.isEmpty() ? est.jugador.usuario.nickname : est.jugador.nombre}">Jugador</strong>
+                                        <img th:if="${est.jugador.foto != null and !est.jugador.foto.isEmpty()}"
+                                             th:src="@{'/' + ${est.jugador.foto}}"
+                                             th:style="'object-position:' + ${est.jugador.fotoPosicionX} + '\% ' +${est.jugador.fotoPosicionY} + '%;'"
+                                             class="avatar-jugador" alt="Foto de perfil">
+                                        <div th:unless="${est.jugador.foto != null and !est.jugador.foto.isEmpty()}"
+                                             class="avatar-jugador avatar-sin-foto">⚽</div>
+                                        <div>
+                                            <strong class="d-block text-dark text-start" style="font-size: 13px;"
+                                                    th:text="${est.jugador.usuario != null && est.jugador.usuario.nickname != null && !est.jugador.usuario.nickname.isEmpty() ? est.jugador.usuario.nickname : est.jugador.nombre}">Jugador</strong>
+                                            <div class="d-flex flex-wrap gap-1 mt-1">
+                                                <span class="badge-posicion"
+                                                      th:if="${est.jugador.posicion1 != null}"
+                                                      th:text="${est.jugador.posicion1}">
+                                                </span>
+                                                <span class="badge-posicion"
+                                                      th:if="${est.jugador.posicion2 != null}"
+                                                      th:text="${est.jugador.posicion2}">
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
                                 <td><span class="badge bg-success px-2 py-1" th:text="${est.goles != null ? est.goles : 0}">0</span></td>
@@ -246,9 +279,26 @@
                             <tr th:each="est : ${estadisticasVisitante}">
                                 <td style="padding-left: 8px;">
                                     <div class="d-flex align-items-center gap-2 py-1">
-                                        <img th:src="${est.jugador.foto != null and !est.jugador.foto.isEmpty() ? '/' + est.jugador.foto : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" class="avatar-jugador" alt="Avatar">
-                                        <strong class="d-block text-dark text-start" style="font-size: 13px;"
-                                                th:text="${est.jugador.usuario != null && est.jugador.usuario.nickname != null && !est.jugador.usuario.nickname.isEmpty() ? est.jugador.usuario.nickname : est.jugador.nombre}">Jugador</strong>
+                                        <img th:if="${est.jugador.foto != null and !est.jugador.foto.isEmpty()}"
+                                             th:src="@{'/' + ${est.jugador.foto}}"
+                                             th:style="'object-position:' + ${est.jugador.fotoPosicionX} + '\% ' +${est.jugador.fotoPosicionY} + '%;'"
+                                             class="avatar-jugador" alt="Foto de perfil">
+                                        <div th:unless="${est.jugador.foto != null and !est.jugador.foto.isEmpty()}"
+                                             class="avatar-jugador avatar-sin-foto">⚽</div>
+                                        <div>
+                                            <strong class="d-block text-dark text-start" style="font-size: 13px;"
+                                                    th:text="${est.jugador.usuario != null && est.jugador.usuario.nickname != null && !est.jugador.usuario.nickname.isEmpty() ? est.jugador.usuario.nickname : est.jugador.nombre}">Jugador</strong>
+                                            <div class="d-flex flex-wrap gap-1 mt-1">
+                                                <span class="badge-posicion"
+                                                      th:if="${est.jugador.posicion1 != null}"
+                                                      th:text="${est.jugador.posicion1}">
+                                                </span>
+                                                <span class="badge-posicion"
+                                                      th:if="${est.jugador.posicion2 != null}"
+                                                      th:text="${est.jugador.posicion2}">
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
                                 <td><span class="badge bg-success px-2 py-1" th:text="${est.goles != null ? est.goles : 0}">0</span></td>
@@ -267,10 +317,5 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html></title>
-</head>
-<body>
-
 </body>
 </html>
