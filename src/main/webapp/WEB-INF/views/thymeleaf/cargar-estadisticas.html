@@ -105,6 +105,13 @@
         .table-estadisticas th:first-child, .table-estadisticas td:first-child {
             text-align: left;
         }
+        .badge-posicion {
+            background-color: #f0f4f2;
+            color: #4a635a;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
     </style>
 </head>
 
@@ -188,6 +195,15 @@
                                                 <span th:if="${ins.esCapitan}" class="badge bg-dark text-white mt-1" style="font-size: 9px;">
                                                     <i class="fa-solid fa-crown me-1 text-warning"></i> Capitán
                                                 </span>
+                                                <span class="badge-posicion"
+                                                      th:if="${ins.jugador.posicion1 != null}"
+                                                      th:text="${ins.jugador.posicion1}">
+    </span>
+
+                                                <span class="badge-posicion"
+                                                      th:if="${ins.jugador.posicion2 != null}"
+                                                      th:text="${ins.jugador.posicion2}">
+    </span>
                                             </div>
                                         </div>
                                     </td>
@@ -240,9 +256,19 @@
 
                                                 <strong class="d-block text-dark text-start" style="font-size: 13px;" th:text="${ins.jugador.usuario != null && ins.jugador.usuario.nickname != null && !ins.jugador.usuario.nickname.isEmpty() ? ins.jugador.usuario.nickname : ins.jugador.nombre}">Jugador</strong>
 
+
                                                 <span th:if="${ins.esCapitan}" class="badge bg-dark text-white mt-1" style="font-size: 9px;">
                                                     <i class="fa-solid fa-crown me-1 text-warning"></i> Capitán
                                                 </span>
+                                                <span class="badge-posicion"
+                                                      th:if="${ins.jugador.posicion1 != null}"
+                                                      th:text="${ins.jugador.posicion1}">
+    </span>
+
+                                                <span class="badge-posicion"
+                                                      th:if="${ins.jugador.posicion2 != null}"
+                                                      th:text="${ins.jugador.posicion2}">
+    </span>
                                             </div>
                                         </div>
                                     </td>

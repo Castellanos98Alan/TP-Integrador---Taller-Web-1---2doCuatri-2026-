@@ -29,6 +29,15 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.06);
             margin-bottom: 20px;
         }
+
+        .badge-posicion {
+            background-color: #f0f4f2;
+            color: #4a635a;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
         .header-seccion {
             background-color: #e8f7f0;
             color: #003c2e;
@@ -206,6 +215,15 @@
                                         <img th:src="${est.jugador.foto != null and !est.jugador.foto.isEmpty() ? '/' + est.jugador.foto : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" class="avatar-jugador" alt="Avatar">
                                         <strong class="d-block text-dark text-start" style="font-size: 13px;"
                                                 th:text="${est.jugador.usuario != null && est.jugador.usuario.nickname != null && !est.jugador.usuario.nickname.isEmpty() ? est.jugador.usuario.nickname : est.jugador.nombre}">Jugador</strong>
+                                        <span class="badge-posicion"
+                                              th:if="${est.jugador.posicion1 != null}"
+                                              th:text="${est.jugador.posicion1}">
+    </span>
+
+                                        <span class="badge-posicion"
+                                              th:if="${est.jugador.posicion2 != null}"
+                                              th:text="${est.jugador.posicion2}">
+    </span>
                                     </div>
                                 </td>
                                 <td><span class="badge bg-success px-2 py-1" th:text="${est.goles != null ? est.goles : 0}">0</span></td>
@@ -249,6 +267,15 @@
                                         <img th:src="${est.jugador.foto != null and !est.jugador.foto.isEmpty() ? '/' + est.jugador.foto : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" class="avatar-jugador" alt="Avatar">
                                         <strong class="d-block text-dark text-start" style="font-size: 13px;"
                                                 th:text="${est.jugador.usuario != null && est.jugador.usuario.nickname != null && !est.jugador.usuario.nickname.isEmpty() ? est.jugador.usuario.nickname : est.jugador.nombre}">Jugador</strong>
+                                        <span class="badge-posicion"
+                                              th:if="${est.jugador.posicion1 != null}"
+                                              th:text="${est.jugador.posicion1}">
+    </span>
+
+                                        <span class="badge-posicion"
+                                              th:if="${est.jugador.posicion2 != null}"
+                                              th:text="${est.jugador.posicion2}">
+    </span>
                                     </div>
                                 </td>
                                 <td><span class="badge bg-success px-2 py-1" th:text="${est.goles != null ? est.goles : 0}">0</span></td>
