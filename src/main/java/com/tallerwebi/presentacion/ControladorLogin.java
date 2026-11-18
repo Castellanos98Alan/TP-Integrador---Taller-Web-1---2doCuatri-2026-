@@ -93,6 +93,14 @@ public class ControladorLogin {
     model.put(ATRIBUTO_USUARIO, new Usuario());
     return new ModelAndView("nuevo-usuario", model);
   }
+
+  @RequestMapping(path = "/logout", method = RequestMethod.GET)
+  public ModelAndView cerrarSesion(HttpServletRequest request) {
+    if (request.getSession(false) != null) {
+      request.getSession().invalidate();
+    }
+    return new ModelAndView("redirect:/login");
+  }
   /* 
   @RequestMapping(path = "/home", method = RequestMethod.GET)
   public ModelAndView irAHome() {

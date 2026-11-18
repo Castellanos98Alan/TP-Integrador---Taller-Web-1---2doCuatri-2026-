@@ -26,6 +26,7 @@ public class HibernateConfig {
     if (dbHost == null) dbHost = "localhost";
     if (dbPort == null) dbPort = "3306";
     if (dbName == null) dbName = "tallerwebi";
+
     if (dbUser == null) dbUser = "root";
     if (dbPassword == null) dbPassword = "";
 

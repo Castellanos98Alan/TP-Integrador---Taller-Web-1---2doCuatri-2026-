@@ -113,6 +113,43 @@
             object-fit: cover;
             display: block;
         }
+
+/* Botón de cerrar sesión (universal) */
+        .navbar-acciones {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        a.boton-logout {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(80, 227, 164, 0.45);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #50e3a4;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+
+        a.boton-logout i {
+            color: inherit;
+        }
+
+        a.boton-logout:hover,
+        a.boton-logout:focus-visible {
+            background-color: #e83c43;
+            border-color: #e83c43;
+            color: white;
+            transform: translateY(-1px);
+            outline: none;
+        }
+        
     </style>
 </head>
 
@@ -173,7 +210,7 @@
                                 th:if="${notificacion.tipoDeNotificacion.name()
                                     == 'INVITACION_PARTIDO'}">
 
-                            <strong>⚽ Invitación a partido</strong>
+                            <strong> Invitación a partido</strong>
 
                             <p
                                     class="mb-1"
@@ -205,7 +242,7 @@
                                 th:if="${notificacion.tipoDeNotificacion.name()
                                     == 'PARTIDO_CANCELADO'}">
 
-                            <strong>❌ Partido cancelado</strong>
+                            <strong> Partido cancelado</strong>
 
                             <p
                                     class="mb-1"
@@ -242,7 +279,7 @@
                                 th:if="${notificacion.tipoDeNotificacion.name()
                                     == 'FORMULARIO_COMPLETADO'}">
 
-                            <strong>📋 Formulario completado</strong>
+                            <strong> Formulario completado</strong>
 
                             <p
                                     class="mb-1"
@@ -341,12 +378,18 @@
             </div>
         </div>
 
+        <div class="navbar-acciones">
+            <!-- CREAR PARTIDO -->
+            <a class="boton-crear" th:href="@{/crearPartido}">
+                + Crear partido
+            </a>
 
-        <!-- CREAR PARTIDO -->
-        <a class="boton-crear" th:href="@{/crearPartido}">
-            + Crear partido
-        </a>
-
+            <!-- CERRAR SESIÓN -->
+            <a class="boton-logout" th:if="${session.USUARIO != null}" th:href="@{/logout}"
+            title="Cerrar sesión" aria-label="Cerrar sesión">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </a>
+        </div>
 
     </div>
 </nav>
@@ -369,7 +412,7 @@
                     <div class="row g-3 align-items-end">
 
                         <div class="col-md-4 col-lg-2">
-                            <label for="filtroNivel" class="form-label small fw-bold mb-1">Rango mínimo</label>
+                            <label for="filtroNivel" class="form-label small fw-bold mb-1">Rango</label>
                             <select name="filtroNivel" id="filtroNivel" class="form-select form-select-sm">
                                 <option value="TODOS" th:selected="${nivelSeleccionado == null or nivelSeleccionado == 'TODOS'}">Cualquier rango</option>
                                 <option value="SS" th:selected="${nivelSeleccionado == 'SS'}">SS</option>
@@ -476,10 +519,10 @@
 
                         <!-- Imagen de la cancha -->
                         <img th:if="${partido.cancha != null and partido.cancha.id != null}"
-                             th:src="@{'/uploads/canchas/cancha' + ${partido.cancha.id} + '.jpg'}"
+                             th:src="@{'/uploads/canchas/cancha' + ${partido.cancha.id} + '.png'}"
                              class="imagen-cancha"
                              alt="Imagen de la cancha"
-                             onerror="this.onerror=null; this.src='/uploads/canchas/cancha1.jpg';">
+                             onerror="this.onerror=null; this.src='/uploads/canchas/cancha1.png';">
 
                         <div class="card-body d-flex flex-column">
 
@@ -571,6 +614,8 @@
         </div>
     </div>
 </div>
+
+<div th:replace="~{footer :: footer}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
