@@ -262,6 +262,23 @@
             border: 1px solid #f3d76e;
         }
 
+        /* Distinción visual de los tres puestos del podio */
+        .podio-card.segundo {
+            border: 1px solid #b8c2c7;
+            box-shadow: 0 0 9px rgba(174, 190, 198, .27), 0 0 16px rgba(174, 190, 198, .10);
+        }
+
+        .podio-card.primero {
+            border: 1px solid #f0c928;
+            box-shadow:
+                0 0 9px rgba(255, 214, 55, .46),
+                0 0 20px rgba(255, 214, 55, .25);
+        }
+
+        .podio-card.tercero {
+            border: 1px solid #bd7b3c;
+        }
+
         .medalla {
             font-size: 32px;
             margin-bottom: 7px;
@@ -619,8 +636,16 @@
         }
 
         @keyframes ranking-brillo-primero {
-            0%, 100% { box-shadow: 0 5px 16px rgba(232, 185, 0, .08); }
-            50%      { box-shadow: 0 9px 24px rgba(232, 185, 0, .20); }
+            0%, 100% {
+                box-shadow:
+                    0 0 9px rgba(255, 214, 55, .32),
+                    0 5px 18px rgba(232, 185, 0, .13);
+            }
+            50% {
+                box-shadow:
+                    0 0 13px rgba(255, 214, 55, .52),
+                    0 8px 25px rgba(232, 185, 0, .25);
+            }
         }
 
         @keyframes ranking-pulso-avatar {
@@ -718,8 +743,23 @@
 
         .podio-card:hover {
             transform: translateY(-5px);
-            border-color: #c4dfd2;
-            box-shadow: 0 12px 25px rgba(18, 63, 47, .10);
+        }
+
+        .podio-card.segundo:hover {
+            border-color: #aab7bd;
+            box-shadow: 0 8px 20px rgba(125, 145, 155, .24), 0 0 10px rgba(174, 190, 198, .15);
+        }
+
+        .podio-card.primero:hover {
+            border-color: #e8bd18;
+            box-shadow:
+                0 0 12px rgba(255, 214, 55, .56),
+                0 0 24px rgba(255, 214, 55, .30);
+        }
+
+        .podio-card.tercero:hover {
+            border-color: #bd7b3c;
+            box-shadow: 0 8px 19px rgba(189, 123, 60, .13);
         }
 
         .podio-card.primero {
@@ -1465,7 +1505,7 @@
 
                     <!-- SEGUNDO -->
 
-                    <div class="podio-card"
+                    <div class="podio-card segundo"
                          th:if="${ranking.size() > 1}">
 
                         <div class="medalla segundo-puesto">
@@ -1583,7 +1623,7 @@
 
                     <!-- TERCERO -->
 
-                    <div class="podio-card"
+                    <div class="podio-card tercero"
                          th:if="${ranking.size() > 2}">
 
                         <div class="medalla tercer-puesto">
