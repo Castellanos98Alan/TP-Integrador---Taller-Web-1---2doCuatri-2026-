@@ -2,6 +2,29 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+    <script>
+        // Evita repetir las animaciones de entrada cuando se actualiza el ranking
+        // mediante los filtros. La animación inicial se conserva al entrar a la página.
+        (function () {
+            try {
+                if (sessionStorage.getItem("rankingFiltroEnviado") === "true") {
+                    document.documentElement.classList.add("ranking-sin-entrada");
+                    sessionStorage.removeItem("rankingFiltroEnviado");
+                }
+            } catch (error) {
+                // Si el navegador bloquea sessionStorage, la página sigue funcionando.
+            }
+        })();
+
+        function enviarFiltroRanking(select) {
+            try {
+                sessionStorage.setItem("rankingFiltroEnviado", "true");
+            } catch (error) {
+                // El envío del formulario no depende de sessionStorage.
+            }
+            select.form.submit();
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -866,6 +889,30 @@
             animation: ranking-aparecer-subiendo .6s ease .3s both;
         }
 
+        /*
+         * Cuando el ranking vuelve del servidor por un cambio de filtro,
+         * se mantienen los elementos visibles y se evita reproducir la
+         * animación de entrada de toda la página.
+         */
+        .ranking-sin-entrada .navbar-ranking,
+        .ranking-sin-entrada .hero-ranking > small,
+        .ranking-sin-entrada .hero-ranking h1,
+        .ranking-sin-entrada .hero-ranking > p,
+        .ranking-sin-entrada .datos-hero .dato-hero,
+        .ranking-sin-entrada .contenido-ranking,
+        .ranking-sin-entrada .filtros,
+        .ranking-sin-entrada .podio-card,
+        .ranking-sin-entrada .podio-card.primero,
+        .ranking-sin-entrada .podio-card.primero .medalla i,
+        .ranking-sin-entrada .podio-card .avatar,
+        .ranking-sin-entrada .tabla-ranking,
+        .ranking-sin-entrada .tabla-ranking tbody tr,
+        .ranking-sin-entrada .tarjeta-posicion,
+        .ranking-sin-entrada .rangos,
+        .ranking-sin-entrada .ranking-vacio {
+            animation: none !important;
+        }
+
         /* Foco visible y movimiento reducido */
         .navbar-ranking a:focus-visible,
         .boton-crear:focus-visible,
@@ -1257,7 +1304,7 @@
                         <span>Nivel</span>
 
                         <select name="nivel"
-                                onchange="this.form.submit()">
+                                onchange="enviarFiltroRanking(this)">
 
                             <option value=""
                                     th:selected="${nivelSeleccionado == null or nivelSeleccionado == ''}">
@@ -1306,7 +1353,7 @@
                         <span>Posición</span>
 
                         <select name="posicion"
-                                onchange="this.form.submit()">
+                                onchange="enviarFiltroRanking(this)">
 
                             <option value=""
                                     th:selected="${posicionSeleccionada == null or posicionSeleccionada == ''}">
@@ -1345,7 +1392,7 @@
                         <span>Rango</span>
 
                         <select name="rango"
-                                onchange="this.form.submit()">
+                                onchange="enviarFiltroRanking(this)">
 
                             <option value=""
                                     th:selected="${rangoSeleccionado == null or rangoSeleccionado == ''}">
@@ -1379,7 +1426,7 @@
                         <span>Vista</span>
 
                         <select name="vista"
-                                onchange="this.form.submit()">
+                                onchange="enviarFiltroRanking(this)">
 
                             <option value="general"
                                     th:selected="${vistaSeleccionada == null
