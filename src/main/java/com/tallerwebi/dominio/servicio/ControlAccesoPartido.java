@@ -9,27 +9,24 @@ public final class ControlAccesoPartido {
 
   private ControlAccesoPartido() {}
 
-  static boolean tieneAcceso(Partido partido, Usuario usuario, BooleanSupplier tieneInvitacion) {
+  static boolean tieneAcceso(Partido partido, Usuario usuario, boolean tieneInvitacion) {
     if (!Boolean.TRUE.equals(partido.getEsPrivado())) {
       return true;
     }
 
+    // Si es privado, el usuario debe estar identificad
     if (usuario == null) {
       return false;
     }
 
-    return (
-      esOrganizador(partido, usuario) ||
-      estaInscripto(partido, usuario) ||
-      tieneInvitacion.getAsBoolean()
-    );
+    return esOrganizador(partido, usuario) || estaInscripto(partido, usuario) || tieneInvitacion;
   }
 
   static void validarCodigo(
     Partido partido,
     Usuario usuario,
     String codigoIngresado,
-    BooleanSupplier tieneInvitacion
+    boolean tieneInvitacion
   ) {
     if (tieneAcceso(partido, usuario, tieneInvitacion)) {
       return;
@@ -37,12 +34,11 @@ public final class ControlAccesoPartido {
 
     String codigoReal = partido.getCodigoDeAcceso();
 
-    boolean coincide =
-      codigoIngresado != null &&
-      codigoReal != null &&
-      codigoReal.equalsIgnoreCase(codigoIngresado.trim());
-
-    if (!coincide) {
+    if (
+      codigoIngresado == null ||
+      codigoReal == null ||
+      !codigoReal.equalsIgnoreCase(codigoIngresado.trim())
+    ) {
       throw new CodigoAccesoInvalidoException("El código de acceso es incorrecto.");
     }
   }

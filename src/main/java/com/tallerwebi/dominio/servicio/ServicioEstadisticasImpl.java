@@ -1,6 +1,13 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.Enumeration.CondicionJugador;
+import com.tallerwebi.dominio.Enumeration.EstadoEstadisticas;
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
+import com.tallerwebi.dominio.excepcion.ConfirmarEstadisticasNoPermitida;
+import com.tallerwebi.dominio.excepcion.EstadisticasNoGuardadas;
+import com.tallerwebi.dominio.excepcion.PartidoNoEncontrado;
+import com.tallerwebi.dominio.excepcion.RechazarEstadisticasNoPermitida;
 import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
@@ -17,10 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ServicioEstadisticasImpl implements ServicioEstadistica {
 
+  private ServicioRanking servicioRanking;
   private RepositorioEstadistica repositorioEstadisticas;
   private RepositorioPartido repositorioPartido;
   private RepositorioJugador repositorioJugador;
   private ServicioNotificacion servicioNotificacion;
+  private final ValidadorEstadisticas validadorEstadisticas = new ValidadorEstadisticas();
 
   @Autowired
   private HttpServletRequest request;
@@ -29,12 +38,14 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
     RepositorioEstadistica repositorioEstadistica,
     RepositorioPartido repositorioPartido,
     RepositorioJugador repositorioJugador,
-    ServicioNotificacion servicioNotificacion
+    ServicioNotificacion servicioNotificacion,
+    ServicioRanking servicioRanking
   ) {
     this.repositorioEstadisticas = repositorioEstadistica;
     this.repositorioPartido = repositorioPartido;
     this.repositorioJugador = repositorioJugador;
     this.servicioNotificacion = servicioNotificacion;
+    this.servicioRanking = servicioRanking;
   }
 
   @Override
@@ -86,7 +97,14 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
     }
 
     boolean esOrganizador = partido.getOrganizador().getId().equals(usuarioLogueado.getId());
-    return esOrganizador;
+
+    boolean partidoActivo = partido.getEstado() == EstadoPartido.ACTIVO;
+
+    boolean estadoEstadisticasValido =
+      partido.getEstadoEstadisticas() == EstadoEstadisticas.PENDIENTE_DE_CARGA ||
+      partido.getEstadoEstadisticas() == EstadoEstadisticas.RECHAZADA;
+
+    return esOrganizador && partidoActivo && estadoEstadisticasValido;
   }
 
   @Transactional
@@ -95,11 +113,13 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
     Long idPartido,
     List<DTOEstadisticaJugador> datosCargados
   ) {
+    validadorEstadisticas.validarLista(datosCargados);
+
     Partido partido = repositorioPartido.buscarPorId(idPartido);
 
     guardarOActualizarEstadisticas(partido, datosCargados);
 
-    partido.setEstadoEstadisticas(Partido.EstadoEstadisticas.EN_REVISION);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.EN_REVISION);
     repositorioPartido.guardar(partido);
 
     servicioNotificacion.notificarFormularioCompletado(partido.getOrganizador(), partido);
@@ -158,7 +178,7 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
     boolean puedeRevisar = false;
 
     boolean partidoValidoEnRevision =
-      partido != null && partido.getEstadoEstadisticas() == Partido.EstadoEstadisticas.EN_REVISION;
+      partido != null && partido.getEstadoEstadisticas() == EstadoEstadisticas.EN_REVISION;
     boolean usuarioValido = usuarioLogueado != null;
 
     if (partidoValidoEnRevision && usuarioValido) {
@@ -292,5 +312,136 @@ public class ServicioEstadisticasImpl implements ServicioEstadistica {
     resultado.put("locales", locales);
     resultado.put("visitantes", visitantes);
     return resultado;
+  }
+
+  @Transactional
+  @Override
+  public void confirmarEstadisticas(Long idPartido, Usuario usuarioLogueado)
+    throws ConfirmarEstadisticasNoPermitida {
+    Partido partido = repositorioPartido.buscarPorId(idPartido);
+
+    if (partido == null) {
+      throw new PartidoNoEncontrado("El partido no existe.");
+    }
+
+    if (!puedeRevisarEstadisticas(partido, usuarioLogueado)) {
+      throw new ConfirmarEstadisticasNoPermitida(
+        "No estas autorizado para confirmar estas estadisticas."
+      );
+    }
+
+    aplicarPuntajesYActualizarJugadores(partido);
+
+    partido.setEstadoEstadisticas(EstadoEstadisticas.CONFIRMADA);
+    partido.setEstado(EstadoPartido.FINALIZADO);
+
+    repositorioPartido.guardar(partido);
+
+    servicioNotificacion.notificarFormularioCompletado(partido.getOrganizador(), partido);
+  }
+
+  private void aplicarPuntajesYActualizarJugadores(Partido partido) {
+    List<Estadistica> estadisticas = repositorioEstadisticas.buscarTodasLasEstadisticasPorPartido(
+      partido
+    );
+    if (estadisticas == null || estadisticas.isEmpty()) {
+      return;
+    }
+
+    Map<String, Integer> marcador = calcularMarcadorPartido(partido, estadisticas);
+    int golesLocal = marcador.get("local");
+    int golesVisitante = marcador.get("visitante");
+
+    for (Estadistica est : estadisticas) {
+      if (est.getJugador() != null) {
+        procesarEstadisticaJugador(partido, est, golesLocal, golesVisitante);
+      }
+    }
+  }
+
+  private void procesarEstadisticaJugador(
+    Partido partido,
+    Estadistica est,
+    int golesLocal,
+    int golesVisitante
+  ) {
+    Jugador jugador = est.getJugador();
+    boolean esLocal = esJugadorDelEquipoLocal(partido, jugador);
+    est.setCondicion(esLocal ? CondicionJugador.LOCAL : CondicionJugador.VISITANTE);
+
+    int golesEquipo = esLocal ? golesLocal : golesVisitante;
+    int golesRival = esLocal ? golesVisitante : golesLocal;
+
+    int puntosResultado = calcularPuntosYActualizarHistorial(jugador, golesEquipo, golesRival);
+    int puntosRendimiento =
+      (valorOZero(est.getGoles()) * 2) +
+      (valorOZero(est.getAsistencias()) * 1) -
+      (valorOZero(est.getAmarillas()) * 1) -
+      (valorOZero(est.getRojas()) * 3);
+
+    int puntajeTotalPartido = puntosResultado + puntosRendimiento;
+
+    est.setPuntaje(puntajeTotalPartido);
+    repositorioEstadisticas.guardar(est);
+
+    jugador.setPartidosJugados(valorOZero(jugador.getPartidosJugados()) + 1);
+    jugador.setPuntos(Math.max(0, valorOZero(jugador.getPuntos()) + puntajeTotalPartido));
+
+    String nuevoNivel = servicioRanking.calcularNivel(jugador.getPuntos());
+
+    jugador.setNivel(nuevoNivel);
+
+    repositorioJugador.modificar(jugador);
+  }
+
+  private int calcularPuntosYActualizarHistorial(Jugador jugador, int golesEquipo, int golesRival) {
+    if (golesEquipo > golesRival) {
+      jugador.setPartidosGanados(valorOZero(jugador.getPartidosGanados()) + 1);
+      return 4;
+    }
+    if (golesEquipo < golesRival) {
+      jugador.setPartidosPerdidos(valorOZero(jugador.getPartidosPerdidos()) + 1);
+      return -1;
+    }
+    return 2;
+  }
+
+  private boolean esJugadorDelEquipoLocal(Partido partido, Jugador jugador) {
+    if (partido.getInscripciones() == null || partido.getEquipo1() == null || jugador == null) {
+      return false;
+    }
+
+    return partido
+      .getInscripciones()
+      .stream()
+      .anyMatch(ins ->
+        ins.getJugador() != null &&
+        ins.getJugador().getId().equals(jugador.getId()) &&
+        ins.getEquipo() != null &&
+        ins.getEquipo().getId().equals(partido.getEquipo1().getId())
+      );
+  }
+
+  @Transactional
+  @Override
+  public void rechazarEstadisticas(Long idPartido, Usuario usuarioLogueado)
+    throws RechazarEstadisticasNoPermitida {
+    Partido partido = repositorioPartido.buscarPorId(idPartido);
+
+    if (partido == null) {
+      throw new PartidoNoEncontrado("El partido no existe.");
+    }
+
+    if (!puedeRevisarEstadisticas(partido, usuarioLogueado)) {
+      throw new RechazarEstadisticasNoPermitida(
+        "No estas autorizado para rechazar estas estadisticas."
+      );
+    }
+
+    partido.setEstadoEstadisticas(EstadoEstadisticas.RECHAZADA);
+
+    repositorioPartido.guardar(partido);
+
+    servicioNotificacion.notificarFormularioCompletado(partido.getOrganizador(), partido);
   }
 }

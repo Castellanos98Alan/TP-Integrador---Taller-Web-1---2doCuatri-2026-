@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import jakarta.persistence.*;
 
 @SuppressWarnings("PMD.TooManyFields")
@@ -16,9 +17,11 @@ public class Jugador {
 
   private String nombre;
 
-  private String posicion1;
+  @Enumerated(EnumType.STRING)
+  private PosicionJugador posicion1;
 
-  private String posicion2;
+  @Enumerated(EnumType.STRING)
+  private PosicionJugador posicion2;
 
   private String nivel;
 
@@ -37,7 +40,12 @@ public class Jugador {
 
   public Jugador() {}
 
-  public Jugador(String nombre, String posicion1, String posicion2, String nivel) {
+  public Jugador(
+    String nombre,
+    PosicionJugador posicion1,
+    PosicionJugador posicion2,
+    String nivel
+  ) {
     this.nombre = nombre;
     this.posicion1 = posicion1;
     this.posicion2 = posicion2;
@@ -56,19 +64,19 @@ public class Jugador {
     this.id = id;
   }
 
-  public String getPosicion1() {
+  public PosicionJugador getPosicion1() {
     return posicion1;
   }
 
-  public void setPosicion1(String posicion) {
+  public void setPosicion1(PosicionJugador posicion) {
     this.posicion1 = posicion;
   }
 
-  public String getPosicion2() {
+  public PosicionJugador getPosicion2() {
     return posicion2;
   }
 
-  public void setPosicion2(String posicion) {
+  public void setPosicion2(PosicionJugador posicion) {
     this.posicion2 = posicion;
   }
 

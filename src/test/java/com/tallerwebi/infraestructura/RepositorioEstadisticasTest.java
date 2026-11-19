@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.Enumeration.CondicionJugador;
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
@@ -44,9 +45,24 @@ public class RepositorioEstadisticasTest {
   @Test
   public void dadoQueTengo3PartidosConSusEstadisticasMeDebeRetornarTodasLasEstadisticasDeUnPartido() {
     //Given
-    Jugador jugador1 = givenDadoQueTengoUnJugador("Pedro", "Delantero", "Mediocampista", "B");
-    Jugador jugador2 = givenDadoQueTengoUnJugador("Ivan", "Delantero", "Mediocampista", "A");
-    Jugador jugador3 = givenDadoQueTengoUnJugador("Juan", "Delantero", "Mediocampista", "B");
+    Jugador jugador1 = givenDadoQueTengoUnJugador(
+      "Pedro",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "B"
+    );
+    Jugador jugador2 = givenDadoQueTengoUnJugador(
+      "Ivan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "A"
+    );
+    Jugador jugador3 = givenDadoQueTengoUnJugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "B"
+    );
 
     Partido partido1 = givenDadoQueTengoUnPartido("B", false, LocalDateTime.of(2026, 10, 9, 23, 0));
     Partido partido2 = givenDadoQueTengoUnPartido("A", false, LocalDateTime.of(2026, 10, 9, 22, 0));
@@ -108,9 +124,24 @@ public class RepositorioEstadisticasTest {
   @Test
   public void dadoQueTengo3PartidosConSusEstadisticasMeDebeRetornarLasEstadisticasTotalesDeXJugador() {
     //Given
-    Jugador jugador1 = givenDadoQueTengoUnJugador("Pedro", "Delantero", "Mediocampista", "B");
-    Jugador jugador2 = givenDadoQueTengoUnJugador("Ivan", "Delantero", "Mediocampista", "A");
-    Jugador jugador3 = givenDadoQueTengoUnJugador("Juan", "Delantero", "Mediocampista", "B");
+    Jugador jugador1 = givenDadoQueTengoUnJugador(
+      "Pedro",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "B"
+    );
+    Jugador jugador2 = givenDadoQueTengoUnJugador(
+      "Ivan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "A"
+    );
+    Jugador jugador3 = givenDadoQueTengoUnJugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "B"
+    );
 
     Partido partido1 = givenDadoQueTengoUnPartido("B", false, LocalDateTime.of(2026, 10, 9, 23, 0));
     Partido partido2 = givenDadoQueTengoUnPartido("A", false, LocalDateTime.of(2026, 10, 9, 22, 0));
@@ -200,7 +231,12 @@ public class RepositorioEstadisticasTest {
   public void dadoQueTengo1JuadorQueTodaviaNoTieneEstadisticasRetornaVacio() {
     //Given
 
-    Jugador jugador1 = givenDadoQueTengoUnJugador("Pedro", "Delantero", "Mediocampista", "B");
+    Jugador jugador1 = givenDadoQueTengoUnJugador(
+      "Pedro",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "B"
+    );
 
     //When
 
@@ -218,7 +254,12 @@ public class RepositorioEstadisticasTest {
   public void dadoQueTengoUnaEstadisticaDeUnJugadorDebeRetornarSusGolesCorrectamente() {
     //given
 
-    Jugador jugador1 = givenDadoQueTengoUnJugador("Pedro", "Delantero", "Arquero", "C");
+    Jugador jugador1 = givenDadoQueTengoUnJugador(
+      "Pedro",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.ARQUERO,
+      "C"
+    );
     Partido partido1 = givenDadoQueTengoUnPartido(
       "C",
       false,
@@ -242,9 +283,24 @@ public class RepositorioEstadisticasTest {
   @Test
   public void dadoQueTengoEstadisticasDeDistintosPartidosDebeRetornarSoloLasDelPartidoBuscado() {
     //Given
-    Jugador jugador1 = givenDadoQueTengoUnJugador("Pedro", "Delantero", "Mediocampista", "B");
-    Jugador jugador2 = givenDadoQueTengoUnJugador("Ivan", "Delantero", "Mediocampista", "A");
-    Jugador jugador3 = givenDadoQueTengoUnJugador("Juan", "Delantero", "Mediocampista", "B");
+    Jugador jugador1 = givenDadoQueTengoUnJugador(
+      "Pedro",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "B"
+    );
+    Jugador jugador2 = givenDadoQueTengoUnJugador(
+      "Ivan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "A"
+    );
+    Jugador jugador3 = givenDadoQueTengoUnJugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "B"
+    );
 
     Partido partido1 = givenDadoQueTengoUnPartido("B", false, LocalDateTime.of(2026, 10, 9, 23, 0));
     Partido partido2 = givenDadoQueTengoUnPartido("A", false, LocalDateTime.of(2026, 10, 9, 22, 0));
@@ -307,9 +363,24 @@ public class RepositorioEstadisticasTest {
   public void dadoQueTengoJugadoresDeDistintosNivelesDebeRetornarSoloLosDelNivelBuscado() {
     // Given
 
-    Jugador jugador1 = givenDadoQueTengoUnJugador("Pedro", "Delantero", "Mediocampista", "B");
-    Jugador jugador2 = givenDadoQueTengoUnJugador("Ivan", "Delantero", "Mediocampista", "A");
-    Jugador jugador3 = givenDadoQueTengoUnJugador("Juan", "Delantero", "Mediocampista", "B");
+    Jugador jugador1 = givenDadoQueTengoUnJugador(
+      "Pedro",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "B"
+    );
+    Jugador jugador2 = givenDadoQueTengoUnJugador(
+      "Ivan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "A"
+    );
+    Jugador jugador3 = givenDadoQueTengoUnJugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "B"
+    );
 
     Partido partido1 = givenDadoQueTengoUnPartido("B", false, LocalDateTime.of(2026, 10, 9, 23, 0));
     Partido partido2 = givenDadoQueTengoUnPartido("A", false, LocalDateTime.of(2026, 10, 9, 22, 0));
@@ -375,9 +446,24 @@ public class RepositorioEstadisticasTest {
   @Rollback
   @Test
   public void dadoQueTengoJugadoresDeDistintosPosicionesDebeRetornarSoloLosDeLaProsicion1() {
-    Jugador jugador1 = givenDadoQueTengoUnJugador("Pedro", "Delantero", "Mediocampista", "B");
-    Jugador jugador2 = givenDadoQueTengoUnJugador("Ivan", "Defensor", "Mediocampista", "A");
-    Jugador jugador3 = givenDadoQueTengoUnJugador("Juan", "Arquero", "Mediocampista", "B");
+    Jugador jugador1 = givenDadoQueTengoUnJugador(
+      "Pedro",
+      PosicionJugador.ARQUERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "B"
+    );
+    Jugador jugador2 = givenDadoQueTengoUnJugador(
+      "Ivan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "A"
+    );
+    Jugador jugador3 = givenDadoQueTengoUnJugador(
+      "Juan",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "B"
+    );
 
     Partido partido1 = givenDadoQueTengoUnPartido("B", false, LocalDateTime.of(2026, 10, 9, 23, 0));
     Partido partido2 = givenDadoQueTengoUnPartido("A", false, LocalDateTime.of(2026, 10, 9, 22, 0));
@@ -428,7 +514,7 @@ public class RepositorioEstadisticasTest {
 
     List<Jugador> jugadoresFiltrados = repositorioJugador.buscarRankingFiltrado(
       null,
-      "Arquero",
+      PosicionJugador.ARQUERO,
       null,
       null,
       null
@@ -444,7 +530,12 @@ public class RepositorioEstadisticasTest {
   @Rollback
   public void deberiaGuardarUnaEstadisticaDeJugadorLocal() {
     // Given
-    Jugador jugador = givenDadoQueTengoUnJugador("Pedro", "Delantero", "Mediocampista", "B");
+    Jugador jugador = givenDadoQueTengoUnJugador(
+      "Pedro",
+      PosicionJugador.DELANTERO,
+      PosicionJugador.MEDIOCAMPISTA,
+      "B"
+    );
 
     Partido partido = givenDadoQueTengoUnPartido("B", false, LocalDateTime.of(2026, 10, 20, 20, 0));
 
@@ -489,8 +580,8 @@ public class RepositorioEstadisticasTest {
 
   private Jugador givenDadoQueTengoUnJugador(
     String nombre,
-    String posicion1,
-    String posicion2,
+    PosicionJugador posicion1,
+    PosicionJugador posicion2,
     String nivel
   ) {
     Jugador jugador = new Jugador(nombre, posicion1, posicion2, nivel);

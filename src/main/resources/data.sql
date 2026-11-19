@@ -9,6 +9,31 @@ SELECT 'test@unlam.edu.ar', 'test', 'ADMIN', true
     SELECT 1 FROM Usuario WHERE email = 'test@unlam.edu.ar'
 );
 
+INSERT IGNORE INTO usuario (id, dni, email, nickname, password, rol, zona) VALUES
+                                                                        (2, 45395728, 'juan@gmail.com', 'Juancito', '1234', NULL, 'Laferrere'),
+                                                                        (3, 44395728, 'juan2@gmail.com', 'Robertito', '1234', NULL, 'Laferrere'),
+                                                                        (4, 43395728, 'juan3@gmail.com', 'Tomasito', '1234', NULL, 'Laferrere'),
+                                                                        (5, 42395728, 'juan4@gmail.com', 'Alansito', '1234', NULL, 'Laferrere'),
+                                                                        (6, 41395728, 'juan5@gmail.com', 'Axelito', '1234', NULL, 'Laferrere'),
+                                                                        (7, 40395728, 'juan6@gmail.com', 'Santiaguito', '1234', NULL, 'Laferrere'),
+                                                                        (8, 39395728, 'juan7@gmail.com', 'Andisito', '1234', NULL, 'Laferrere'),
+                                                                        (9, 38395728, 'juan8@gmail.com', 'Ezequielito', '1234', NULL, 'Laferrere'),
+                                                                        (10, 37395728, 'juan9@gmail.com', 'Lucasito', '1234', NULL, 'Laferrere'),
+                                                                        (11, 36395728, 'juan10@gmail.com', 'Jorgito', '1234', NULL, 'Laferrere');
+
+
+INSERT IGNORE INTO jugador (id, puntos, partidosGanados, partidosJugados, partidosPerdidos, fotoPosicionX, fotoPosicionY, nivel, nombre, posicion1, posicion2, usuario_id, foto) VALUES
+                                                                                                                                                                              (7, 7, 0, 0, 0, 50, 50, 'D', 'juan', 'MEDIOCAMPISTA', 'ARQUERO', 2, NULL),
+                                                                                                                                                                              (8, 8, 0, 0, 0, 50, 50, 'D', 'roberto', 'MEDIOCAMPISTA', 'ARQUERO', 3, NULL),
+                                                                                                                                                                              (9, 3, 0, 0, 0, 50, 50, 'D', 'tomas', 'MEDIOCAMPISTA', 'DEFENSOR', 4, NULL),
+                                                                                                                                                                              (10, 0, 0, 0, 0, 50, 50, 'D', 'alan', 'MEDIOCAMPISTA', 'DELANTERO', 5, NULL),
+                                                                                                                                                                              (11, 12, 0, 0, 0, 50, 50, 'C', 'axel', 'DELANTERO', 'MEDIOCAMPISTA', 6, NULL),
+                                                                                                                                                                              (12, 16, 0, 0, 0, 50, 50, 'C', 'santiago', 'DELANTERO', 'DEFENSOR', 7, NULL),
+                                                                                                                                                                              (13, 1, 0, 0, 0, 50, 50, 'D', 'andy', 'DELANTERO', 'DEFENSOR', 8, NULL),
+                                                                                                                                                                              (14, 15, 0, 0, 0, 50, 50, 'C', 'ezequiel', 'MEDIOCAMPISTA', 'DEFENSOR', 9, NULL),
+                                                                                                                                                                              (15, 12, 0, 0, 0, 50, 50, 'C', 'lucas', 'DELANTERO', 'ARQUERO', 10, NULL),
+                                                                                                                                                                              (16, 14, 0, 0, 0, 50, 50, 'C', 'lucas', 'DELANTERO', 'DEFENSOR', 11, NULL);
+
 -- Canchas de ejemplo (no son usuarios).
 INSERT INTO Cancha (nombre, localidad, latitud, longitud, imagen_url)
 SELECT 'Cancha Los Leones', 'San Justo', -34.6798, -58.5608, 'uploads/canchas/cancha1.jpg'
@@ -37,10 +62,25 @@ SELECT 'Cancha El Fortin', 'Ramos Mejia', -34.6460, -58.5600, 'uploads/canchas/c
 -- Perfil asociado al usuario Test.
 INSERT INTO Jugador (nombre, posicion1, posicion2, puntos, nivel, usuario_id,
                      partidosJugados, partidosGanados, partidosPerdidos)
-SELECT 'Jugador Test', 'Delantero', 'Mediocampista', 60, 'A', u.id, 3, 2, 1
+
+SELECT 'Jugador Test', 'DELANTERO', 'MEDIOCAMPISTA', 60, 'A', u.id, 3, 2, 1
 FROM Usuario u
 WHERE u.email = 'test@unlam.edu.ar'
   AND NOT EXISTS (SELECT 1 FROM Jugador j WHERE j.usuario_id = u.id);
+
+-- Valores iniciales del jugador de prueba.
+-- Los 81 puntos quedan precargados solo para este escenario de desarrollo.
+UPDATE Jugador
+SET puntos = 81,
+    nivel = 'S',
+    partidosJugados = 3,
+    partidosGanados = 2,
+    partidosPerdidos = 0
+WHERE usuario_id = (
+    SELECT id
+    FROM Usuario
+    WHERE email = 'test@unlam.edu.ar'
+);
 
 -- Equipos del unico partido historico de ejemplo.
 INSERT INTO equipo (nombre)
@@ -70,7 +110,59 @@ WHERE u.email = 'test@unlam.edu.ar'
     WHERE p.organizador_id = u.id AND p.fecha = '2026-10-30 20:00:00'
 );
 
+-- Segundo partido finalizado de octubre.
+INSERT INTO Partido (
+    nivel, esPrivado, fecha, cancha_id, cupoMaximo, codigoDeAcceso,
+    distancia, cantJugadores, estado, estadoEstadisticas,
+    organizador_id, equipo1_id, equipo2_id
+)
+SELECT
+    'A', false, '2026-10-23 20:00:00', c.id, 6, NULL,
+    0, 6, 'FINALIZADO', 'CONFIRMADA', u.id, e1.id, e2.id
+FROM Usuario u
+         JOIN Cancha c ON c.nombre = 'Cancha Los Leones' AND c.localidad = 'San Justo'
+         JOIN equipo e1 ON e1.nombre = 'Los Testers'
+         JOIN equipo e2 ON e2.nombre = 'Los Devs'
+WHERE u.email = 'test@unlam.edu.ar'
+  AND NOT EXISTS (
+    SELECT 1 FROM Partido p
+    WHERE p.organizador_id = u.id AND p.fecha = '2026-10-23 20:00:00'
+);
+
 -- Inscripcion del Jugador Test en ese partido.
+
+SET @jugador_test = (
+    SELECT id FROM Jugador
+    WHERE usuario_id = (
+        SELECT id FROM Usuario WHERE email = 'test@unlam.edu.ar'
+    )
+);
+
+SET @equipo_testers = (
+    SELECT id FROM equipo WHERE nombre = 'Los Testers'
+);
+
+-- Eliminar estadisticas historicas precargadas que no pertenecen a un partido.
+-- Las estadisticas del perfil se obtienen exclusivamente de partidos.
+DELETE FROM Estadistica
+WHERE jugador_id = @jugador_test
+  AND partido_id IS NULL;
+
+SET @partido_test = (
+    SELECT id FROM Partido
+    WHERE fecha = '2026-10-30 20:00:00'
+      AND organizador_id = (
+          SELECT id FROM Usuario WHERE email = 'test@unlam.edu.ar'
+      )
+);
+
+SET @partido_test_2 = (
+    SELECT id FROM Partido
+    WHERE fecha = '2026-10-23 20:00:00'
+      AND organizador_id = (
+          SELECT id FROM Usuario WHERE email = 'test@unlam.edu.ar'
+      )
+);
 
 INSERT INTO InscripcionPartido (
     partido_id,
@@ -81,28 +173,242 @@ INSERT INTO InscripcionPartido (
     fechaInscripcion,
     recordatorioEnviado
 )
-VALUES (
-           @partido_test,
-           @jugador_test,
-           @equipo_testers,
-           true,
-           true,
-           '2026-10-29 18:00:00',
-           false
-       );
+SELECT
+    p.id,
+    j.id,
+    e.id,
+    true,
+    true,
+    '2026-10-29 18:00:00',
+    false
 
+FROM Partido p
+         JOIN Usuario u ON p.organizador_id = u.id AND u.email = 'test@unlam.edu.ar'
+         JOIN Jugador j ON j.usuario_id = u.id
+         JOIN equipo e ON e.nombre = 'Los Testers'
+WHERE p.fecha = '2026-10-30 20:00:00'
+  AND NOT EXISTS (
+    SELECT 1 FROM InscripcionPartido ip
+    WHERE ip.partido_id = p.id
+      AND ip.jugador_id = j.id
+);
 
--- Estadistica individual para el historial del partido, sin duplicarla.
+-- Inscripcion del jugador en el segundo partido de octubre.
+INSERT INTO InscripcionPartido (
+    partido_id,
+    jugador_id,
+    equipo_id,
+    confirmado,
+    esCapitan,
+    fechaInscripcion,
+    recordatorioEnviado
+)
+SELECT
+    p.id,
+    j.id,
+    e.id,
+    true,
+    true,
+    '2026-10-22 18:00:00',
+    false
+FROM Partido p
+JOIN Usuario u ON p.organizador_id = u.id
+JOIN Jugador j ON j.usuario_id = u.id
+JOIN equipo e ON e.nombre = 'Los Testers'
+WHERE u.email = 'test@unlam.edu.ar'
+  AND p.fecha = '2026-10-23 20:00:00'
+  AND NOT EXISTS (
+    SELECT 1 FROM InscripcionPartido ip
+    WHERE ip.partido_id = p.id
+      AND ip.jugador_id = j.id
+);
+
+-- Crear la estadistica del primer partido si todavia no existe.
 INSERT INTO Estadistica (
     goles, asistencias, amarillas, rojas, puntaje, jugador_id, partido_id
 )
 SELECT 1, 1, 0, 0, 9, j.id, p.id
 FROM Partido p
-         JOIN Usuario u ON p.organizador_id = u.id
-         JOIN Jugador j ON j.usuario_id = u.id
+JOIN Usuario u ON p.organizador_id = u.id
+JOIN Jugador j ON j.usuario_id = u.id
 WHERE u.email = 'test@unlam.edu.ar'
   AND p.fecha = '2026-10-30 20:00:00'
   AND NOT EXISTS (
     SELECT 1 FROM Estadistica es
     WHERE es.jugador_id = j.id AND es.partido_id = p.id
 );
+
+-- Mantener los datos del primer partido aunque la estadistica ya existiera.
+UPDATE Estadistica es
+JOIN Partido p ON p.id = es.partido_id
+SET es.goles = 1, es.asistencias = 1, es.amarillas = 0, es.rojas = 0, es.puntaje = 9
+WHERE es.jugador_id = @jugador_test
+  AND p.fecha = '2026-10-30 20:00:00';
+
+INSERT INTO Estadistica (
+    goles, asistencias, amarillas, rojas, puntaje, jugador_id, partido_id
+)
+SELECT 0, 1, 0, 0, 7, j.id, p.id
+FROM Partido p
+         JOIN Usuario u ON p.organizador_id = u.id
+         JOIN Jugador j ON j.usuario_id = u.id
+WHERE u.email = 'test@unlam.edu.ar'
+  AND p.fecha = '2026-10-23 20:00:00'
+  AND NOT EXISTS (
+    SELECT 1 FROM Estadistica es
+    WHERE es.jugador_id = j.id AND es.partido_id = p.id
+);
+-- Mantener los datos del segundo partido aunque la estadistica ya existiera.
+UPDATE Estadistica es
+JOIN Partido p ON p.id = es.partido_id
+SET es.goles = 0, es.asistencias = 1, es.amarillas = 0, es.rojas = 0, es.puntaje = 7
+WHERE es.jugador_id = @jugador_test
+  AND p.fecha = '2026-10-23 20:00:00';
+
+-- Resultado del primer partido: victoria de Los Testers (2 - 1).
+SET @resultado_test = (
+    SELECT resultado_id FROM Partido
+    WHERE id = @partido_test
+);
+
+INSERT INTO Resultado (golesLocal, golesVisitante, fechaRegistro)
+SELECT 2, 1, NOW()
+    WHERE @resultado_test IS NULL;
+
+SET @resultado_test = IFNULL(@resultado_test, LAST_INSERT_ID());
+
+UPDATE Partido
+SET resultado_id = @resultado_test
+WHERE id = @partido_test
+  AND resultado_id IS NULL;
+
+-- Asegurar el marcador incluso si el resultado ya existia.
+UPDATE Resultado r
+JOIN Partido p ON p.resultado_id = r.id
+SET r.golesLocal = 2, r.golesVisitante = 1
+WHERE p.id = @partido_test;
+
+-- Resultado del segundo partido: derrota de Los Testers (1 - 3).
+SET @resultado_test_2 = (
+    SELECT resultado_id FROM Partido
+    WHERE id = @partido_test_2
+);
+
+INSERT INTO Resultado (golesLocal, golesVisitante, fechaRegistro)
+SELECT 1, 3, NOW()
+    WHERE @resultado_test_2 IS NULL;
+
+SET @resultado_test_2 = IFNULL(@resultado_test_2, LAST_INSERT_ID());
+
+UPDATE Partido
+SET resultado_id = @resultado_test_2
+WHERE id = @partido_test_2
+  AND resultado_id IS NULL;
+
+-- Asegurar el marcador incluso si el resultado ya existia.
+UPDATE Resultado r
+JOIN Partido p ON p.resultado_id = r.id
+SET r.golesLocal = 1, r.golesVisitante = 3
+WHERE p.id = @partido_test_2;
+
+-- Tercer partido finalizado de noviembre: empate.
+INSERT INTO Partido (
+    nivel, esPrivado, fecha, cancha_id, cupoMaximo, codigoDeAcceso,
+    distancia, cantJugadores, estado, estadoEstadisticas,
+    organizador_id, equipo1_id, equipo2_id
+)
+SELECT
+    'A', false, '2026-11-06 20:00:00', c.id, 6, NULL,
+    0, 6, 'FINALIZADO', 'CONFIRMADA', u.id, e1.id, e2.id
+FROM Usuario u
+         JOIN Cancha c ON c.nombre = 'Cancha Los Leones' AND c.localidad = 'San Justo'
+         JOIN equipo e1 ON e1.nombre = 'Los Testers'
+         JOIN equipo e2 ON e2.nombre = 'Los Devs'
+WHERE u.email = 'test@unlam.edu.ar'
+  AND NOT EXISTS (
+    SELECT 1 FROM Partido p
+    WHERE p.organizador_id = u.id AND p.fecha = '2026-11-06 20:00:00'
+);
+
+SET @partido_test_3 = (
+    SELECT id FROM Partido
+    WHERE fecha = '2026-11-06 20:00:00'
+      AND organizador_id = (
+          SELECT id FROM Usuario WHERE email = 'test@unlam.edu.ar'
+      )
+);
+
+INSERT INTO InscripcionPartido (
+    partido_id,
+    jugador_id,
+    equipo_id,
+    confirmado,
+    esCapitan,
+    fechaInscripcion,
+    recordatorioEnviado
+)
+SELECT
+    p.id,
+    j.id,
+    e.id,
+    true,
+    true,
+    '2026-11-05 18:00:00',
+    false
+FROM Partido p
+         JOIN Usuario u ON p.organizador_id = u.id
+         JOIN Jugador j ON j.usuario_id = u.id
+         JOIN equipo e ON e.nombre = 'Los Testers'
+WHERE u.email = 'test@unlam.edu.ar'
+  AND p.fecha = '2026-11-06 20:00:00'
+  AND NOT EXISTS (
+    SELECT 1 FROM InscripcionPartido ip
+    WHERE ip.partido_id = p.id
+      AND ip.jugador_id = j.id
+);
+
+-- Estadistica individual para el historial del tercer partido, sin duplicarla.
+INSERT INTO Estadistica (
+    goles, asistencias, amarillas, rojas, puntaje, jugador_id, partido_id
+)
+SELECT 1, 0, 1, 0, 5, j.id, p.id
+FROM Partido p
+         JOIN Usuario u ON p.organizador_id = u.id
+         JOIN Jugador j ON j.usuario_id = u.id
+WHERE u.email = 'test@unlam.edu.ar'
+  AND p.fecha = '2026-11-06 20:00:00'
+  AND NOT EXISTS (
+    SELECT 1 FROM Estadistica es
+    WHERE es.jugador_id = j.id AND es.partido_id = p.id
+);
+-- Mantener los datos del tercer partido aunque la estadistica ya existiera.
+UPDATE Estadistica es
+JOIN Partido p ON p.id = es.partido_id
+SET es.goles = 1, es.asistencias = 0, es.amarillas = 1, es.rojas = 0, es.puntaje = 5
+WHERE es.jugador_id = @jugador_test
+  AND p.fecha = '2026-11-06 20:00:00';
+
+-- Resultado del tercer partido: empate entre Los Testers y Los Devs (2 - 2).
+SET @resultado_test_3 = (
+    SELECT resultado_id FROM Partido
+    WHERE id = @partido_test_3
+);
+
+INSERT INTO Resultado (golesLocal, golesVisitante, fechaRegistro)
+SELECT 2, 2, NOW()
+    WHERE @resultado_test_3 IS NULL;
+
+SET @resultado_test_3 = IFNULL(@resultado_test_3, LAST_INSERT_ID());
+
+UPDATE Partido
+SET resultado_id = @resultado_test_3
+WHERE id = @partido_test_3
+  AND resultado_id IS NULL;
+
+-- Asegurar el marcador incluso si el resultado ya existia.
+UPDATE Resultado r
+JOIN Partido p ON p.resultado_id = r.id
+SET r.golesLocal = 2, r.golesVisitante = 2
+WHERE p.id = @partido_test_3;
+
+ALTER TABLE Partido MODIFY COLUMN estadoEstadisticas ENUM('PENDIENTE_DE_CARGA', 'EN_REVISION', 'CONFIRMADA', 'RECHAZADA') DEFAULT 'PENDIENTE_DE_CARGA';

@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import com.tallerwebi.dominio.excepcion.InvitacionAlPartidoException;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
 import com.tallerwebi.dominio.repositorio.RepositorioUsuario;
@@ -204,7 +205,7 @@ public class ServicioInvitacionPartidoTest {
 
     Partido partido = givenDadoQueTengoUnPartidoPendiente();
 
-    partido.setEstado(Partido.EstadoPartido.CANCELADO);
+    partido.setEstado(EstadoPartido.CANCELADO);
 
     givenDadoQueTengoUnJugadorConfirmado(partido, juan);
 
@@ -240,7 +241,7 @@ public class ServicioInvitacionPartidoTest {
 
     Partido partido = givenDadoQueTengoUnPartidoPendiente();
 
-    partido.setEstado(Partido.EstadoPartido.ACTIVO);
+    partido.setEstado(EstadoPartido.ACTIVO);
 
     givenDadoQueTengoUnJugadorConfirmado(partido, juan);
 
@@ -306,7 +307,7 @@ public class ServicioInvitacionPartidoTest {
   private Partido givenDadoQueTengoUnPartidoPendiente() {
     Partido partido = new Partido();
 
-    partido.setEstado(Partido.EstadoPartido.PENDIENTE);
+    partido.setEstado(EstadoPartido.PENDIENTE);
 
     return partido;
   }

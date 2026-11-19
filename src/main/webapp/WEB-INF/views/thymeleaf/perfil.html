@@ -13,7 +13,7 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <link rel="stylesheet" th:href="@{/css/perfil.css(v=20261103)}">
+    <link rel="stylesheet" th:href="@{/css/perfil.css(v=${#dates.createNow().time})}">
     <!-- Estilos del Fair Play (copia de perfil.css; borrar este bloque cuando perfil.css se sirva actualizado) -->
     <style>
     /* Fair Play: tarjetas de fútbol ilustradas (roja = expulsiones, amarilla = amonestaciones) */
@@ -148,7 +148,7 @@
                                 th:if="${notificacion.tipoDeNotificacion.name()
                                     == 'INVITACION_PARTIDO'}">
 
-                            <strong>⚽ Invitación a partido</strong>
+                            <strong> Invitación a partido</strong>
 
                             <p
                                     class="mb-1"
@@ -180,7 +180,7 @@
                                 th:if="${notificacion.tipoDeNotificacion.name()
                                     == 'PARTIDO_CANCELADO'}">
 
-                            <strong>❌ Partido cancelado</strong>
+                            <strong> Partido cancelado</strong>
 
                             <p
                                     class="mb-1"
@@ -217,7 +217,7 @@
                                 th:if="${notificacion.tipoDeNotificacion.name()
                                     == 'FORMULARIO_COMPLETADO'}">
 
-                            <strong>📋 Formulario completado</strong>
+                            <strong> Formulario completado</strong>
 
                             <p
                                     class="mb-1"
@@ -226,7 +226,7 @@
 
 
                             <a
-                                    th:href="@{'/partido/' + ${notificacion.partido.id}}"
+                                    th:href="@{'/partido/' + ${notificacion.partido.id}+'/resumen'}"
                                     class="btn btn-sm btn-outline-success mt-1">
 
                                 Ver revisión
@@ -342,7 +342,7 @@
         </a>
 
         <!-- CERRAR SESIÓN (solo en MI perfil) -->
-        <a class="boton-logout" th:if="${esMiPerfil}" th:href="@{/login}"
+        <a class="boton-logout" th:if="${esMiPerfil}" th:href="@{/logout}"
            title="Cerrar sesión" aria-label="Cerrar sesión">
             <i class="fa-solid fa-right-from-bracket"></i>
         </a>
@@ -473,13 +473,13 @@
                 <div class="datos-hero">
 
                     <div class="dato-hero"
-                         th:if="${posicion1 != null and !posicion1.isEmpty()}">
+                         th:if="${posicion1 != null}">
                         <i class="fa-solid fa-futbol"></i>
                         <span th:text="${posicion1}">Posición principal</span>
                     </div>
 
                     <div class="dato-hero"
-                         th:if="${posicion2 != null and !posicion2.isEmpty()}">
+                         th:if="${posicion2 != null}">
                         <i class="fa-solid fa-futbol"></i>
                         <span th:text="${posicion2}">Posición secundaria</span>
                     </div>
@@ -642,6 +642,17 @@
         </div>
 
         <div class="stat-card">
+            <div class="stat-icono empate">
+                <i class="fa-solid fa-handshake"></i>
+            </div>
+            <div>
+                <span class="stat-label">Empates</span>
+                <span class="stat-valor" th:text="${empates}">0</span>
+                <span class="stat-sub">Partidos empatados</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
             <div class="stat-icono">
                 <i class="fa-solid fa-chart-simple"></i>
             </div>
@@ -712,77 +723,117 @@
     <div class="perfil-grid">
 
         <!-- Evolución -->
-
         <div class="pg-evolucion">
-
-            <div class="panel">
-
-                <div class="panel-encabezado">
-                    <span class="panel-icono"><i class="fa-solid fa-chart-column"></i></span>
-                    <h5>Evolución de rendimiento</h5>
+            <section class="panel panel-evolucion" aria-labelledby="titulo-evolucion">
+                <div class="panel-encabezado evolucion-encabezado">
+                    <span class="panel-icono"><i class="fa-solid fa-chart-line"></i></span>
+                    <div class="evolucion-titulos">
+                        <h5 id="titulo-evolucion">Evolución de rendimiento</h5>
+                        <span class="evolucion-subtitulo">Tu promedio de puntos por mes</span>
+                    </div>
+                    <span class="evolucion-anio" th:if="${hayDatosEvolucion}"
+                          th:text="${anioEvolucion}">2026</span>
                 </div>
 
-                <div class="grafico">
+                <div class="evolucion-resumen" th:if="${hayDatosEvolucion}">
+                    <div>
+                        <span class="evolucion-resumen-label">Año analizado</span>
+                        <strong th:text="${anioEvolucion}">2026</strong>
+                    </div>
+                    <div class="evolucion-leyenda">
+                        <span class="evolucion-leyenda-punto"></span>
+                        Promedio mensual
+                    </div>
+                    <div class="evolucion-ayuda"><i class="fa-regular fa-hand-pointer"></i> Pasá por los puntos para ver el detalle</div>
+                </div>
 
-                    <svg viewBox="0 0 520 180" role="img"
-                         aria-label="Gráfico de evolución sin datos">
+                <div class="grafico grafico-evolucion"
+                     th:classappend="${!hayDatosEvolucion} ? ' grafico-sin-datos'">
+                    <svg class="evolucion-svg" viewBox="0 0 520 220" role="img"
+                         preserveAspectRatio="xMidYMid meet"
+                         th:attr="aria-label=${hayDatosEvolucion ? 'Evolución mensual del promedio de puntos, escala de 0 a 15, durante ' + anioEvolucion : 'Todavía no hay datos de evolución'}">
+                        <defs>
+                            <linearGradient id="evolucionArea" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#20a36d" stop-opacity=".24"/>
+                                <stop offset="100%" stop-color="#20a36d" stop-opacity=".015"/>
+                            </linearGradient>
+                            <filter id="evolucionSombra" x="-30%" y="-30%" width="160%" height="160%">
+                                <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#087653" flood-opacity=".18"/>
+                            </filter>
+                        </defs>
 
-                        <g stroke="#dfe7e3" stroke-width="1">
-                            <line x1="34" y1="20" x2="510" y2="20"/>
-                            <line x1="34" y1="46" x2="510" y2="46"/>
-                            <line x1="34" y1="72" x2="510" y2="72"/>
-                            <line x1="34" y1="98" x2="510" y2="98"/>
-                            <line x1="34" y1="124" x2="510" y2="124"/>
-                            <line x1="34" y1="150" x2="510" y2="150"/>
+                        <g class="evolucion-grilla">
+                            <line x1="42" y1="24" x2="506" y2="24"/>
+                            <line x1="42" y1="49" x2="506" y2="49"/>
+                            <line x1="42" y1="74" x2="506" y2="74"/>
+                            <line x1="42" y1="99" x2="506" y2="99"/>
+                            <line x1="42" y1="124" x2="506" y2="124"/>
+                            <line x1="42" y1="149" x2="506" y2="149"/>
                         </g>
 
-                        <g fill="#7b8d86" font-size="11" text-anchor="end">
-                            <text x="26" y="24">10</text>
-                            <text x="26" y="50">8</text>
-                            <text x="26" y="76">6</text>
-                            <text x="26" y="102">4</text>
-                            <text x="26" y="128">2</text>
-                            <text x="26" y="154">0</text>
+                        <g class="evolucion-eje" text-anchor="end">
+                            <text x="33" y="28">15</text>
+                            <text x="33" y="53">12</text>
+                            <text x="33" y="78">9</text>
+                            <text x="33" y="103">6</text>
+                            <text x="33" y="128">3</text>
+                            <text x="33" y="153">0</text>
                         </g>
 
-                        <g fill="#7b8d86" font-size="11" text-anchor="middle">
-                            <text x="56" y="172">Ene</text>
-                            <text x="97" y="172">Feb</text>
-                            <text x="138" y="172">Mar</text>
-                            <text x="179" y="172">Abr</text>
-                            <text x="220" y="172">May</text>
-                            <text x="261" y="172">Jun</text>
-                            <text x="302" y="172">Jul</text>
-                            <text x="343" y="172">Ago</text>
-                            <text x="384" y="172">Sep</text>
-                            <text x="425" y="172">Oct</text>
-                            <text x="466" y="172">Nov</text>
+                        <g class="evolucion-meses" text-anchor="middle">
+                            <text x="56" y="180">Ene</text><text x="95" y="180">Feb</text>
+                            <text x="134" y="180">Mar</text><text x="173" y="180">Abr</text>
+                            <text x="212" y="180">May</text><text x="251" y="180">Jun</text>
+                            <text x="290" y="180">Jul</text><text x="329" y="180">Ago</text>
+                            <text x="368" y="180">Sep</text><text x="407" y="180">Oct</text>
+                            <text x="446" y="180">Nov</text><text x="485" y="180">Dic</text>
                         </g>
 
-                        <line x1="34" y1="150" x2="510" y2="150"
-                              stroke="#9fb3aa" stroke-width="2"
-                              stroke-dasharray="6 6"/>
+                        <line class="evolucion-base" x1="42" y1="149" x2="506" y2="149"/>
+                        <polyline class="evolucion-linea-origen"
+                                  th:if="${hayDatosEvolucion}"
+                                  th:attr="points=${lineaEvolucion}"
+                                  points=""/>
+                        <g class="evolucion-puntos" th:if="${hayDatosEvolucion}">
+                            <circle class="evolucion-punto"
+                                    th:each="punto : ${puntosEvolucion}"
+                                    th:attr="cx=${punto['x']}, cy=${punto['y']},
+                                     data-valor=${punto['puntaje']}"
+                                    r="5.5" tabindex="0" role="img"
+                                    th:attrappend="aria-label=${'Promedio mensual: ' + punto['puntaje'] + ' puntos'}">
+                                <title th:text="${punto['puntaje']} + ' puntos'">Puntaje</title>
+                            </circle>
+                        </g>
 
-                        <text x="272" y="90" text-anchor="middle"
-                              fill="#536762" font-size="13" font-weight="bold">
-                            Sin datos todavía
-                        </text>
-
+                        <g th:unless="${hayDatosEvolucion}" class="evolucion-vacia">
+                            <circle cx="272" cy="91" r="31"/>
+                            <text x="272" y="98" text-anchor="middle">⚽</text>
+                            <text x="272" y="143" text-anchor="middle" class="evolucion-vacia-titulo">Todavía no hay datos</text>
+                            <text x="272" y="162" text-anchor="middle" class="evolucion-vacia-texto">Jugá partidos para empezar a ver tu progreso</text>
+                        </g>
                     </svg>
-
+                    <div class="evolucion-tooltip" role="status" aria-live="polite" hidden>
+                        <span class="tooltip-mes"></span>
+                        <strong><span class="tooltip-valor"></span> <small>pts</small></strong>
+                        <small>Promedio del mes</small>
+                    </div>
                 </div>
 
-                <div class="franja-info">
-                    <i class="fa-solid fa-arrow-trend-up"></i>
-                    Tu evolución aparecerá cuando juegues tus primeros partidos.
+                <div class="franja-info evolucion-pie">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span th:if="${hayDatosEvolucion}"
+                          th:text="${'Se muestra el promedio de puntos de cada mes de ' + anioEvolucion + ', en una escala fija de 0 a 15. Los meses sin partidos no se grafican.'}">
+                        Promedio mensual de puntos.
+                    </span>
+                    <span th:unless="${hayDatosEvolucion}">
+                        Tu evolución aparecerá automáticamente cuando tengas estadísticas de partidos.
+                    </span>
                 </div>
-
-            </div>
-
+            </section>
         </div>
 
 
-        <!-- Ranking por puntos -->
+                <!-- Ranking por puntos -->
 
         <div class="pg-ranking">
 
@@ -951,13 +1002,20 @@
 
         <!-- Últimos partidos -->
 
+        <!-- Últimos partidos -->
+
+
         <div class="pg-partidos" id="partidos">
 
             <div class="panel">
 
                 <div class="panel-encabezado">
-                    <span class="panel-icono"><i class="fa-solid fa-calendar-days"></i></span>
+            <span class="panel-icono">
+                <i class="fa-solid fa-calendar-days"></i>
+            </span>
+
                     <h5>Últimos partidos</h5>
+
                     <a class="panel-link" th:href="@{/partidos}">
                         Ver todos los partidos &rarr;
                     </a>
@@ -965,8 +1023,10 @@
 
                 <div class="tabla-scroll">
 
+                    <!-- Encabezados -->
                     <div class="tabla-partidos-cabecera">
                         <span>FECHA</span>
+                        <span>RESULTADO</span>
                         <span>GOLES</span>
                         <span>ASIST.</span>
                         <span>AMAR.</span>
@@ -974,23 +1034,77 @@
                         <span>PUNTAJE</span>
                     </div>
 
-                    <div class="tabla-partido-fila" th:each="partido : ${historialPartidos}">
-                        <span th:text="${#temporals.format(partido['fecha'], 'dd/MM/yyyy')}"></span>
-                        <span th:text="${partido['goles']}"></span>
-                        <span th:text="${partido['asistencias']}"></span>
-                        <span th:text="${partido['amarillas']}"></span>
-                        <span th:text="${partido['rojas']}"></span>
-                        <span th:text="${partido['puntaje']}"></span>
-                    </div>
+                    <!-- Historial de partidos -->
+                    <a class="tabla-partido-fila text-decoration-none text-dark"
+                       style="cursor: pointer;"
+                       th:each="partido : ${historialPartidos}"
+                       th:href="@{/partido/{id}/resumen(id=${partido['idPartido']})}">
+
+                        <!-- Fecha -->
+                        <span class="celda-fecha"
+                              th:text="${#temporals.format(partido['fecha'], 'dd/MM/yyyy')}">
+                </span>
+
+                        <!-- Resultado y condición -->
+                        <div class="celda-resultado">
+
+                    <span class="celda-marcador"
+                          th:text="${partido['resultado']}">
+                    </span>
+
+                            <span class="resultado-chip"
+                                  th:classappend="${partido['condicion'] == 'Victoria' ? ' ganado' : (partido['condicion'] == 'Derrota' ? ' perdido' : (partido['condicion'] == 'Empate' ? ' empatado' : ' sin-resultado'))}"
+                                  th:text="${partido['condicion']}">
+                    </span>
+
+                        </div>
+
+                        <!-- Goles -->
+                        <span class="celda-num"
+                              th:text="${partido['goles']}">
+                </span>
+
+                        <!-- Asistencias -->
+                        <span class="celda-num"
+                              th:text="${partido['asistencias']}">
+                </span>
+
+                        <!-- Tarjetas amarillas -->
+                        <span class="celda-num celda-amarilla"
+                              th:classappend="${partido['amarillas'] != null and partido['amarillas'] > 0 ? ' activa' : ''}"
+                              th:text="${partido['amarillas']}">
+                </span>
+
+                        <!-- Tarjetas rojas -->
+                        <span class="celda-num celda-roja"
+                              th:classappend="${partido['rojas'] != null and partido['rojas'] > 0 ? ' activa' : ''}"
+                              th:text="${partido['rojas']}">
+                </span>
+
+                        <!-- Puntaje -->
+                        <span class="celda-puntaje">
+                    <b th:text="${partido['puntaje']}"></b>
+                    <small>pts</small>
+                </span>
+
+                    </a>
 
                 </div>
 
-                <div class="actividad-vacia" th:if="${#lists.isEmpty(historialPartidos)}">
+                <!-- Mensaje cuando no existen partidos -->
+                <div class="actividad-vacia"
+                     th:if="${#lists.isEmpty(historialPartidos)}">
+
                     <div class="actividad-icono">
                         <i class="fa-solid fa-futbol"></i>
                     </div>
+
                     <h3>¡Tu próximo partido te espera!</h3>
-                    <p>Próximamente vas a poder visualizar tu actividad deportiva desde acá.</p>
+
+                    <p>
+                        Próximamente vas a poder visualizar tu actividad deportiva desde acá.
+                    </p>
+
                 </div>
 
             </div>
@@ -998,27 +1112,286 @@
         </div>
 
 
+    </div> <!-- Cierre de .perfil-grid -->
+</div> <!-- Cierre de .contenido-ranking -->
+
+
+<!-- ANIMACIÓN DE ASCENSO: solo se renderiza en el perfil propio -->
+<div class="ascenso-overlay"
+     id="modalAscensoRango"
+     th:if="${esMiPerfil}"
+     th:data-jugador="${nickname != null and !nickname.isBlank() ? nickname : nombreJugador}"
+     th:data-rango-actual="${nivel}"
+     aria-hidden="true">
+    <div class="ascenso-confeti" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
     </div>
 
+    <div class="ascenso-destello-fondo" aria-hidden="true"></div>
+    <div class="ascenso-rayos" aria-hidden="true"></div>
+
+    <section class="ascenso-modal"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="ascensoTitulo"
+             aria-describedby="ascensoDescripcion">
+        <div class="ascenso-destello" aria-hidden="true"></div>
+        <span class="ascenso-etiqueta">¡NUEVO RANGO DESBLOQUEADO!</span>
+        <h2 id="ascensoTitulo">¡FELICITACIONES!</h2>
+        <p id="ascensoDescripcion">Tu esfuerzo en la cancha tiene recompensa.</p>
+
+        <div class="ascenso-icono">
+            <i class="fa-solid fa-trophy"></i>
+        </div>
+
+        <span class="ascenso-cambio-label">TU ASCENSO</span>
+        <div class="ascenso-cambio">
+            <span class="ascenso-rango-anterior" id="ascensoRangoAnterior">D</span>
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            <span class="ascenso-rango-nuevo" id="ascensoRangoNuevo">C</span>
+        </div>
+
+        <p class="ascenso-mensaje">¡Subiste de categoría! Cada partido te acerca a tu mejor versión.</p>
+        <button type="button" class="ascenso-continuar" id="continuarAscenso">
+            Seguir creciendo <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </section>
 </div>
 
-
-<footer class="footer">
-    <p class="mb-0">ArmoLaCancha <span>&bull;</span> Conectando jugadores, creando equipos.</p>
-</footer>
+<div th:replace="~{footer :: footer}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js">
 </script>
 
 <script>
+(function () {
+    'use strict';
+
     document.querySelectorAll('.hero-tab').forEach(function (tab) {
         tab.addEventListener('click', function () {
-            document.querySelectorAll('.hero-tab').forEach(function (t) {
-                t.classList.remove('activo');
+            document.querySelectorAll('.hero-tab').forEach(function (item) {
+                item.classList.remove('activo');
             });
             tab.classList.add('activo');
         });
     });
+
+    // Conteo animado de las cifras (goles, partidos, puntos, win rate, etc.)
+    const reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!reduceMotion) {
+        const counters = document.querySelectorAll(
+            '.stat-valor, .vidrio-valor > span');
+
+        counters.forEach(function (el) {
+            if (el.children.length) return;
+            const original = el.textContent.trim();
+            const m = original.match(/^(\d+)(?:([.,])(\d+))?(%?)$/);
+            if (!m) return;
+
+            const decimals = m[3] ? m[3].length : 0;
+            const separator = m[2] || ',';
+            const suffix = m[4] || '';
+            const target = parseFloat(m[1] + (m[3] ? '.' + m[3] : ''));
+            if (!(target > 0)) return;
+
+            const duration = 900;
+            const delay = 250;
+            const start = performance.now() + delay;
+
+            el.textContent = (0).toFixed(decimals).replace('.', separator) + suffix;
+
+            function tick(now) {
+                const t = Math.max(0, Math.min(1, (now - start) / duration));
+                const eased = 1 - Math.pow(1 - t, 3);
+                const value = target * eased;
+                el.textContent = (t >= 1 ? original :
+                    value.toFixed(decimals).replace('.', separator) + suffix);
+                if (t < 1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+        });
+    }
+
+
+    // Ascenso de rango: comparación local entre la última visita y la actual.
+    // Se ejecuta únicamente cuando Thymeleaf renderiza el modal en el perfil propio.
+    const ascensoModal = document.getElementById('modalAscensoRango');
+
+    if (ascensoModal) {
+        const rangoActual = (ascensoModal.dataset.rangoActual || '').trim().toUpperCase();
+        const jugador = (ascensoModal.dataset.jugador || 'jugador').trim().toLowerCase();
+        const claveRango = 'armolacancha.ultimoRango.' + encodeURIComponent(jugador);
+        const ordenRangos = ['D', 'C', 'B', 'A', 'S', 'SS'];
+
+        try {
+            const rangoAnterior = localStorage.getItem(claveRango);
+            const indiceAnterior = ordenRangos.indexOf(rangoAnterior);
+            const indiceActual = ordenRangos.indexOf(rangoActual);
+
+            // Primera visita: se guarda el punto de partida sin mostrar una felicitación.
+            if (indiceActual >= 0 && rangoAnterior === null) {
+                localStorage.setItem(claveRango, rangoActual);
+            } else if (indiceAnterior >= 0 && indiceActual > indiceAnterior) {
+                document.getElementById('ascensoRangoAnterior').textContent = rangoAnterior;
+                document.getElementById('ascensoRangoNuevo').textContent = rangoActual;
+
+                // La animación se muestra al entrar al perfil propio.
+                ascensoModal.classList.add('ascenso-visible');
+                ascensoModal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('ascenso-bloqueo-scroll');
+
+                const botonContinuar = document.getElementById('continuarAscenso');
+                botonContinuar.addEventListener('click', function () {
+                    localStorage.setItem(claveRango, rangoActual);
+                    ascensoModal.classList.remove('ascenso-visible');
+                    ascensoModal.setAttribute('aria-hidden', 'true');
+                    document.body.classList.remove('ascenso-bloqueo-scroll');
+                }, { once: true });
+            } else if (indiceActual >= 0 && indiceAnterior !== indiceActual) {
+                // Si el rango bajó, se actualiza la referencia sin celebrar un ascenso.
+                localStorage.setItem(claveRango, rangoActual);
+            }
+        } catch (error) {
+            // Si el navegador bloquea localStorage, el perfil sigue funcionando normalmente.
+            console.warn('No se pudo consultar el historial local de rango.', error);
+        }
+    }
+
+    const chart = document.querySelector('.grafico-evolucion');
+    if (!chart) return;
+
+    const svg = chart.querySelector('.evolucion-svg');
+    if (!svg) return;
+
+    const sourceLine = svg.querySelector('.evolucion-linea-origen');
+    const points = Array.from(svg.querySelectorAll('.evolucion-punto'));
+    const tooltip = chart.querySelector('.evolucion-tooltip');
+
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+    // Escala fija de 0 a 15. Los valores originales siguen intactos en data-valor.
+    const coordinates = points.map(function (point) {
+        const rawValue = Number(point.getAttribute('data-valor'));
+        const value = Number.isFinite(rawValue) ? Math.max(0, Math.min(15, rawValue)) : 0;
+        const x = Number(point.getAttribute('cx'));
+        const y = 149 - (value / 15) * 125;
+        point.setAttribute('cy', y.toFixed(2));
+        return { x: x, y: y };
+    }).filter(function (point) {
+        return Number.isFinite(point.x) && Number.isFinite(point.y);
+    }).sort(function (a, b) { return a.x - b.x; });
+
+    // Construye la evolución desde el 0 del eje (esquina inferior izquierda)
+    // y sube en diagonal hasta el primer promedio mensual.
+    // Después conecta cada promedio mensual en orden cronológico.
+    if (coordinates.length) {
+        const first = coordinates[0];
+        const originX = 42;   // inicio del eje (x1 de la base)
+        const originY = 149;  // valor 0
+        let pathData = 'M ' + originX + ' ' + originY + ' L ' + first.x + ' ' + first.y;
+
+        for (let i = 1; i < coordinates.length; i++) {
+            const previous = coordinates[i - 1];
+            const current = coordinates[i];
+            const middle = (previous.x + current.x) / 2;
+            pathData += ' C ' + middle + ' ' + previous.y + ', ' + middle + ' ' + current.y +
+                ', ' + current.x + ' ' + current.y;
+        }
+
+        const last = coordinates[coordinates.length - 1];
+        const area = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        area.setAttribute('d', pathData + ' L ' + last.x + ' ' + originY + ' Z');
+        area.setAttribute('class', 'evolucion-area');
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        line.setAttribute('d', pathData);
+        line.setAttribute('class', 'evolucion-trazo');
+        line.setAttribute('pathLength', '1200');
+
+        // Insertar detrás de los puntos para que estos sigan siendo interactivos.
+        const pointsGroup = svg.querySelector('.evolucion-puntos');
+        const insertionPoint = pointsGroup || sourceLine || svg.querySelector('.evolucion-vacia');
+        if (insertionPoint) {
+            svg.insertBefore(area, insertionPoint);
+            svg.insertBefore(line, insertionPoint);
+        } else {
+            svg.appendChild(area);
+            svg.appendChild(line);
+        }
+
+        const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        halo.setAttribute('cx', last.x);
+        halo.setAttribute('cy', last.y);
+        halo.setAttribute('r', '6');
+        halo.setAttribute('class', 'evolucion-halo');
+        if (pointsGroup) {
+            svg.insertBefore(halo, pointsGroup);
+        } else {
+            svg.appendChild(halo);
+        }
+
+        if (sourceLine) sourceLine.setAttribute('display', 'none');
+    }
+
+    if (!points.length || !tooltip) return;
+
+    function showTooltip(point) {
+        const x = Number(point.getAttribute('cx'));
+        const y = Number(point.getAttribute('cy'));
+        const monthIndex = Math.max(0, Math.min(11, Math.round((x - 56) / 39)));
+        const value = point.getAttribute('data-valor') || '0';
+
+        tooltip.querySelector('.tooltip-mes').textContent = monthNames[monthIndex];
+        tooltip.querySelector('.tooltip-valor').textContent =
+            Number(value).toLocaleString('es-AR', { maximumFractionDigits: 2 });
+
+        const chartRect = chart.getBoundingClientRect();
+        const svgRect = svg.getBoundingClientRect();
+        const scaleX = svgRect.width / 520;
+        const scaleY = svgRect.height / 220;
+        const left = (svgRect.left - chartRect.left) + x * scaleX;
+        const top = (svgRect.top - chartRect.top) + y * scaleY;
+
+        tooltip.hidden = false;
+        const maxLeft = Math.max(8, chart.clientWidth - tooltip.offsetWidth - 8);
+        tooltip.style.left = Math.max(8, Math.min(maxLeft, left - tooltip.offsetWidth / 2)) + 'px';
+        tooltip.style.top = Math.max(4, top - tooltip.offsetHeight - 13) + 'px';
+
+        points.forEach(function (item) {
+            item.classList.toggle('punto-seleccionado', item === point);
+        });
+    }
+
+    function hideTooltip() {
+        tooltip.hidden = true;
+        points.forEach(function (point) {
+            point.classList.remove('punto-seleccionado');
+        });
+    }
+
+    points.forEach(function (point) {
+        point.addEventListener('mouseenter', function () { showTooltip(point); });
+        point.addEventListener('focus', function () { showTooltip(point); });
+        point.addEventListener('mouseleave', function () {
+            if (document.activeElement !== point) hideTooltip();
+        });
+        point.addEventListener('blur', hideTooltip);
+        point.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                hideTooltip();
+                point.blur();
+            }
+        });
+    });
+
+    window.addEventListener('resize', hideTooltip, { passive: true });
+})();
 </script>
 
 </body>

@@ -1,9 +1,11 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.Enumeration.PosicionJugador;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import com.tallerwebi.dominio.servicio.ServicioLogin;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Locale;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -58,12 +60,19 @@ public class ControladorLogin {
   public ModelAndView registrarme(
     @ModelAttribute(ATRIBUTO_USUARIO) Usuario usuario,
     @RequestParam("nombreJugador") String nombreJugador,
-    @RequestParam("posicion1") String posicion1,
-    @RequestParam(value = "posicion2", required = false) String posicion2
+    @RequestParam("posicion1") String posicion1Str,
+    @RequestParam(value = "posicion2", required = false) String posicion2Str
   ) {
     Map<String, Object> model = new ModelMap();
 
     try {
+      PosicionJugador posicion1 = PosicionJugador.valueOf(posicion1Str.toUpperCase(Locale.ROOT));
+
+      PosicionJugador posicion2 = null;
+      if (posicion2Str != null && !posicion2Str.trim().isEmpty()) {
+        posicion2 = PosicionJugador.valueOf(posicion2Str.toUpperCase(Locale.ROOT));
+      }
+
       servicioLogin.registrar(usuario, nombreJugador, posicion1, posicion2);
     } catch (UsuarioExistente e) {
       model.put(ATRIBUTO_USUARIO, usuario);
@@ -83,6 +92,14 @@ public class ControladorLogin {
     Map<String, Object> model = new ModelMap();
     model.put(ATRIBUTO_USUARIO, new Usuario());
     return new ModelAndView("nuevo-usuario", model);
+  }
+
+  @RequestMapping(path = "/logout", method = RequestMethod.GET)
+  public ModelAndView cerrarSesion(HttpServletRequest request) {
+    if (request.getSession(false) != null) {
+      request.getSession().invalidate();
+    }
+    return new ModelAndView("redirect:/login");
   }
   /* 
   @RequestMapping(path = "/home", method = RequestMethod.GET)
