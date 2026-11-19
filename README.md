@@ -176,11 +176,13 @@ mvn clean verify
 
 ## ✒️ Integrantes
 
-- **Alan Castellanos**
-- **Axel Gaete**
-- **Tomas Canosa**
-- **Santiago Navarro**
-- **Juan Pablo Caldas**
+
+- ## ✒️ Integrantes 
+* **[Axel Gaete]([https://github.com/BrianArrojas](https://github.com/AxeGaete))** - *Desarrollo front-end y maquetado.*
+* **[Alan Castellanos](https://github.com/Castellanos98Alan)** - *Desarrollo front-end y maquetado.*
+* **[Tomas Canosa]([https://github.com/Garsito22](https://github.com/Salvatorum))** - *Desarrollo front-end y maquetado.*
+* **[Santiago Navarro]([https://github.com/juminio1](https://github.com/santinavarro0705-oss))** - *Desarrollo front-end y maquetado.*
+* **[Juan Pablo Caldas]([https://github.com/Mikaaaaaaaaaaaaaaaaaaaaaaaaa](https://github.com/Juan-Pablo-Caldas))** - *Desarrollo front-end y maquetado.*
 
 ---
 
