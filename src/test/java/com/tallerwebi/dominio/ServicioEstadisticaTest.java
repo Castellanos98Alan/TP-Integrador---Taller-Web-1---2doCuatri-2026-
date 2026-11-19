@@ -3,11 +3,18 @@ package com.tallerwebi.dominio;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.Enumeration.CondicionJugador;
 import com.tallerwebi.dominio.Enumeration.EstadoEstadisticas;
+import com.tallerwebi.dominio.Enumeration.EstadoPartido;
 import com.tallerwebi.dominio.Enumeration.PosicionJugador;
+import com.tallerwebi.dominio.excepcion.ConfirmarEstadisticasNoPermitida;
+import com.tallerwebi.dominio.excepcion.PartidoNoEncontrado;
+import com.tallerwebi.dominio.excepcion.RechazarEstadisticasNoPermitida;
 import com.tallerwebi.dominio.repositorio.RepositorioEstadistica;
 import com.tallerwebi.dominio.repositorio.RepositorioJugador;
 import com.tallerwebi.dominio.repositorio.RepositorioPartido;
@@ -18,6 +25,7 @@ import com.tallerwebi.dominio.servicio.ServicioRanking;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -385,6 +393,248 @@ public class ServicioEstadisticaTest {
 
     // Then
     assertThat(puedeRevisar, is(false));
+  }
+
+  @Test
+  public void puedeCargarEstadisticasDebeRetornarTrueParaOrganizadorConPartidoActivoYPendienteORechazada() {
+    Usuario organizador = crearUsuario(1L, "org@test.com");
+    Partido partido = new Partido();
+    partido.setOrganizador(organizador);
+    partido.setEstado(EstadoPartido.ACTIVO);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.PENDIENTE_DE_CARGA);
+
+    assertThat(servicioEstadistica.puedeCargarEstadisticas(partido, organizador), is(true));
+
+    partido.setEstadoEstadisticas(EstadoEstadisticas.RECHAZADA);
+    assertThat(servicioEstadistica.puedeCargarEstadisticas(partido, organizador), is(true));
+  }
+
+  @Test
+  public void puedeCargarEstadisticasDebeRetornarFalseSiDatosSonNulosONoCumplenCondiciones() {
+    Usuario organizador = crearUsuario(1L, "org@test.com");
+    Usuario otroUsuario = crearUsuario(2L, "otro@test.com");
+    Partido partido = new Partido();
+    partido.setOrganizador(organizador);
+    partido.setEstado(EstadoPartido.ACTIVO);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.PENDIENTE_DE_CARGA);
+
+    assertThat(servicioEstadistica.puedeCargarEstadisticas(null, organizador), is(false));
+    assertThat(servicioEstadistica.puedeCargarEstadisticas(partido, null), is(false));
+    assertThat(servicioEstadistica.puedeCargarEstadisticas(partido, otroUsuario), is(false));
+
+    partido.setEstado(EstadoPartido.FINALIZADO);
+    assertThat(servicioEstadistica.puedeCargarEstadisticas(partido, organizador), is(false));
+
+    partido.setEstado(EstadoPartido.ACTIVO);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.CONFIRMADA);
+    assertThat(servicioEstadistica.puedeCargarEstadisticas(partido, organizador), is(false));
+  }
+
+  @Test
+  public void calcularMarcadorPartidoDebeSumarGolesDeLocalYVisitante() {
+    Equipo local = crearEquipo(100L, "Local");
+    Equipo visitante = crearEquipo(200L, "Visitante");
+    Jugador jLocal = crearJugador(10L, "Local1", crearUsuario(1L, "l@test.com"));
+    Jugador jVisitante = crearJugador(20L, "Vis1", crearUsuario(2L, "v@test.com"));
+
+    Partido partido = new Partido();
+    partido.setEquipo1(local);
+    partido.setEquipo2(visitante);
+    partido.setInscripciones(
+      List.of(crearInscripcion(jLocal, local, true), crearInscripcion(jVisitante, visitante, true))
+    );
+
+    Estadistica estLocal = givenDadoQueTengoUnaEstadistica(2, 0, 0, 0, 0, jLocal, partido);
+    Estadistica estVisitante = givenDadoQueTengoUnaEstadistica(1, 0, 0, 0, 0, jVisitante, partido);
+
+    Map<String, Integer> marcador = servicioEstadistica.calcularMarcadorPartido(
+      partido,
+      List.of(estLocal, estVisitante)
+    );
+
+    assertThat(marcador.get("local"), equalTo(2));
+    assertThat(marcador.get("visitante"), equalTo(1));
+  }
+
+  @Test
+  public void obtenerEstadisticasSeparadasPorEquipoDebeAgruparLocalesYVisitantes() {
+    Equipo local = crearEquipo(100L, "Local");
+    Equipo visitante = crearEquipo(200L, "Visitante");
+    Jugador jLocal = crearJugador(10L, "Local1", crearUsuario(1L, "l@test.com"));
+    Jugador jVisitante = crearJugador(20L, "Vis1", crearUsuario(2L, "v@test.com"));
+
+    Partido partido = new Partido();
+    partido.setEquipo1(local);
+    partido.setEquipo2(visitante);
+    partido.setInscripciones(
+      List.of(crearInscripcion(jLocal, local, true), crearInscripcion(jVisitante, visitante, true))
+    );
+
+    Estadistica estLocal = givenDadoQueTengoUnaEstadistica(1, 0, 0, 0, 0, jLocal, partido);
+    Estadistica estVisitante = givenDadoQueTengoUnaEstadistica(0, 1, 0, 0, 0, jVisitante, partido);
+
+    Map<String, List<Estadistica>> separadas =
+      servicioEstadistica.obtenerEstadisticasSeparadasPorEquipo(
+        partido,
+        List.of(estLocal, estVisitante)
+      );
+
+    assertThat(separadas.get("locales").size(), equalTo(1));
+    assertThat(separadas.get("visitantes").size(), equalTo(1));
+  }
+
+  @Test
+  public void confirmarEstadisticasDebeLanzarExcepcionSiPartidoNoExiste() {
+    when(repositorioPartidoMock.buscarPorId(99L)).thenReturn(null);
+
+    assertThrows(
+      PartidoNoEncontrado.class,
+      () -> servicioEstadistica.confirmarEstadisticas(99L, crearUsuario(1L, "u@test.com"))
+    );
+  }
+
+  @Test
+  public void confirmarEstadisticasDebeLanzarExcepcionSiUsuarioNoPuedeRevisar() {
+    Partido partido = new Partido();
+    partido.setId(1L);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.PENDIENTE_DE_CARGA);
+
+    when(repositorioPartidoMock.buscarPorId(1L)).thenReturn(partido);
+
+    assertThrows(
+      ConfirmarEstadisticasNoPermitida.class,
+      () -> servicioEstadistica.confirmarEstadisticas(1L, crearUsuario(2L, "u@test.com"))
+    );
+  }
+
+  @Test
+  public void confirmarEstadisticasDebeActualizarPuntajesHistorialYFinalizarPartido() {
+    Usuario uOrg = crearUsuario(1L, "org@test.com");
+    Usuario uCapRival = crearUsuario(2L, "rival@test.com");
+    Jugador jOrg = crearJugador(10L, "Org", uOrg);
+    Jugador jCapRival = crearJugador(20L, "Rival", uCapRival);
+    Equipo local = crearEquipo(100L, "Local");
+    Equipo visitante = crearEquipo(200L, "Visitante");
+
+    Partido partido = new Partido();
+    partido.setId(1L);
+    partido.setOrganizador(uOrg);
+    partido.setEquipo1(local);
+    partido.setEquipo2(visitante);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.EN_REVISION);
+    partido.setInscripciones(
+      List.of(crearInscripcion(jOrg, local, true), crearInscripcion(jCapRival, visitante, true))
+    );
+
+    Estadistica estLocal = givenDadoQueTengoUnaEstadistica(2, 1, 0, 0, 0, jOrg, partido);
+    Estadistica estVisitante = givenDadoQueTengoUnaEstadistica(1, 0, 1, 0, 0, jCapRival, partido);
+
+    when(repositorioPartidoMock.buscarPorId(1L)).thenReturn(partido);
+    when(repositorioJugadorMock.buscarPorUsuarioId(1L)).thenReturn(jOrg);
+    when(repositorioJugadorMock.buscarPorUsuarioId(2L)).thenReturn(jCapRival);
+    when(repositorioEstadisticaMock.buscarTodasLasEstadisticasPorPartido(partido))
+      .thenReturn(List.of(estLocal, estVisitante));
+    when(servicioRankingMock.calcularNivel(anyInt())).thenReturn("B");
+
+    servicioEstadistica.confirmarEstadisticas(1L, uCapRival);
+
+    assertThat(partido.getEstadoEstadisticas(), equalTo(EstadoEstadisticas.CONFIRMADA));
+    assertThat(partido.getEstado(), equalTo(EstadoPartido.FINALIZADO));
+    assertThat(estLocal.getCondicion(), equalTo(CondicionJugador.LOCAL));
+    assertThat(estVisitante.getCondicion(), equalTo(CondicionJugador.VISITANTE));
+    assertThat(jOrg.getPartidosGanados(), equalTo(1));
+    assertThat(jCapRival.getPartidosPerdidos(), equalTo(1));
+    verify(repositorioPartidoMock, times(1)).guardar(partido);
+    verify(servicioNotificacionMock, times(1)).notificarFormularioCompletado(uOrg, partido);
+  }
+
+  @Test
+  public void confirmarEstadisticasDebeSumarDosPuntosPorEmpate() {
+    Usuario uOrg = crearUsuario(1L, "org@test.com");
+    Usuario uCapRival = crearUsuario(2L, "rival@test.com");
+    Jugador jOrg = crearJugador(10L, "Org", uOrg);
+    Jugador jCapRival = crearJugador(20L, "Rival", uCapRival);
+    Equipo local = crearEquipo(100L, "Local");
+    Equipo visitante = crearEquipo(200L, "Visitante");
+
+    Partido partido = new Partido();
+    partido.setId(1L);
+    partido.setOrganizador(uOrg);
+    partido.setEquipo1(local);
+    partido.setEquipo2(visitante);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.EN_REVISION);
+    partido.setInscripciones(
+      List.of(crearInscripcion(jOrg, local, true), crearInscripcion(jCapRival, visitante, true))
+    );
+
+    Estadistica estLocal = givenDadoQueTengoUnaEstadistica(1, 0, 0, 0, 0, jOrg, partido);
+    Estadistica estVisitante = givenDadoQueTengoUnaEstadistica(1, 0, 0, 0, 0, jCapRival, partido);
+
+    when(repositorioPartidoMock.buscarPorId(1L)).thenReturn(partido);
+    when(repositorioJugadorMock.buscarPorUsuarioId(1L)).thenReturn(jOrg);
+    when(repositorioJugadorMock.buscarPorUsuarioId(2L)).thenReturn(jCapRival);
+    when(repositorioEstadisticaMock.buscarTodasLasEstadisticasPorPartido(partido))
+      .thenReturn(List.of(estLocal, estVisitante));
+    when(servicioRankingMock.calcularNivel(anyInt())).thenReturn("C");
+
+    servicioEstadistica.confirmarEstadisticas(1L, uCapRival);
+
+    assertThat(estLocal.getPuntaje(), equalTo(4)); // 2 por empate + 2 por 1 gol
+    assertThat(jOrg.getPartidosJugados(), equalTo(1));
+  }
+
+  @Test
+  public void rechazarEstadisticasDebeLanzarExcepcionSiPartidoNoExiste() {
+    when(repositorioPartidoMock.buscarPorId(99L)).thenReturn(null);
+
+    assertThrows(
+      PartidoNoEncontrado.class,
+      () -> servicioEstadistica.rechazarEstadisticas(99L, crearUsuario(1L, "u@test.com"))
+    );
+  }
+
+  @Test
+  public void rechazarEstadisticasDebeLanzarExcepcionSiUsuarioNoPuedeRevisar() {
+    Partido partido = new Partido();
+    partido.setId(1L);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.PENDIENTE_DE_CARGA);
+
+    when(repositorioPartidoMock.buscarPorId(1L)).thenReturn(partido);
+
+    assertThrows(
+      RechazarEstadisticasNoPermitida.class,
+      () -> servicioEstadistica.rechazarEstadisticas(1L, crearUsuario(2L, "u@test.com"))
+    );
+  }
+
+  @Test
+  public void rechazarEstadisticasDebeCambiarEstadoARechazadaYNotificar() {
+    Usuario uOrg = crearUsuario(1L, "org@test.com");
+    Usuario uCapRival = crearUsuario(2L, "rival@test.com");
+    Jugador jOrg = crearJugador(10L, "Org", uOrg);
+    Jugador jCapRival = crearJugador(20L, "Rival", uCapRival);
+    Equipo local = crearEquipo(100L, "Local");
+    Equipo visitante = crearEquipo(200L, "Visitante");
+
+    Partido partido = new Partido();
+    partido.setId(1L);
+    partido.setOrganizador(uOrg);
+    partido.setEquipo1(local);
+    partido.setEquipo2(visitante);
+    partido.setEstadoEstadisticas(EstadoEstadisticas.EN_REVISION);
+    partido.setInscripciones(
+      List.of(crearInscripcion(jOrg, local, true), crearInscripcion(jCapRival, visitante, true))
+    );
+
+    when(repositorioPartidoMock.buscarPorId(1L)).thenReturn(partido);
+    when(repositorioJugadorMock.buscarPorUsuarioId(1L)).thenReturn(jOrg);
+    when(repositorioJugadorMock.buscarPorUsuarioId(2L)).thenReturn(jCapRival);
+
+    servicioEstadistica.rechazarEstadisticas(1L, uCapRival);
+
+    assertThat(partido.getEstadoEstadisticas(), equalTo(EstadoEstadisticas.RECHAZADA));
+    verify(repositorioPartidoMock, times(1)).guardar(partido);
+    verify(servicioNotificacionMock, times(1)).notificarFormularioCompletado(uOrg, partido);
   }
 
   private Usuario crearUsuario(Long id, String email) {
